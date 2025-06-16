@@ -29,30 +29,7 @@ resolveDataUrl() {
 isGitHubPages() {
     return window.location.host.includes('github.io');
 }
-    async saveDataToFile() {
-    try {
-        // 1. Prepare the data to save
-        const dataToSave = {
-            bets: this.bets,
-            gameData: this.gameData
-        };
-        
-        // 2. Create a download link for the user
-        const dataStr = "data:text/json;charset=utf-8," + 
-                       encodeURIComponent(JSON.stringify(dataToSave, null, 2));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "bets.json");
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-        
-        console.log("Data prepared for download");
-    } catch (error) {
-        console.error("Error saving data:", error);
-        alert("Error saving data. Check console for details.");
-    }
-}
+
 getDefaultBets() {
     return [
         {
