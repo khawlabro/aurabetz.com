@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetSmart - Daily Sports Betting Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="flex justify-between items-center">
+                <h1>BetSmart</h1>
+                <div class="flex items-center gap-3">
+                    <button id="theGameBtn" class="btn btn-primary gap-2">
+                        <i class="fas fa-gem"></i>
+                        <span>The Game</span>
+                    </button>
+                    <button id="adminBtn" class="btn btn-primary gap-2">
+                        <i class="fas fa-lock"></i>
+                        <span>Admin</span>
+                    </button>
+                    <button id="darkModeToggle" class="btn-icon dark-mode-toggle">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun hidden"></i>
+                    </button>
+                </div>
+            </div>
+            <p>Find today's best betting opportunities</p>
+        </header>
+
+        <!-- Sports Filter Tabs -->
+        <div class="tabs" id="sportTabs">
+            <button class="tab tab-active" data-sport="All Sports">All Sports</button>
+            <button class="tab tab-inactive" data-sport="UFC">UFC</button>
+            <button class="tab tab-inactive" data-sport="NHL">NHL</button>
+            <button class="tab tab-inactive" data-sport="NBA">NBA</button>
+            <button class="tab tab-inactive" data-sport="Soccer">Soccer</button>
+            <button class="tab tab-inactive" data-sport="Table Tennis">Table Tennis</button>
+        </div>
+
+        <!-- Filters and Sorting -->
+        <div class="filters">
+            <div class="flex items-center gap-2">
+                <span>Sort by:</span>
+                <select id="sortOptions">
+                    <option value="value">Best Value</option>
+                    <option value="odds">Best Odds</option>
+                    <option value="confidence">Highest Confidence</option>
+                    <option value="time">Start Time</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="highValueOnly">
+                    <span>Show Only High Value</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Bets Grid -->
+        <div id="betsContainer" class="bets-grid"></div>
+    </div>
+
+    <!-- Modal for Detailed View -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle" class="modal-title"></h2>
+                <button id="closeModal" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modalContent" class="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- The Game Modal -->
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title flex items-center gap-2">
+                    <i class="fas fa-gem text-primary"></i>
+                    The Game: 9-Day Challenge
+                </h2>
+                <button id="closeGameModal" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="grid">
+                    <!-- Left Side: The Progress Tree -->
+                    <div>
+                        <div class="progress-tree-container">
+                            <h3>Your Progress Tree</h3>
+                            <div class="diamond-tree">
+                                <!-- Diamond 9 (top) -->
+                                <div class="diamond-container">
+                                    <div class="diamond diamond-9" data-day="9">
+                                        <span>9</span>
+                                    </div>
+                                    <div class="diamond-label">Day 9: $500+</div>
+                                </div>
+                                
+                                <!-- Diamond 8 & 7 -->
+                                <div class="diamond-row">
+                                    <div class="diamond-container">
+                                        <div class="diamond diamond-8" data-day="8">
+                                            <span>8</span>
+                                        </div>
+                                        <div class="diamond-label">Day 8: $350</div>
+                                    </div>
+                                    <div class="diamond-container">
+                                        <div class="diamond diamond-7" data-day="7">
+                                            <span>7</span>
+                                        </div>
+                                        <div class="diamond-label">Day 7: $225</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Diamond 6 & 5 -->
+                                <div class="diamond-row">
+                                    <div class="diamond-container">
+                                        <div class="diamond diamond-6" data-day="6">
+                                            <span>6</span>
+                                        </div>
+                                        <div class="diamond-label">Day 6: $150</div>
+                                    </div>
+                                    <div class="diamond-container">
+                                        <div class="diamond diamond-5" data-day="5">
+                                            <span>5</span>
+                                        </div>
+                                        <div class="diamond-label">Day 5: $100</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Diamond 4 & 3 -->
+                                <div class="diamond-row">
+                                    <div class="diamond-container">
+                                        <div class="diamond diamond-4" data-day="4">
+                                            <span>4</span>
+                                        </div>
+                                        <div class="diamond-label">Day 4: $65</div>
+                                    </div>
+                                    <div class="diamond-container">
+                                        <div class="diamond diamond-3" data-day="3">
+                                            <span>3</span>
+                                        </div>
+                                        <div class="diamond-label">Day 3: $40</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Diamond 2 & 1 (bottom) -->
+                                <div class="diamond-row">
+                                    <div class="diamond-container">
+                                        <div class="diamond diamond-2" data-day="2">
+                                            <span>2</span>
+                                        </div>
+                                        <div class="diamond-label">Day 2: $25</div>
+                                    </div>
+                                    <div class="diamond-container">
+                                        <div class="diamond diamond-1" data-day="1">
+                                            <span>1</span>
+                                        </div>
+                                        <div class="diamond-label">Day 1: $10</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Side: Game Info and Today's Bet -->
+                    <div>
+                        <div class="game-info-section">
+                            <h3>How It Works</h3>
+                            <div class="info-box">
+                                <ul>
+                                    <li><span class="info-label">1 Game Per Day:</span> Bet ONLY on our single daily recommended game.</li>
+                                    <li><span class="info-label">Compound Your Winnings:</span> Start with $10 and reinvest all winnings each day.</li>
+                                    <li><span class="info-label">Track Your Progress:</span> Each win lights up a diamond on your tree.</li>
+                                    <li><span class="info-label">Potential 5-10X Return:</span> Following the system can multiply your initial $10 by 5-10X or more.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="todays-pick-section">
+                            <h3>Today's Pick (Day 2)</h3>
+                            <div class="bet-card">
+                                <div class="bet-header">
+                                    <span class="sport-badge">NHL</span>
+                                    <span class="game-time">Nov 11, 7:00 PM</span>
+                                </div>
+                                <h4>Toronto Maple Leafs vs Montreal Canadiens</h4>
+                                <div class="bet-details">
+                                    <div class="bet-type">
+                                        <span>Puck Line</span>
+                                        <span class="value-badge">Value: 30%</span>
+                                    </div>
+                                    <div class="bet-selection">
+                                        <div>
+                                            <div class="pick">Maple Leafs -1.5</div>
+                                            <div class="odds">+145</div>
+                                        </div>
+                                        <span class="confidence-badge high">High Confidence</span>
+                                    </div>
+                                </div>
+                                <div class="bet-amounts">
+                                    <div>
+                                        <div>Bet Amount:</div>
+                                        <div class="amount">$25.00</div>
+                                    </div>
+                                    <div>
+                                        <div>Potential Profit:</div>
+                                        <div class="profit">+$36.25</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-section">
+                            <h3>Your Progress</h3>
+                            <div class="progress-box">
+                                <div class="progress-item">
+                                    <span>Starting Amount:</span>
+                                    <span class="value">$10.00</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span>Current Amount:</span>
+                                    <span class="value">$25.00</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span>Days Completed:</span>
+                                    <span class="value">1 of 9</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span>Projected Final Amount:</span>
+                                    <span class="final-amount">$500+</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Email Signup Modal -->
+<div id="emailSignupModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">BetSmart</h2>
+            <p>AI-Powered Sports Betting Analysis</p>
+        </div>
+        <div class="modal-body">
+            <h3>Get Access To:</h3>
+            <ul class="features-list">
+                <li>AI-analyzed daily picks with 70%+ win rate</li>
+                <li>Real-time odds comparison across sportsbooks</li>
+                <li>The Game: Turn $10 into $500+ challenge</li>
+                <li>Expert analysis for UFC, NBA, NHL & more</li>
+            </ul>
+
+            <div class="divider"></div>
+
+            <h3>Enter your email address</h3>
+            <input type="email" id="emailInput" class="form-control" placeholder="you@example.com" required>
+            <button id="submitEmailBtn" class="btn btn-primary">Get Free Access</button>
+
+            <p class="privacy-note">
+                <strong>Your email is secure.</strong> No spam, unsubscribe anytime.
+            </p>
+
+            <div class="stats">
+                <span>25,000+ users</span>
+                <span>4.9/5 rating</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="app.js"></script>
+</body>
+</html>
