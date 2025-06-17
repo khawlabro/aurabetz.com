@@ -576,4 +576,32 @@ input[type="checkbox"] {
     justify-content: center;
     margin-top: 1.5rem;
 }
+
+    /* Add these styles to your CSS */
+.bet-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto; /* Pushes footer to bottom */
+    padding-top: 0.5rem;
+}
+
+.view-analysis-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.view-analysis-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+.dark .view-analysis-btn {
+    background-color: var(--primary-dark);
+}
 }
