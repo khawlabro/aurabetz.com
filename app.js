@@ -123,7 +123,34 @@ getDefaultGameData() {
         if (darkModeToggle) {
             darkModeToggle.addEventListener('click', () => this.toggleDarkMode());
         }
+// Subscribe modal events
+const subscribeBtn = document.getElementById('subscribeBtn');
+const closeSubscribeModal = document.getElementById('closeSubscribeModal');
+const subscribeModal = document.getElementById('subscribeModal');
 
+if (subscribeBtn && closeSubscribeModal && subscribeModal) {
+    subscribeBtn.addEventListener('click', () => {
+        subscribeModal.classList.add('active');
+    });
+    
+    closeSubscribeModal.addEventListener('click', () => {
+        subscribeModal.classList.remove('active');
+    });
+    
+    subscribeModal.addEventListener('click', (e) => {
+        if (e.target === subscribeModal) {
+            subscribeModal.classList.remove('active');
+        }
+    });
+    
+    // Payment selection
+    document.querySelectorAll('.payment-select-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const paymentMethod = this.closest('.payment-option').querySelector('h3').textContent;
+            alert(`You selected ${paymentMethod}. More payment details would be shown here.`);
+        });
+    });
+}
 
         // Sport tabs
         const sportTabs = document.querySelectorAll('.tab');
