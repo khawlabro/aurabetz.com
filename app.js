@@ -290,7 +290,7 @@ getDefaultGameData() {
                 </div>
                 <div class="bet-footer">
                     <span class="best-odds">Best Odds: ${this.formatAmericanOdds(Math.max(...bet.sportsbooks.map(sb => sb.odds)))}</span>
-                    <span class="view-analysis">View Analysis</span>
+            <button class="view-analysis-btn">View Analysis</button>
                 </div>
             </div>
         `;
