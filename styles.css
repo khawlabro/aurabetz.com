@@ -218,6 +218,9 @@ input[type="checkbox"] {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     border: 1px solid var(--gray-200);
     transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .dark .bet-card {
@@ -235,20 +238,20 @@ input[type="checkbox"] {
     display: flex;
     justify-content: space-between;
     margin-bottom: 8px;
+    color: var(--gray-700);
 }
 
 .bet-sport {
     font-weight: 600;
-    color: var(--gray-700);
-}
-
-.dark .bet-sport {
-    color: var(--gray-300);
 }
 
 .bet-time {
     color: var(--gray-600);
     font-size: 0.9em;
+}
+
+.dark .bet-header {
+    color: var(--gray-300);
 }
 
 .dark .bet-time {
@@ -259,6 +262,7 @@ input[type="checkbox"] {
     font-size: 1.2em;
     margin: 8px 0;
     color: var(--gray-900);
+    font-weight: 600;
 }
 
 .dark .bet-title {
@@ -317,8 +321,9 @@ input[type="checkbox"] {
 }
 
 .confidence-high {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--secondary);
+    border: 1px solid rgba(40, 167, 69, 0.3);
 }
 
 .confidence-medium {
@@ -333,11 +338,12 @@ input[type="checkbox"] {
 
 .bet-footer {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     margin-top: 12px;
     padding-top: 8px;
     border-top: 1px solid var(--gray-200);
+    gap: 8px;
 }
 
 .dark .bet-footer {
@@ -347,6 +353,7 @@ input[type="checkbox"] {
 .best-odds {
     font-size: 0.9em;
     color: var(--gray-600);
+    margin-right: auto;
 }
 
 .dark .best-odds {
@@ -362,6 +369,8 @@ input[type="checkbox"] {
     font-size: 0.9em;
     cursor: pointer;
     transition: background-color 0.2s;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .view-analysis-btn:hover {
