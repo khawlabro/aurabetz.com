@@ -209,11 +209,11 @@
     {
       "id": 10,
       "sport": "UFC",
-      "event": "asdf",
+      "event": "Mucho vs Bandeto",
       "time": "",
       "mainBet": {
-        "type": "",
-        "pick": "",
+        "type": "Futurama",
+        "pick": "Ballz",
         "odds": null,
         "probability": null,
         "value": null,
