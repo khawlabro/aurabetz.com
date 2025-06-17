@@ -605,3 +605,74 @@ input[type="checkbox"] {
 .dark .stats {
     color: var(--gray-400);
 }
+/* Payment Options Styles */
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.payment-option {
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.2s;
+}
+
+.dark .payment-option {
+    border-color: var(--gray-700);
+}
+
+.payment-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.payment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.payment-icon {
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.payment-details {
+    margin-bottom: 1rem;
+}
+
+.payment-details p {
+    color: var(--gray-600);
+    margin-bottom: 0.5rem;
+}
+
+.dark .payment-details p {
+    color: var(--gray-400);
+}
+
+.payment-details ul {
+    padding-left: 1.25rem;
+    margin: 0.5rem 0;
+}
+
+.payment-details li {
+    margin-bottom: 0.25rem;
+}
+
+.payment-select-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.payment-select-btn:hover {
+    background-color: var(--primary-dark);
+}
