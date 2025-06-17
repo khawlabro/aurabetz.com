@@ -1,12 +1,16 @@
 :root {
     --primary: #5D5CDE;
     --primary-dark: #4d4cc7;
-    --secondary: #4CAF50;
-    --secondary-dark: #3e8e41;
-    --danger: #F44336;
-    --warning: #FFC107;
-    --warning-dark: #e6ac00;
-    --info: #2196F3;
+    --secondary: #28a745;
+    --secondary-dark: #218838;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --warning-dark: #e0a800;
+    --info: #17a2b8;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --white: #ffffff;
+    --black: #000000;
     --gray-100: #f8f9fa;
     --gray-200: #e9ecef;
     --gray-300: #dee2e6;
@@ -16,8 +20,6 @@
     --gray-700: #495057;
     --gray-800: #343a40;
     --gray-900: #212529;
-    --white: #ffffff;
-    --black: #000000;
 }
 
 * {
@@ -41,6 +43,7 @@ body.dark {
     color: var(--gray-100);
 }
 
+/* Container and Layout */
 .container {
     width: 100%;
     max-width: 1200px;
@@ -67,6 +70,7 @@ body.dark {
     color: var(--gray-300);
 }
 
+/* Utility Classes */
 .flex {
     display: flex;
 }
@@ -91,6 +95,7 @@ body.dark {
     display: none;
 }
 
+/* Buttons */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -128,6 +133,7 @@ body.dark {
     color: var(--warning);
 }
 
+/* Tabs */
 .tabs {
     display: flex;
     gap: 0.5rem;
@@ -161,6 +167,7 @@ body.dark {
     color: var(--gray-300);
 }
 
+/* Filters */
 .filters {
     display: flex;
     flex-wrap: wrap;
@@ -197,6 +204,7 @@ input[type="checkbox"] {
     cursor: pointer;
 }
 
+/* Bet Cards */
 .bets-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -205,46 +213,42 @@ input[type="checkbox"] {
 
 .bet-card {
     background-color: var(--white);
-    border-radius: 0.75rem;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s;
-    cursor: pointer;
-    position: relative;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid var(--gray-200);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .dark .bet-card {
     background-color: var(--gray-800);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    border-color: var(--gray-700);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .bet-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.bet-card-content {
-    padding: 1.25rem;
-    position: relative;
+.bet-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
 }
 
 .bet-sport {
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 0.25rem 0.5rem;
-    border-radius: 9999px;
-    background-color: var(--gray-100);
-    color: var(--gray-800);
+    font-weight: 600;
+    color: var(--gray-700);
 }
 
 .dark .bet-sport {
-    background-color: var(--gray-700);
     color: var(--gray-300);
 }
 
 .bet-time {
-    font-size: 0.75rem;
-    color: var(--gray-500);
+    color: var(--gray-600);
+    font-size: 0.9em;
 }
 
 .dark .bet-time {
@@ -252,9 +256,8 @@ input[type="checkbox"] {
 }
 
 .bet-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin: 0.5rem 0;
+    font-size: 1.2em;
+    margin: 8px 0;
     color: var(--gray-900);
 }
 
@@ -262,8 +265,14 @@ input[type="checkbox"] {
     color: var(--white);
 }
 
+.bet-type-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
 .bet-type {
-    font-size: 0.875rem;
+    font-weight: 600;
     color: var(--gray-700);
 }
 
@@ -272,65 +281,98 @@ input[type="checkbox"] {
 }
 
 .bet-value {
-    font-size: 0.875rem;
     font-weight: 600;
 }
 
-.value-high {
-    color: var(--secondary);
+.value-high { color: var(--secondary); }
+.value-medium { color: var(--warning); }
+.value-low { color: var(--gray-500); }
+
+.bet-selection-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
 }
 
-.value-medium {
-    color: var(--warning);
-}
-
-.value-low {
-    color: var(--gray-500);
+.bet-pick-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .bet-pick {
-    font-size: 1.125rem;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .bet-odds {
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .confidence-badge {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 9999px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 500;
 }
 
 .confidence-high {
-    background-color: rgba(74, 222, 128, 0.1);
-    color: var(--secondary);
-}
-
-.dark .confidence-high {
-    background-color: rgba(74, 222, 128, 0.2);
+    background-color: #d4edda;
+    color: #155724;
 }
 
 .confidence-medium {
-    background-color: rgba(251, 191, 36, 0.1);
-    color: var(--warning);
-}
-
-.dark .confidence-medium {
-    background-color: rgba(251, 191, 36, 0.2);
+    background-color: #fff3cd;
+    color: #856404;
 }
 
 .confidence-low {
-    background-color: rgba(156, 163, 175, 0.1);
-    color: var(--gray-500);
+    background-color: #f8f9fa;
+    color: #6c757d;
 }
 
-.dark .confidence-low {
-    background-color: rgba(156, 163, 175, 0.2);
+.bet-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--gray-200);
 }
 
+.dark .bet-footer {
+    border-top-color: var(--gray-700);
+}
+
+.best-odds {
+    font-size: 0.9em;
+    color: var(--gray-600);
+}
+
+.dark .best-odds {
+    color: var(--gray-400);
+}
+
+.view-analysis-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 12px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.view-analysis-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+.dark .view-analysis-btn {
+    background-color: var(--primary-dark);
+}
+
+/* Modals */
 .modal {
     position: fixed;
     top: 0;
@@ -354,7 +396,7 @@ input[type="checkbox"] {
 
 .modal-content {
     background-color: var(--white);
-    border-radius: 0.5rem;
+    border-radius: 8px;
     max-width: 800px;
     width: 90%;
     max-height: 90vh;
@@ -410,133 +452,6 @@ input[type="checkbox"] {
     padding: 1.5rem;
 }
 
-/* Admin Styles */
-.admin-section {
-    margin-bottom: 2rem;
-}
-
-.admin-section h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-}
-
-.admin-actions {
-    margin-bottom: 1.5rem;
-}
-
-.admin-bets-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.admin-bet-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background-color: var(--gray-100);
-    border-radius: 0.5rem;
-}
-
-.dark .admin-bet-item {
-    background-color: var(--gray-700);
-}
-
-.admin-bet-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    flex: 1;
-}
-
-.admin-bet-sport {
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 0.25rem 0.5rem;
-    border-radius: 9999px;
-    background-color: var(--gray-200);
-    color: var(--gray-800);
-    align-self: flex-start;
-    margin-bottom: 0.5rem;
-}
-
-.dark .admin-bet-sport {
-    background-color: var(--gray-600);
-    color: var(--gray-100);
-}
-
-.admin-bet-event {
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-}
-
-.admin-bet-time {
-    font-size: 0.75rem;
-    color: var(--gray-500);
-}
-
-.dark .admin-bet-time {
-    color: var(--gray-400);
-}
-
-.admin-bet-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.edit-bet-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    white-space: nowrap;
-}
-
-/* Admin Form Styles */
-.admin-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.form-group label {
-    font-weight: 500;
-}
-
-.form-control {
-    padding: 0.5rem;
-    border: 1px solid var(--gray-300);
-    border-radius: 0.25rem;
-    font-size: 1rem;
-    width: 100%;
-}
-
-.dark .form-control {
-    background-color: var(--gray-700);
-    border-color: var(--gray-600);
-    color: var(--gray-100);
-}
-
-.form-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 1rem;
-}
-
-.btn-danger {
-    background-color: var(--danger);
-    color: var(--white);
-}
-
-.btn-danger:hover {
-    background-color: #d32f2f;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
     .bets-grid {
@@ -546,62 +461,138 @@ input[type="checkbox"] {
     .modal-content {
         width: 95%;
     }
-    
-    .admin-bet-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .admin-bet-actions {
-        width: 100%;
-        margin-top: 1rem;
-        justify-content: flex-end;
-    }
+}
 
-    .error-message {
-    color: var(--danger);
-    margin-top: 1rem;
+/* Game Modal Specific Styles */
+.progress-tree-container {
+    margin-bottom: 1.5rem;
+}
+
+.diamond-tree {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.diamond-row {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 0.5rem 0;
+}
+
+.diamond-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.diamond {
+    width: 40px;
+    height: 40px;
+    background-color: var(--gray-200);
+    transform: rotate(45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+}
+
+.dark .diamond {
+    background-color: var(--gray-700);
+}
+
+.diamond span {
+    transform: rotate(-45deg);
+    color: var(--gray-700);
+    font-weight: bold;
+}
+
+.dark .diamond span {
+    color: var(--gray-300);
+}
+
+.diamond-label {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+}
+
+.dark .diamond-label {
+    color: var(--gray-400);
+}
+
+.diamond-pulse {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: rotate(45deg) scale(1); }
+    50% { transform: rotate(45deg) scale(1.1); }
+    100% { transform: rotate(45deg) scale(1); }
+}
+
+/* Email Signup Modal */
+#emailSignupModal {
     display: none;
 }
 
-#pinInput {
-    font-size: 1.5rem;
-    letter-spacing: 0.5rem;
-    text-align: center;
-    padding: 0.5rem 1rem;
+#emailSignupModal .modal-content {
+    max-width: 500px;
 }
 
-.form-actions {
+.features-list {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.features-list li {
+    margin-bottom: 0.5rem;
+}
+
+.divider {
+    height: 1px;
+    background-color: var(--gray-200);
+    margin: 1.5rem 0;
+}
+
+.dark .divider {
+    background-color: var(--gray-700);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.dark .form-control {
+    background-color: var(--gray-700);
+    border-color: var(--gray-600);
+    color: var(--gray-100);
+}
+
+.privacy-note {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    margin: 1rem 0;
+}
+
+.dark .privacy-note {
+    color: var(--gray-400);
+}
+
+.stats {
     display: flex;
     justify-content: center;
-    margin-top: 1.5rem;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    margin-top: 1rem;
 }
 
-    /* Add these styles to your CSS */
-.bet-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: auto; /* Pushes footer to bottom */
-    padding-top: 0.5rem;
-}
-
-.view-analysis-btn {
-    background-color: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.view-analysis-btn:hover {
-    background-color: var(--primary-dark);
-}
-
-.dark .view-analysis-btn {
-    background-color: var(--primary-dark);
-}
+.dark .stats {
+    color: var(--gray-400);
 }
