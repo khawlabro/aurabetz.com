@@ -57,7 +57,55 @@
         </div>
 
         <!-- Bets Grid -->
-        <div id="betsContainer" class="bets-grid"></div>
+        <div id="betsContainer" class="bets-grid">
+            <!-- Sample UFC Bet Card -->
+            <div class="bet-card">
+                <div class="bet-header">
+                    <span class="bet-sport">UFC</span>
+                    <span class="bet-time">Jun 1, 7:00 PM</span>
+                </div>
+                <h3 class="bet-title">Islam Makhachev vs Dustin Poirier</h3>
+                <div class="bet-type-row">
+                    <span class="bet-type">Moneyline</span>
+                    <span class="bet-value value-high">Value: 28%</span>
+                </div>
+                <div class="bet-selection-row">
+                    <div class="bet-pick-container">
+                        <span class="bet-pick">Islam Makhachev</span>
+                        <span class="confidence-badge confidence-high">High Confidence</span>
+                    </div>
+                    <span class="bet-odds">-250</span>
+                </div>
+                <div class="bet-footer">
+                    <span class="best-odds">Best Odds: -240</span>
+                    <button class="view-analysis-btn">View Analysis</button>
+                </div>
+            </div>
+
+            <!-- Sample UFC Bet Card 2 -->
+            <div class="bet-card">
+                <div class="bet-header">
+                    <span class="bet-sport">UFC</span>
+                    <span class="bet-time">Jun 14, 7:45 PM</span>
+                </div>
+                <h3 class="bet-title">Ange Loosa vs Philip Rowe</h3>
+                <div class="bet-type-row">
+                    <span class="bet-type">Moneyline</span>
+                    <span class="bet-value value-high">Value: 15%</span>
+                </div>
+                <div class="bet-selection-row">
+                    <div class="bet-pick-container">
+                        <span class="bet-pick">Ange Loosa</span>
+                        <span class="confidence-badge confidence-high">High Confidence</span>
+                    </div>
+                    <span class="bet-odds">-162</span>
+                </div>
+                <div class="bet-footer">
+                    <span class="best-odds">Best Odds: -160</span>
+                    <button class="view-analysis-btn">View Analysis</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Modal for Detailed View -->
@@ -185,32 +233,24 @@
                             <h3>Today's Pick (Day 2)</h3>
                             <div class="bet-card">
                                 <div class="bet-header">
-                                    <span class="sport-badge">NHL</span>
-                                    <span class="game-time">Nov 11, 7:00 PM</span>
+                                    <span class="bet-sport">NHL</span>
+                                    <span class="bet-time">Nov 11, 7:00 PM</span>
                                 </div>
-                                <h4>Toronto Maple Leafs vs Montreal Canadiens</h4>
-                                <div class="bet-details">
-                                    <div class="bet-type">
-                                        <span>Puck Line</span>
-                                        <span class="value-badge">Value: 30%</span>
-                                    </div>
-                                    <div class="bet-selection">
-                                        <div>
-                                            <div class="pick">Maple Leafs -1.5</div>
-                                            <div class="odds">+145</div>
-                                        </div>
-                                        <span class="confidence-badge high">High Confidence</span>
-                                    </div>
+                                <h3 class="bet-title">Toronto Maple Leafs vs Montreal Canadiens</h3>
+                                <div class="bet-type-row">
+                                    <span class="bet-type">Puck Line</span>
+                                    <span class="bet-value value-high">Value: 30%</span>
                                 </div>
-                                <div class="bet-amounts">
-                                    <div>
-                                        <div>Bet Amount:</div>
-                                        <div class="amount">$25.00</div>
+                                <div class="bet-selection-row">
+                                    <div class="bet-pick-container">
+                                        <span class="bet-pick">Maple Leafs -1.5</span>
+                                        <span class="confidence-badge confidence-high">High Confidence</span>
                                     </div>
-                                    <div>
-                                        <div>Potential Profit:</div>
-                                        <div class="profit">+$36.25</div>
-                                    </div>
+                                    <span class="bet-odds">+145</span>
+                                </div>
+                                <div class="bet-footer">
+                                    <span class="best-odds">Best Odds: +140</span>
+                                    <button class="view-analysis-btn">View Analysis</button>
                                 </div>
                             </div>
                         </div>
@@ -242,39 +282,39 @@
         </div>
     </div>
 
-<!-- Email Signup Modal -->
-<div id="emailSignupModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title">BetSmart</h2>
-            <p>AI-Powered Sports Betting Analysis</p>
-        </div>
-        <div class="modal-body">
-            <h3>Get Access To:</h3>
-            <ul class="features-list">
-                <li>AI-analyzed daily picks with 70%+ win rate</li>
-                <li>Real-time odds comparison across sportsbooks</li>
-                <li>The Game: Turn $10 into $500+ challenge</li>
-                <li>Expert analysis for UFC, NBA, NHL & more</li>
-            </ul>
+    <!-- Email Signup Modal -->
+    <div id="emailSignupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">BetSmart</h2>
+                <p>AI-Powered Sports Betting Analysis</p>
+            </div>
+            <div class="modal-body">
+                <h3>Get Access To:</h3>
+                <ul class="features-list">
+                    <li>AI-analyzed daily picks with 70%+ win rate</li>
+                    <li>Real-time odds comparison across sportsbooks</li>
+                    <li>The Game: Turn $10 into $500+ challenge</li>
+                    <li>Expert analysis for UFC, NBA, NHL & more</li>
+                </ul>
 
-            <div class="divider"></div>
+                <div class="divider"></div>
 
-            <h3>Enter your email address</h3>
-            <input type="email" id="emailInput" class="form-control" placeholder="you@example.com" required>
-            <button id="submitEmailBtn" class="btn btn-primary">Get Free Access</button>
+                <h3>Enter your email address</h3>
+                <input type="email" id="emailInput" class="form-control" placeholder="you@example.com" required>
+                <button id="submitEmailBtn" class="btn btn-primary">Get Free Access</button>
 
-            <p class="privacy-note">
-                <strong>Your email is secure.</strong> No spam, unsubscribe anytime.
-            </p>
+                <p class="privacy-note">
+                    <strong>Your email is secure.</strong> No spam, unsubscribe anytime.
+                </p>
 
-            <div class="stats">
-                <span>25,000+ users</span>
-                <span>4.9/5 rating</span>
+                <div class="stats">
+                    <span>25,000+ users</span>
+                    <span>4.9/5 rating</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <script src="app.js"></script>
 </body>
