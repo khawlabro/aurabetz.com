@@ -200,10 +200,6 @@ class BetSmartApp {
         document.getElementById('subscribeModal')?.classList.remove('active');
     }
 
-    // ... [rest of your existing methods remain exactly the same] ...
-    // All other methods (filterAndSortBets, renderBets, createBetCard, etc.)
-    // should remain exactly as they were in your original file
-
     filterAndSortBets() {
         let filteredBets = [...this.bets];
         
