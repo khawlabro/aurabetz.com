@@ -183,6 +183,15 @@ getDefaultGameData() {
                 }
             });
         }
+        // Add this after your existing event listeners
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('view-analysis-btn')) {
+        const card = e.target.closest('.bet-card');
+        const betId = parseInt(card.getAttribute('data-bet-id'));
+        this.showDetailModal(betId);
+        e.stopPropagation(); // Prevent the card click from also triggering
+    }
+});
 
 
         // For demo: Add click events to diamonds to simulate progress
