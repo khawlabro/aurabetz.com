@@ -1,117 +1,106 @@
 // BetSmart App - Main application class
 class BetSmartApp {
     constructor() {
-    this.bets = [];
-    this.gameData = {};
-    this.selectedSport = 'All Sports';
-    this.sortBy = 'value';
-    this.highValueOnly = false;
-    
-    // Enhanced path resolution with fallback
-    this.DATA_URL = this.resolveDataUrl();
-    
-    this.init();
-}
-
-resolveDataUrl() {
-    try {
-        if (this.isGitHubPages()) {
-            // Manually specify your repo name here:
-            return '/aurabetz-1.0/data/bets.json'; 
-        }
-        return 'data/bets.json';
-    } catch (e) {
-        console.error('Path resolution error, using fallback', e);
-        return 'data/bets.json';
+        this.bets = [];
+        this.gameData = {};
+        this.selectedSport = 'All Sports';
+        this.sortBy = 'value';
+        this.highValueOnly = false;
+        this.DATA_URL = this.resolveDataUrl();
+        
+        this.init();
     }
-}
 
-isGitHubPages() {
-    return window.location.host.includes('github.io');
-}
-
-getDefaultBets() {
-    return [
-        {
-            id: 1,
-            sport: "UFC",
-            event: "Jon Jones vs Stipe Miocic",
-            time: "2023-11-12T03:00:00Z",
-            mainBet: {
-                type: "Moneyline",
-                pick: "Jon Jones",
-                odds: -180,
-                probability: 0.75,
-                value: 0.25,
-                confidence: "High"
-            },
-            otherBets: [],
-            analysis: "Default analysis...",
-            aiReasoning: "Default AI reasoning...",
-            sportsbooks: [
-                { name: "DraftKings", odds: -180 },
-                { name: "FanDuel", odds: -175 },
-                { name: "BetMGM", odds: -185 }
-            ]
+    resolveDataUrl() {
+        try {
+            if (this.isGitHubPages()) {
+                return '/aurabetz-1.0/data/bets.json'; 
+            }
+            return 'data/bets.json';
+        } catch (e) {
+            console.error('Path resolution error, using fallback', e);
+            return 'data/bets.json';
         }
-    ];
-}
+    }
 
-getDefaultGameData() {
-    return {
-        currentDay: 1,
-        completedDays: 0,
-        startingAmount: 10,
-        currentAmount: 10,
-        bets: [
+    isGitHubPages() {
+        return window.location.host.includes('github.io');
+    }
+
+    getDefaultBets() {
+        return [
             {
-                day: 1,
+                id: 1,
                 sport: "UFC",
                 event: "Jon Jones vs Stipe Miocic",
-                bet: "Jon Jones",
-                betType: "Moneyline",
-                odds: -180,
-                amount: 10,
-                potentialProfit: 15,
-                completed: false,
-                won: null
+                time: "2023-11-12T03:00:00Z",
+                mainBet: {
+                    type: "Moneyline",
+                    pick: "Jon Jones",
+                    odds: -180,
+                    probability: 0.75,
+                    value: 0.25,
+                    confidence: "High"
+                },
+                otherBets: [],
+                analysis: "Default analysis...",
+                aiReasoning: "Default AI reasoning...",
+                sportsbooks: [
+                    { name: "DraftKings", odds: -180 },
+                    { name: "FanDuel", odds: -175 },
+                    { name: "BetMGM", odds: -185 }
+                ]
             }
-        ]
-    };
-}
+        ];
+    }
+
+    getDefaultGameData() {
+        return {
+            currentDay: 1,
+            completedDays: 0,
+            startingAmount: 10,
+            currentAmount: 10,
+            bets: [
+                {
+                    day: 1,
+                    sport: "UFC",
+                    event: "Jon Jones vs Stipe Miocic",
+                    bet: "Jon Jones",
+                    betType: "Moneyline",
+                    odds: -180,
+                    amount: 10,
+                    potentialProfit: 15,
+                    completed: false,
+                    won: null
+                }
+            ]
+        };
+    }
+
     init() {
-    this.loadData().then(() => {  // Make init wait for loadData
-        this.render();
-        this.setupEventListeners();
-        this.checkDarkMode();
-    });
-}
+        this.loadData().then(() => {
+            this.render();
+            this.setupEventListeners();
+            this.checkDarkMode();
+        });
+    }
 
     async loadData() {
-    try {
-        console.log('Attempting to load bets.json...'); // Add this
-        const response = await fetch('data/bets.json');
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('Loaded data:', data); // Add this
-        
-        this.bets = data.bets || this.getDefaultBets();
-        this.gameData = data.gameData || this.getDefaultGameData();
-        
-    } catch (error) {
-        console.error("Error loading bets.json:", error);
-        this.bets = this.getDefaultBets();
-        this.gameData = this.getDefaultGameData();
-
-    
-    
-    } 
-    this.render(); // Ensure this is called
-}
+        try {
+            const response = await fetch('data/bets.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            this.bets = data.bets || this.getDefaultBets();
+            this.gameData = data.gameData || this.getDefaultGameData();
+        } catch (error) {
+            console.error("Error loading bets.json:", error);
+            this.bets = this.getDefaultBets();
+            this.gameData = this.getDefaultGameData();
+        } 
+        this.render();
+    }
 
     render() {
         this.renderBets(this.filterAndSortBets());
@@ -119,42 +108,13 @@ getDefaultGameData() {
 
     setupEventListeners() {
         // Dark mode toggle
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        if (darkModeToggle) {
-            darkModeToggle.addEventListener('click', () => this.toggleDarkMode());
-        }
-// Subscribe modal events
-const subscribeBtn = document.getElementById('subscribeBtn');
-const closeSubscribeModal = document.getElementById('closeSubscribeModal');
-const subscribeModal = document.getElementById('subscribeModal');
+        document.getElementById('darkModeToggle')?.addEventListener('click', () => this.toggleDarkMode());
 
-if (subscribeBtn && closeSubscribeModal && subscribeModal) {
-    subscribeBtn.addEventListener('click', () => {
-        subscribeModal.classList.add('active');
-    });
-    
-    closeSubscribeModal.addEventListener('click', () => {
-        subscribeModal.classList.remove('active');
-    });
-    
-    subscribeModal.addEventListener('click', (e) => {
-        if (e.target === subscribeModal) {
-            subscribeModal.classList.remove('active');
-        }
-    });
-    
-    // Payment selection
-    document.querySelectorAll('.payment-select-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const paymentMethod = this.closest('.payment-option').querySelector('h3').textContent;
-            alert(`You selected ${paymentMethod}. More payment details would be shown here.`);
-        });
-    });
-}
+        // Subscribe button
+        document.getElementById('subscribeBtn')?.addEventListener('click', () => this.showSubscribeModal());
 
         // Sport tabs
-        const sportTabs = document.querySelectorAll('.tab');
-        sportTabs.forEach(tab => {
+        document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', (e) => {
                 this.selectedSport = e.target.getAttribute('data-sport');
                 this.updateActiveSportTab();
@@ -163,67 +123,66 @@ if (subscribeBtn && closeSubscribeModal && subscribeModal) {
         });
 
         // Sort dropdown
-        const sortOptions = document.getElementById('sortOptions');
-        if (sortOptions) {
-            sortOptions.addEventListener('change', (e) => {
-                this.sortBy = e.target.value;
-                this.renderBets(this.filterAndSortBets());
-            });
-        }
+        document.getElementById('sortOptions')?.addEventListener('change', (e) => {
+            this.sortBy = e.target.value;
+            this.renderBets(this.filterAndSortBets());
+        });
 
         // High value checkbox
-        const highValueOnly = document.getElementById('highValueOnly');
-        if (highValueOnly) {
-            highValueOnly.addEventListener('change', (e) => {
-                this.highValueOnly = e.target.checked;
-                this.renderBets(this.filterAndSortBets());
-            });
-        }
+        document.getElementById('highValueOnly')?.addEventListener('change', (e) => {
+            this.highValueOnly = e.target.checked;
+            this.renderBets(this.filterAndSortBets());
+        });
 
-        // Modal events
-        const closeModal = document.getElementById('closeModal');
-        const detailModal = document.getElementById('detailModal');
-        if (closeModal && detailModal) {
-            closeModal.addEventListener('click', () => this.hideDetailModal());
-            detailModal.addEventListener('click', (e) => {
-                if (e.target === detailModal) {
-                    this.hideDetailModal();
-                }
-            });
-        }
+        // Modals
+        document.getElementById('closeModal')?.addEventListener('click', () => this.hideDetailModal());
+        document.getElementById('detailModal')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('detailModal')) {
+                this.hideDetailModal();
+            }
+        });
 
-        // The Game button and modal
-        const theGameBtn = document.getElementById('theGameBtn');
-        const closeGameModal = document.getElementById('closeGameModal');
-        const gameModal = document.getElementById('gameModal');
-        
-        if (theGameBtn && closeGameModal && gameModal) {
-            theGameBtn.addEventListener('click', () => {
-                this.showGameModal();
-                this.updateGameProgress();
-            });
-            
-            closeGameModal.addEventListener('click', () => this.hideGameModal());
-            gameModal.addEventListener('click', (e) => {
-                if (e.target === gameModal) {
-                    this.hideGameModal();
-                }
-            });
-        }
-        // Add this after your existing event listeners
-document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('view-analysis-btn')) {
-        const card = e.target.closest('.bet-card');
-        const betId = parseInt(card.getAttribute('data-bet-id'));
-        this.showDetailModal(betId);
-        e.stopPropagation(); // Prevent the card click from also triggering
-    }
-});
+        // The Game modal
+        document.getElementById('theGameBtn')?.addEventListener('click', () => {
+            this.showGameModal();
+            this.updateGameProgress();
+        });
+        document.getElementById('closeGameModal')?.addEventListener('click', () => this.hideGameModal());
+        document.getElementById('gameModal')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('gameModal')) {
+                this.hideGameModal();
+            }
+        });
 
+        // Subscribe modal
+        document.getElementById('closeSubscribeModal')?.addEventListener('click', () => this.hideSubscribeModal());
+        document.getElementById('subscribeModal')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('subscribeModal')) {
+                this.hideSubscribeModal();
+            }
+        });
 
-        // For demo: Add click events to diamonds to simulate progress
-        const diamonds = document.querySelectorAll('.diamond');
-        diamonds.forEach(diamond => {
+        // View analysis buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('view-analysis-btn')) {
+                const card = e.target.closest('.bet-card');
+                const betId = parseInt(card.getAttribute('data-bet-id'));
+                this.showDetailModal(betId);
+                e.stopPropagation();
+            }
+        });
+
+        // Payment selection buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('payment-select-btn')) {
+                const paymentMethod = e.target.closest('.payment-option').querySelector('h3').textContent;
+                alert(`Selected ${paymentMethod}. Payment processing would be implemented here.`);
+                this.hideSubscribeModal();
+            }
+        });
+
+        // Diamond clicks for The Game
+        document.querySelectorAll('.diamond').forEach(diamond => {
             diamond.addEventListener('click', (e) => {
                 const day = parseInt(e.currentTarget.getAttribute('data-day'));
                 if (day === this.gameData.currentDay) {
@@ -233,22 +192,29 @@ document.addEventListener('click', (e) => {
         });
     }
 
+    showSubscribeModal() {
+        document.getElementById('subscribeModal')?.classList.add('active');
+    }
 
+    hideSubscribeModal() {
+        document.getElementById('subscribeModal')?.classList.remove('active');
+    }
+
+    // ... [rest of your existing methods remain exactly the same] ...
+    // All other methods (filterAndSortBets, renderBets, createBetCard, etc.)
+    // should remain exactly as they were in your original file
 
     filterAndSortBets() {
         let filteredBets = [...this.bets];
         
-        // Filter by sport
         if (this.selectedSport !== 'All Sports') {
             filteredBets = filteredBets.filter(bet => bet.sport === this.selectedSport);
         }
         
-        // Filter by value
         if (this.highValueOnly) {
             filteredBets = filteredBets.filter(bet => bet.mainBet.value >= 0.20);
         }
         
-        // Sort the bets
         switch(this.sortBy) {
             case 'value':
                 filteredBets.sort((a, b) => b.mainBet.value - a.mainBet.value);
@@ -284,7 +250,6 @@ document.addEventListener('click', (e) => {
             container.appendChild(card);
         });
 
-        // Add event listeners to the entire bet cards
         document.querySelectorAll('.bet-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 const betId = parseInt(card.getAttribute('data-bet-id'));
@@ -326,7 +291,7 @@ document.addEventListener('click', (e) => {
                 </div>
                 <div class="bet-footer">
                     <span class="best-odds">Best Odds: ${this.formatAmericanOdds(Math.max(...bet.sportsbooks.map(sb => sb.odds)))}</span>
-            <button class="view-analysis-btn">View Analysis</button>
+                    <button class="view-analysis-btn">View Analysis</button>
                 </div>
             </div>
         `;
@@ -338,12 +303,9 @@ document.addEventListener('click', (e) => {
         const sportTabs = document.querySelectorAll('.tab');
         sportTabs.forEach(tab => {
             const sport = tab.getAttribute('data-sport');
-            
-            // Remove active class from all tabs
             tab.classList.remove('tab-active');
             tab.classList.add('tab-inactive');
             
-            // Add active class to selected tab
             if (sport === this.selectedSport) {
                 tab.classList.remove('tab-inactive');
                 tab.classList.add('tab-active');
@@ -440,51 +402,34 @@ document.addEventListener('click', (e) => {
             </div>
         `;
         
-        const detailModal = document.getElementById('detailModal');
-        if (detailModal) {
-            detailModal.classList.add('active');
-        }
+        document.getElementById('detailModal')?.classList.add('active');
     }
 
     hideDetailModal() {
-        const detailModal = document.getElementById('detailModal');
-        if (detailModal) {
-            detailModal.classList.remove('active');
-        }
+        document.getElementById('detailModal')?.classList.remove('active');
     }
 
     showGameModal() {
-        const gameModal = document.getElementById('gameModal');
-        if (gameModal) {
-            gameModal.classList.add('active');
-        }
+        document.getElementById('gameModal')?.classList.add('active');
     }
 
     hideGameModal() {
-        const gameModal = document.getElementById('gameModal');
-        if (gameModal) {
-            gameModal.classList.remove('active');
-        }
+        document.getElementById('gameModal')?.classList.remove('active');
     }
 
     updateGameProgress() {
         document.querySelectorAll('.diamond').forEach(diamond => {
             const day = parseInt(diamond.getAttribute('data-day'));
-            
-            // Reset styling
             diamond.style.backgroundColor = '';
             diamond.querySelector('span').style.color = '';
             
             if (day < this.gameData.currentDay) {
-                // Completed days
                 diamond.style.backgroundColor = 'var(--secondary)';
                 diamond.querySelector('span').style.color = 'var(--white)';
             } else if (day === this.gameData.currentDay) {
-                // Current day
                 diamond.style.backgroundColor = 'var(--primary)';
                 diamond.querySelector('span').style.color = 'var(--white)';
             } else {
-                // Future days
                 diamond.style.backgroundColor = 'var(--gray-200)';
                 diamond.querySelector('span').style.color = 'var(--gray-700)';
                 
@@ -504,14 +449,10 @@ document.addEventListener('click', (e) => {
             currentBet.won = won;
             
             if (won) {
-                // If won, update current amount
                 this.gameData.currentAmount += currentBet.potentialProfit;
                 this.gameData.completedDays++;
-                
-                // Prepare for next day
                 this.gameData.currentDay++;
                 
-                // Light up the diamond
                 const diamond = document.querySelector(`.diamond[data-day="${this.gameData.currentDay - 1}"]`);
                 if (diamond) {
                     diamond.classList.add('diamond-pulse');
@@ -520,7 +461,6 @@ document.addEventListener('click', (e) => {
                     }, 1500);
                 }
                 
-                // Add next day's bet if we haven't reached day 9
                 if (this.gameData.currentDay <= 9) {
                     this.gameData.bets.push({
                         day: this.gameData.currentDay,
@@ -536,12 +476,10 @@ document.addEventListener('click', (e) => {
                     });
                 }
             } else {
-                // If lost, game is over
                 alert("Sorry! You lost today's bet. The Game is over. You can restart from Day 1.");
                 this.resetGame();
             }
             
-            // Update the UI
             this.updateGameProgress();
         }
     }
@@ -551,7 +489,6 @@ document.addEventListener('click', (e) => {
         this.gameData.completedDays = 0;
         this.gameData.currentAmount = this.gameData.startingAmount;
         
-        // Reset bets
         this.gameData.bets = [{
             day: 1,
             sport: "UFC",
@@ -565,7 +502,6 @@ document.addEventListener('click', (e) => {
             won: null
         }];
         
-        // Update UI
         this.updateGameProgress();
     }
 
@@ -594,7 +530,6 @@ document.addEventListener('click', (e) => {
             }
         }
         
-        // Listen for changes in preferred color scheme
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
             if (event.matches) {
                 document.body.classList.add('dark');
@@ -633,9 +568,9 @@ document.addEventListener('click', (e) => {
         });
     }
 }
-// ===== Email Signup Functionality =====
+
+// Email Signup Functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize email signup
     const emailInput = document.getElementById('emailInput');
     const submitEmailBtn = document.getElementById('submitEmailBtn');
     
@@ -649,7 +584,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Show modal on page load
     setTimeout(() => {
         const emailModal = document.getElementById('emailSignupModal');
         if (emailModal) emailModal.style.display = 'block';
@@ -665,7 +599,6 @@ function submitEmail() {
         return;
     }
     
-    // Save to localStorage
     const existing = JSON.parse(localStorage.getItem("betSmartEmails") || "[]");
     if (!existing.includes(email)) {
         existing.push(email);
@@ -675,11 +608,11 @@ function submitEmail() {
     alert('Thank you! Check your email for access.');
     document.getElementById('emailInput').value = '';
     
-    // Close modal
     const modal = document.getElementById('emailSignupModal');
     if (modal) modal.style.display = 'none';
 }
-// Initialize the app when DOM is fully loaded
+
+// Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
     const app = new BetSmartApp();
 });
