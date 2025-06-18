@@ -676,3 +676,76 @@ input[type="checkbox"] {
 .payment-select-btn:hover {
     background-color: var(--primary-dark);
 }
+
+/* Auth Wall Styles */
+#authWall {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+#authWall .modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 300px;
+    width: 90%;
+}
+
+#authWall h3 {
+    margin-bottom: 1.5rem;
+    color: var(--dark);
+}
+
+#pinInput {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    font-size: 16px;
+    text-align: center;
+}
+
+#submitPin {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+}
+
+#submitPin:hover {
+    background: var(--primary-dark);
+}
+
+#pinError {
+    margin-top: 1rem;
+    color: red;
+}
+
+.dark #authWall .modal-content {
+    background: var(--gray-800);
+    color: white;
+}
+
+.dark #authWall h3 {
+    color: white;
+}
+
+.dark #pinInput {
+    background: var(--gray-700);
+    color: white;
+    border-color: var(--gray-600);
+}
