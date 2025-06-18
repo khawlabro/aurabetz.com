@@ -6,50 +6,41 @@
     <title>BetSmart - Daily Sports Betting Analysis</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-    
-    <script>
-      // Your Firebase config
-      const firebaseConfig = {
-        apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
-        authDomain: "aurabetz.firebaseapp.com",
-        projectId: "aurabetz",
-        storageBucket: "aurabetz.firebasestorage.app",
-        messagingSenderId: "531651661385",
-        appId: "1:531651661385:web:d82a50a33bb77297b7f998",
-        measurementId: "G-7L19JWBH21"
-      };
-      
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-    </script>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="flex justify-between items-center">
-                <h1>BetSmart</h1>
-                <div class="flex items-center gap-3">
-                    <button id="theGameBtn" class="btn btn-primary gap-2">
-                        <i class="fas fa-gem"></i>
-                        <span>The Game</span>
-                    </button>
-                    <button id="subscribeBtn" class="btn btn-primary gap-2">
-    <i class="fas fa-envelope"></i>
-    <span>Subscribe</span>
-</button>
-                    <button id="darkModeToggle" class="btn-icon dark-mode-toggle">
-                        <i class="fas fa-moon"></i>
-                        <i class="fas fa-sun hidden"></i>
-                    </button>
+    <!-- Loading Spinner (shown until Firebase initializes) -->
+    <div id="loadingSpinner" style="position:fixed;top:0;left:0;width:100%;height:100%;background:white;display:flex;justify-content:center;align-items:center;z-index:1000;">
+        <div style="text-align:center">
+            <i class="fas fa-circle-notch fa-spin fa-3x" style="color:var(--primary)"></i>
+            <p style="margin-top:20px">Loading BetSmart...</p>
+        </div>
+    </div>
+
+    <!-- Main App Content (hidden until loaded) -->
+    <div id="appContent" style="display:none">
+        <!-- Your existing HTML content goes here -->
+        <div class="container">
+            <!-- Header -->
+            <header class="header">
+                <div class="flex justify-between items-center">
+                    <h1>BetSmart</h1>
+                    <div class="flex items-center gap-3">
+                        <button id="theGameBtn" class="btn btn-primary gap-2">
+                            <i class="fas fa-gem"></i>
+                            <span>The Game</span>
+                        </button>
+                        <button id="subscribeBtn" class="btn btn-primary gap-2">
+                            <i class="fas fa-envelope"></i>
+                            <span>Subscribe</span>
+                        </button>
+                        <button id="darkModeToggle" class="btn-icon dark-mode-toggle">
+                            <i class="fas fa-moon"></i>
+                            <i class="fas fa-sun hidden"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <p>Find today's best betting opportunities</p>
-        </header>
+                <p>Find today's best betting opportunities</p>
+            </header>
 
         <!-- Sports Filter Tabs -->
         <div class="tabs" id="sportTabs">
@@ -403,6 +394,37 @@
 </div>
 
     
+    <!-- Firebase + App Initialization -->
+    <!-- Load at bottom of body for better performance -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+      // Firebase Config
+      const firebaseConfig = {
+        apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
+        authDomain: "aurabetz.firebaseapp.com",
+        projectId: "aurabetz",
+        storageBucket: "aurabetz.firebasestorage.app",
+        messagingSenderId: "531651661385",
+        appId: "1:531651661385:web:d82a50a33bb77297b7f998",
+        measurementId: "G-7L19JWBH21"
+      };
+      
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      
+      // When Firebase is ready, show app and hide spinner
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+          document.getElementById('loadingSpinner').style.display = 'none';
+          document.getElementById('appContent').style.display = 'block';
+        }, 1000); // Short delay for better UX
+      });
+    </script>
+    
+    <!-- Your App Code -->
     <script src="app.js"></script>
 </body>
 </html>
