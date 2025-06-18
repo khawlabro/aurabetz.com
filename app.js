@@ -1,14 +1,120 @@
 // BetSmart App - Main application class
 class BetSmartApp {
+    // Add these right after the class declaration but before constructor
+const firebaseConfig = {
+  apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
+  authDomain: "aurabetz.firebaseapp.com",
+  projectId: "aurabetz",
+  storageBucket: "aurabetz.firebasestorage.app",
+  messagingSenderId: "531651661385",
+  appId: "1:531651661385:web:d82a50a33bb77297b7f998",
+  measurementId: "G-7L19JWBH21"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+    
     constructor() {
-        this.bets = [];
-        this.gameData = {};
-        this.selectedSport = 'All Sports';
-        this.sortBy = 'value';
-        this.highValueOnly = false;
-        this.DATA_URL = this.resolveDataUrl();
+    this.bets = [];
+    this.gameData = {};
+    this.selectedSport = 'All Sports';
+    this.sortBy = 'value';
+    this.highValueOnly = false;
+    this.DATA_URL = this.resolveDataUrl();
+    this.validPins = ["123456", "654321"]; // Add this line
         
-        this.init();
+        this.initAuth();
+    }
+
+    initAuth() {
+    try {
+        // Check if user is already authenticated
+        const storedPin = localStorage.getItem('betSmartAuth');
+        if (storedPin && this.validPins.includes(storedPin)) {
+            this.initApp();
+            return;
+        }
+
+        // Show auth wall
+        const authWall = document.getElementById('authWall');
+        if (!authWall) throw new Error("Auth wall element not found");
+        authWall.style.display = 'flex';
+
+        // PIN submission handler
+        document.getElementById('submitPin').addEventListener('click', () => {
+            const enteredPin = document.getElementById('pinInput').value;
+            if (!enteredPin) {
+                document.getElementById('pinError').textContent = "Please enter a PIN";
+                document.getElementById('pinError').style.display = 'block';
+                return;
+            }
+
+            if (this.validPins.includes(enteredPin)) {
+                localStorage.setItem('betSmartAuth', enteredPin);
+                authWall.style.display = 'none';
+                this.trackAccess(enteredPin);
+                this.initApp();
+            } else {
+                document.getElementById('pinError').textContent = "Invalid PIN";
+                document.getElementById('pinError').style.display = 'block';
+            }
+        });
+
+        // Enter key support
+        document.getElementById('pinInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('submitPin').click();
+        });
+
+    } catch (error) {
+        this.handleAuthError(error); // Call error handler
+    }
+}
+
+    initApp() {
+        this.init(); // Your original initialization
+        document.getElementById('appContent').style.display = 'block';
+    }
+
+    trackAccess(pin) {
+    try {
+        // Only track in production (optional)
+        if (window.location.hostname !== 'localhost') {
+            db.collection("accessLogs").add({
+                pin: "****" + pin.slice(-2), // Mask PIN for security
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                error: null,
+                success: true
+            }).catch((err) => {
+                console.error("Firestore write failed:", err);
+            });
+        }
+    } catch (error) {
+        console.error("Tracking failed (non-critical):", error);
+        // No UI impact - tracking is optional
+    }
+}
+
+        handleAuthError(error) {
+        console.error("Auth error:", error);
+        const spinner = document.getElementById('loadingSpinner');
+        
+        if (spinner) {
+            spinner.innerHTML = `
+                <div class="spinner-content">
+                    <i class="fas fa-exclamation-triangle" style="color: red; font-size: 2rem;"></i>
+                    <p style="color: red; margin-top: 20px;">
+                        Error loading BetSmart. Please refresh or check your connection.
+                    </p>
+                    <button onclick="window.location.reload()" 
+                            style="margin-top: 10px; padding: 8px 16px; 
+                                   background: var(--primary); color: white; 
+                                   border: none; border-radius: 4px; cursor: pointer;">
+                        Refresh Page
+                    </button>
+                </div>`;
+        }
     }
 
     resolveDataUrl() {
@@ -78,29 +184,35 @@ class BetSmartApp {
     }
 
     init() {
+    try {
         this.loadData().then(() => {
             this.render();
             this.setupEventListeners();
             this.checkDarkMode();
+        }).catch((err) => {
+            this.handleAuthError(err);
         });
+    } catch (error) {
+        this.handleAuthError(error);
     }
+}
 
     async loadData() {
-        try {
-            const response = await fetch('data/bets.json');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            this.bets = data.bets || this.getDefaultBets();
-            this.gameData = data.gameData || this.getDefaultGameData();
-        } catch (error) {
-            console.error("Error loading bets.json:", error);
-            this.bets = this.getDefaultBets();
-            this.gameData = this.getDefaultGameData();
-        } 
-        this.render();
+    try {
+        const response = await fetch(this.DATA_URL);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        this.bets = data.bets || this.getDefaultBets();
+        this.gameData = data.gameData || this.getDefaultGameData();
+    } catch (error) {
+        console.error("Data load failed, using defaults:", error);
+        this.bets = this.getDefaultBets();
+        this.gameData = this.getDefaultGameData();
+        // Optional: Show user-friendly warning
+        alert("Warning: Using demo data. Some features may be limited.");
     }
+    this.render();
+}
 
     render() {
         this.renderBets(this.filterAndSortBets());
@@ -608,7 +720,58 @@ function submitEmail() {
     if (modal) modal.style.display = 'none';
 }
 
-// Initialize the app
+// ▼ Replace with this updated version ▼
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Hide app content until PIN is verified
+    document.getElementById('appContent').style.display = 'none';
+
+    // 2. Initialize app (will trigger auth flow)
     const app = new BetSmartApp();
+
+    // 3. Keep existing email signup logic (but add localStorage check)
+    const emailInput = document.getElementById('emailInput');
+    const submitEmailBtn = document.getElementById('submitEmailBtn');
+
+    if (submitEmailBtn) {
+        submitEmailBtn.addEventListener('click', submitEmail);
+    }
+
+    if (emailInput) {
+        emailInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') submitEmail();
+        });
+    }
+
+    // 4. Show email modal only once per user
+    setTimeout(() => {
+        const emailModal = document.getElementById('emailSignupModal');
+        if (emailModal && !localStorage.getItem('betSmartEmailShown')) {
+            emailModal.style.display = 'block';
+            localStorage.setItem('betSmartEmailShown', 'true');
+        }
+    }, 1000);
 });
+
+// 5. Keep the existing submitEmail() function (DO NOT MODIFY)
+function submitEmail() {
+    const email = document.getElementById('emailInput').value.trim();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!emailPattern.test(email)) {
+        alert('Please enter a valid email address');
+        return;
+    }
+    
+    const existing = JSON.parse(localStorage.getItem("betSmartEmails") || "[]");
+    if (!existing.includes(email)) {
+        existing.push(email);
+        localStorage.setItem("betSmartEmails", JSON.stringify(existing));
+    }
+    
+    alert('Thank you! Check your email for access.');
+    document.getElementById('emailInput').value = '';
+    
+    const modal = document.getElementById('emailSignupModal');
+    if (modal) modal.style.display = 'none';
+}
+// ▲ End of updated code ▲
