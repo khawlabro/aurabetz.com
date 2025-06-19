@@ -1,30 +1,36 @@
 // BetSmart App - Main application class
 class BetSmartApp {
     constructor() {
-        this.bets = [];
-        this.gameData = {};
-        this.selectedSport = 'All Sports';
-        this.sortBy = 'value';
-        this.highValueOnly = false;
-        this.DATA_URL = this.resolveDataUrl();
-        
-        // Initialize Firebase (using your config)
-        this.firebaseConfig = {
-            apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
-            authDomain: "aurabetz.firebaseapp.com",
-            projectId: "aurabetz",
-            storageBucket: "aurabetz.firebasestorage.app",
-            messagingSenderId: "531651661385",
-            appId: "1:531651661385:web:d82a50a33bb77297b7f998",
-            measurementId: "G-7L19JWBH21"
-        };
-        
+    this.bets = [];
+    this.gameData = {};
+    this.selectedSport = 'All Sports';
+    this.sortBy = 'value';
+    this.highValueOnly = false;
+    this.DATA_URL = this.resolveDataUrl();
+    
+    // Modified Firebase initialization
+    this.firebaseConfig = {
+        apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
+        authDomain: "aurabetz.firebaseapp.com",
+        projectId: "aurabetz",
+        storageBucket: "aurabetz.firebasestorage.app",
+        messagingSenderId: "531651661385",
+        appId: "1:531651661385:web:d82a50a33bb77297b7f998",
+        measurementId: "G-7L19JWBH21"
+    };
+    
+    // Check if Firebase is already initialized
+    if (!firebase.apps.length) {
         this.app = firebase.initializeApp(this.firebaseConfig);
-        this.auth = firebase.auth();
-        this.db = firebase.firestore();
-        
-        this.initAuth();
+    } else {
+        this.app = firebase.app();
     }
+    
+    this.auth = firebase.auth();
+    this.db = firebase.firestore();
+    
+    this.initAuth();
+}
 
     initAuth() {
         try {
@@ -91,9 +97,19 @@ class BetSmartApp {
 }
 
     initApp() {
-        this.init();
+    // Hide content during initialization
+    document.getElementById('appContent').style.display = 'none';
+    
+    // Initialize app components
+    this.init().then(() => {
+        // Show content only after full initialization
         document.getElementById('appContent').style.display = 'block';
-    }
+        document.getElementById('loadingSpinner').style.display = 'none';
+    }).catch(error => {
+        console.error("Initialization failed:", error);
+        this.handleAuthError(error);
+    });
+}
 
     trackAccess(pin) {
         try {
