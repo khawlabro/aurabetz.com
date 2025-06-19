@@ -220,18 +220,23 @@ class BetSmartApp {
     }
 
     init() {
+    return new Promise((resolve, reject) => {
         try {
             this.loadData().then(() => {
                 this.render();
                 this.setupEventListeners();
                 this.checkDarkMode();
+                resolve(); // Signal completion
             }).catch((err) => {
                 this.handleAuthError(err);
+                reject(err);
             });
         } catch (error) {
             this.handleAuthError(error);
+            reject(error);
         }
-    }
+    });
+}
 
     async loadData() {
         try {
