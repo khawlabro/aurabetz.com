@@ -97,17 +97,17 @@ class BetSmartApp {
 }
 
     initApp() {
-    // Hide content during initialization
+    // First ensure content is hidden during initialization
     document.getElementById('appContent').style.display = 'none';
     
-    // Initialize app components
+    // Then initialize the app
     this.init().then(() => {
-        // Show content only after full initialization
+        // Only show content after full initialization
         document.getElementById('appContent').style.display = 'block';
         document.getElementById('loadingSpinner').style.display = 'none';
-    }).catch(error => {
-        console.error("Initialization failed:", error);
-        this.handleAuthError(error);
+        
+        // Rebind all event listeners
+        this.setupEventListeners();
     });
 }
 
