@@ -97,17 +97,20 @@ class BetSmartApp {
 }
 
     initApp() {
-    // First ensure content is hidden during initialization
+    // FIRST hide everything and show loading
     document.getElementById('appContent').style.display = 'none';
+    document.getElementById('loadingSpinner').style.display = 'flex';
     
-    // Then initialize the app
+    // THEN initialize
     this.init().then(() => {
-        // Only show content after full initialization
+        // AFTER initialization is complete:
+        this.render(); // Regenerate all UI elements
+        this.setupEventListeners(); // Rebind ALL listeners
+        this.checkDarkMode(); // Reset dark mode
+        
+        // FINALLY show UI
         document.getElementById('appContent').style.display = 'block';
         document.getElementById('loadingSpinner').style.display = 'none';
-        
-        // Rebind all event listeners
-        this.setupEventListeners();
     });
 }
 
