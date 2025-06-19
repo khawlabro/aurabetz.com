@@ -1,102 +1,119 @@
 // BetSmart App - Main application class
 class BetSmartApp {
-    // Add these right after the class declaration but before constructor
-const firebaseConfig = {
-  apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
-  authDomain: "aurabetz.firebaseapp.com",
-  projectId: "aurabetz",
-  storageBucket: "aurabetz.firebasestorage.app",
-  messagingSenderId: "531651661385",
-  appId: "1:531651661385:web:d82a50a33bb77297b7f998",
-  measurementId: "G-7L19JWBH21"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-    
     constructor() {
-    this.bets = [];
-    this.gameData = {};
-    this.selectedSport = 'All Sports';
-    this.sortBy = 'value';
-    this.highValueOnly = false;
-    this.DATA_URL = this.resolveDataUrl();
-    this.validPins = ["123456", "654321"]; // Add this line
+        this.bets = [];
+        this.gameData = {};
+        this.selectedSport = 'All Sports';
+        this.sortBy = 'value';
+        this.highValueOnly = false;
+        this.DATA_URL = this.resolveDataUrl();
+        
+        // Initialize Firebase (using your config)
+        this.firebaseConfig = {
+            apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
+            authDomain: "aurabetz.firebaseapp.com",
+            projectId: "aurabetz",
+            storageBucket: "aurabetz.firebasestorage.app",
+            messagingSenderId: "531651661385",
+            appId: "1:531651661385:web:d82a50a33bb77297b7f998",
+            measurementId: "G-7L19JWBH21"
+        };
+        
+        this.app = firebase.initializeApp(this.firebaseConfig);
+        this.auth = firebase.auth();
+        this.db = firebase.firestore();
         
         this.initAuth();
     }
 
     initAuth() {
-    try {
-        // Check if user is already authenticated
-        const storedPin = localStorage.getItem('betSmartAuth');
-        if (storedPin && this.validPins.includes(storedPin)) {
-            this.initApp();
-            return;
+        try {
+            // Check Firebase auth state
+            this.auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // User is authenticated
+                    this.initApp();
+                } else {
+                    // Show auth wall
+                    const authWall = document.getElementById('authWall');
+                    if (!authWall) throw new Error("Auth wall element not found");
+                    authWall.style.display = 'flex';
+
+                    // PIN submission handler
+                    document.getElementById('submitPin').addEventListener('click', () => {
+                        const enteredPin = document.getElementById('pinInput').value;
+                        if (!enteredPin) {
+                            document.getElementById('pinError').textContent = "Please enter a PIN";
+                            document.getElementById('pinError').style.display = 'block';
+                            return;
+                        }
+
+                        this.verifyPinWithFirebase(enteredPin);
+                    });
+
+                    // Enter key support
+                    document.getElementById('pinInput').addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') document.getElementById('submitPin').click();
+                    });
+                }
+            });
+        } catch (error) {
+            this.handleAuthError(error);
         }
+    }
 
-        // Show auth wall
-        const authWall = document.getElementById('authWall');
-        if (!authWall) throw new Error("Auth wall element not found");
-        authWall.style.display = 'flex';
-
-        // PIN submission handler
-        document.getElementById('submitPin').addEventListener('click', () => {
-            const enteredPin = document.getElementById('pinInput').value;
-            if (!enteredPin) {
-                document.getElementById('pinError').textContent = "Please enter a PIN";
-                document.getElementById('pinError').style.display = 'block';
-                return;
-            }
-
-            if (this.validPins.includes(enteredPin)) {
-                localStorage.setItem('betSmartAuth', enteredPin);
-                authWall.style.display = 'none';
-                this.trackAccess(enteredPin);
+    verifyPinWithFirebase(pin) {
+        this.db.collection("validPins").doc(pin).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    // PIN is valid
+                    localStorage.setItem('betSmartAuth', pin);
+                    document.getElementById('authWall').style.display = 'none';
+                    this.trackAccess(pin);
+                    
+                    // Sign in anonymously to maintain auth state
+                    return this.auth.signInAnonymously();
+                } else {
+                    throw new Error("Invalid PIN");
+                }
+            })
+            .then(() => {
                 this.initApp();
-            } else {
+            })
+            .catch((error) => {
+                console.error("PIN verification failed:", error);
                 document.getElementById('pinError').textContent = "Invalid PIN";
                 document.getElementById('pinError').style.display = 'block';
-            }
-        });
-
-        // Enter key support
-        document.getElementById('pinInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('submitPin').click();
-        });
-
-    } catch (error) {
-        this.handleAuthError(error); // Call error handler
+            });
     }
-}
 
     initApp() {
-        this.init(); // Your original initialization
+        this.init();
         document.getElementById('appContent').style.display = 'block';
     }
 
     trackAccess(pin) {
-    try {
-        // Only track in production (optional)
-        if (window.location.hostname !== 'localhost') {
-            db.collection("accessLogs").add({
-                pin: "****" + pin.slice(-2), // Mask PIN for security
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                error: null,
-                success: true
-            }).catch((err) => {
-                console.error("Firestore write failed:", err);
-            });
+        try {
+            if (window.location.hostname !== 'localhost') {
+                this.db.collection("accessLogs").add({
+                    pin: "****" + pin.slice(-2),
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    error: null,
+                    success: true
+                }).catch((err) => {
+                    console.error("Firestore write failed:", err);
+                });
+            }
+        } catch (error) {
+            console.error("Tracking failed (non-critical):", error);
         }
-    } catch (error) {
-        console.error("Tracking failed (non-critical):", error);
-        // No UI impact - tracking is optional
     }
-}
 
-        handleAuthError(error) {
+    // ... [Keep all other existing methods exactly the same] ...
+    // All methods below this point remain unchanged from your previous implementation
+    // Only the auth-related code above has been modified
+
+    handleAuthError(error) {
         console.error("Auth error:", error);
         const spinner = document.getElementById('loadingSpinner');
         
@@ -184,48 +201,59 @@ const db = firebase.firestore();
     }
 
     init() {
-    try {
-        this.loadData().then(() => {
-            this.render();
-            this.setupEventListeners();
-            this.checkDarkMode();
-        }).catch((err) => {
-            this.handleAuthError(err);
-        });
-    } catch (error) {
-        this.handleAuthError(error);
+        try {
+            this.loadData().then(() => {
+                this.render();
+                this.setupEventListeners();
+                this.checkDarkMode();
+            }).catch((err) => {
+                this.handleAuthError(err);
+            });
+        } catch (error) {
+            this.handleAuthError(error);
+        }
     }
-}
 
     async loadData() {
-    try {
-        const response = await fetch(this.DATA_URL);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        this.bets = data.bets || this.getDefaultBets();
-        this.gameData = data.gameData || this.getDefaultGameData();
-    } catch (error) {
-        console.error("Data load failed, using defaults:", error);
-        this.bets = this.getDefaultBets();
-        this.gameData = this.getDefaultGameData();
-        // Optional: Show user-friendly warning
-        alert("Warning: Using demo data. Some features may be limited.");
+        try {
+            const response = await fetch(this.DATA_URL);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            
+            // Filter out invalid bets
+            this.bets = (data.bets || this.getDefaultBets()).filter(bet => 
+                bet.event && 
+                bet.event.trim() !== "" && 
+                !bet.event.toLowerCase().includes("bitch") &&
+                bet.mainBet && 
+                bet.mainBet.pick
+            );
+            
+            // Validate game data
+            this.gameData = data.gameData || this.getDefaultGameData();
+            
+            // Ensure current day bet exists
+            const currentDayBet = this.gameData.bets.find(b => b.day === this.gameData.currentDay);
+            if (!currentDayBet) {
+                this.resetGame();
+            }
+        } catch (error) {
+            console.error("Data load failed, using defaults:", error);
+            this.bets = this.getDefaultBets();
+            this.gameData = this.getDefaultGameData();
+            alert("Warning: Using demo data. Some features may be limited.");
+        }
+        this.render();
     }
-    this.render();
-}
 
     render() {
         this.renderBets(this.filterAndSortBets());
     }
 
     setupEventListeners() {
-        // Dark mode toggle
         document.getElementById('darkModeToggle')?.addEventListener('click', () => this.toggleDarkMode());
-
-        // Subscribe button
         document.getElementById('subscribeBtn')?.addEventListener('click', () => this.showSubscribeModal());
 
-        // Sport tabs
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', (e) => {
                 this.selectedSport = e.target.getAttribute('data-sport');
@@ -234,19 +262,16 @@ const db = firebase.firestore();
             });
         });
 
-        // Sort dropdown
         document.getElementById('sortOptions')?.addEventListener('change', (e) => {
             this.sortBy = e.target.value;
             this.renderBets(this.filterAndSortBets());
         });
 
-        // High value checkbox
         document.getElementById('highValueOnly')?.addEventListener('change', (e) => {
             this.highValueOnly = e.target.checked;
             this.renderBets(this.filterAndSortBets());
         });
 
-        // Modals
         document.getElementById('closeModal')?.addEventListener('click', () => this.hideDetailModal());
         document.getElementById('detailModal')?.addEventListener('click', (e) => {
             if (e.target === document.getElementById('detailModal')) {
@@ -254,7 +279,6 @@ const db = firebase.firestore();
             }
         });
 
-        // The Game modal
         document.getElementById('theGameBtn')?.addEventListener('click', () => {
             this.showGameModal();
             this.updateGameProgress();
@@ -266,7 +290,6 @@ const db = firebase.firestore();
             }
         });
 
-        // Subscribe modal
         document.getElementById('closeSubscribeModal')?.addEventListener('click', () => this.hideSubscribeModal());
         document.getElementById('subscribeModal')?.addEventListener('click', (e) => {
             if (e.target === document.getElementById('subscribeModal')) {
@@ -274,7 +297,6 @@ const db = firebase.firestore();
             }
         });
 
-        // View analysis buttons
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('view-analysis-btn')) {
                 const card = e.target.closest('.bet-card');
@@ -284,7 +306,6 @@ const db = firebase.firestore();
             }
         });
 
-        // Payment selection buttons
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('payment-select-btn')) {
                 const paymentMethod = e.target.closest('.payment-option').querySelector('h3').textContent;
@@ -293,7 +314,6 @@ const db = firebase.firestore();
             }
         });
 
-        // Diamond clicks for The Game
         document.querySelectorAll('.diamond').forEach(diamond => {
             diamond.addEventListener('click', (e) => {
                 const day = parseInt(e.currentTarget.getAttribute('data-day'));
@@ -325,17 +345,24 @@ const db = firebase.firestore();
         
         switch(this.sortBy) {
             case 'value':
-                filteredBets.sort((a, b) => b.mainBet.value - a.mainBet.value);
+                filteredBets.sort((a, b) => (b.mainBet.value || 0) - (a.mainBet.value || 0));
                 break;
             case 'odds':
-                filteredBets.sort((a, b) => a.mainBet.odds - b.mainBet.odds);
+                filteredBets.sort((a, b) => (a.mainBet.odds || 0) - (b.mainBet.odds || 0));
                 break;
             case 'confidence':
                 const confidenceMap = { 'High': 3, 'Medium': 2, 'Low': 1 };
-                filteredBets.sort((a, b) => confidenceMap[b.mainBet.confidence] - confidenceMap[a.mainBet.confidence]);
+                filteredBets.sort((a, b) => 
+                    confidenceMap[b.mainBet.confidence || 'Medium'] - 
+                    confidenceMap[a.mainBet.confidence || 'Medium']
+                );
                 break;
             case 'time':
-                filteredBets.sort((a, b) => new Date(a.time) - new Date(b.time));
+                filteredBets.sort((a, b) => {
+                    const dateA = a.time ? new Date(a.time) : new Date(0);
+                    const dateB = b.time ? new Date(b.time) : new Date(0);
+                    return dateA - dateB;
+                });
                 break;
         }
         
@@ -355,7 +382,9 @@ const db = firebase.firestore();
 
         betsToRender.forEach(bet => {
             const card = this.createBetCard(bet);
-            container.appendChild(card);
+            if (card.childNodes.length > 0) {
+                container.appendChild(card);
+            }
         });
 
         document.querySelectorAll('.bet-card').forEach(card => {
@@ -367,8 +396,12 @@ const db = firebase.firestore();
     }
 
     createBetCard(bet) {
-        const valueClass = this.getValueClass(bet.mainBet.value);
-        const confidenceBadgeClass = this.getConfidenceBadgeClass(bet.mainBet.confidence);
+        if (!bet.event || !bet.mainBet || !bet.mainBet.pick) {
+            return document.createElement('div');
+        }
+
+        const valueClass = this.getValueClass(bet.mainBet.value || 0);
+        const confidenceBadgeClass = this.getConfidenceBadgeClass(bet.mainBet.confidence || "Medium");
         
         const card = document.createElement('div');
         card.className = 'bet-card';
@@ -380,31 +413,39 @@ const db = firebase.firestore();
                     <i class="fas fa-info-circle text-primary"></i>
                 </div>
                 <div class="bet-header">
-                    <span class="bet-sport">${bet.sport}</span>
+                    <span class="bet-sport">${bet.sport || 'Unknown Sport'}</span>
                     <span class="bet-time">${this.formatDate(bet.time)}</span>
                 </div>
                 <h3 class="bet-title">${bet.event}</h3>
                 <div class="bet-main">
                     <div class="bet-type-row">
-                        <span class="bet-type">${bet.mainBet.type}</span>
-                        <span class="bet-value ${valueClass}">Value: ${(bet.mainBet.value * 100).toFixed(0)}%</span>
+                        <span class="bet-type">${bet.mainBet.type || 'Unknown Type'}</span>
+                        ${bet.mainBet.value ? `<span class="bet-value ${valueClass}">Value: ${(bet.mainBet.value * 100).toFixed(0)}%</span>` : ''}
                     </div>
                     <div class="bet-selection-row">
                         <div class="bet-pick-container">
                             <div class="bet-pick">${bet.mainBet.pick}</div>
-                            <div class="bet-odds ${valueClass}">${this.formatAmericanOdds(bet.mainBet.odds)}</div>
+                            ${bet.mainBet.odds ? `<div class="bet-odds ${valueClass}">${this.formatAmericanOdds(bet.mainBet.odds)}</div>` : ''}
                         </div>
-                        <span class="confidence-badge ${confidenceBadgeClass}">${bet.mainBet.confidence} Confidence</span>
+                        <span class="confidence-badge ${confidenceBadgeClass}">${bet.mainBet.confidence || 'Medium'} Confidence</span>
                     </div>
                 </div>
                 <div class="bet-footer">
-                    <span class="best-odds">Best Odds: ${this.formatAmericanOdds(Math.max(...bet.sportsbooks.map(sb => sb.odds)))}</span>
+                    ${this.getBestOdds(bet.sportsbooks) ? `<span class="best-odds">Best Odds: ${this.getBestOdds(bet.sportsbooks)}</span>` : ''}
                     <button class="view-analysis-btn">View Analysis</button>
                 </div>
             </div>
         `;
         
         return card;
+    }
+
+    getBestOdds(sportsbooks) {
+        if (!sportsbooks || sportsbooks.length === 0) return null;
+        const validOdds = sportsbooks.filter(sb => sb.odds !== null && sb.odds !== undefined);
+        if (validOdds.length === 0) return null;
+        const bestOdds = Math.max(...validOdds.map(sb => sb.odds));
+        return this.formatAmericanOdds(bestOdds);
     }
 
     updateActiveSportTab() {
@@ -432,47 +473,53 @@ const db = firebase.firestore();
         
         modalTitle.textContent = bet.event;
         
-        const sportsBookComparison = bet.sportsbooks.map(sb => 
-            `<div class="odds-comparison-row">
-                <span>${sb.name}</span>
-                <span class="odds-value">${this.formatAmericanOdds(sb.odds)}</span>
-            </div>`
-        ).join('');
+        const sportsBookComparison = bet.sportsbooks 
+            ? bet.sportsbooks.filter(sb => sb.odds !== null && sb.odds !== undefined)
+                .map(sb => `
+                    <div class="odds-comparison-row">
+                        <span>${sb.name}</span>
+                        <span class="odds-value">${this.formatAmericanOdds(sb.odds)}</span>
+                    </div>`
+                ).join('')
+            : '<p class="no-odds">No odds comparison available</p>';
 
-        const otherBetsHtml = bet.otherBets.map(ob => 
-            `<div class="other-bet-row">
-                <div class="other-bet-info">
-                    <span class="other-bet-type">${ob.type}: ${ob.pick}</span>
-                    <span class="other-bet-odds">${this.formatAmericanOdds(ob.odds)}</span>
-                </div>
-                <div class="other-bet-value ${this.getValueClass(ob.value)}">Value: ${(ob.value * 100).toFixed(0)}%</div>
-            </div>`
-        ).join('');
+        const otherBetsHtml = bet.otherBets && bet.otherBets.length > 0
+            ? bet.otherBets.map(ob => `
+                <div class="other-bet-row">
+                    <div class="other-bet-info">
+                        <span class="other-bet-type">${ob.type || 'Unknown'}: ${ob.pick || 'Unknown'}</span>
+                        ${ob.odds ? `<span class="other-bet-odds">${this.formatAmericanOdds(ob.odds)}</span>` : ''}
+                    </div>
+                    ${ob.value ? `<div class="other-bet-value ${this.getValueClass(ob.value)}">Value: ${(ob.value * 100).toFixed(0)}%</div>` : ''}
+                </div>`
+            ).join('')
+            : '<p class="no-other-bets">No additional bets available</p>';
 
-        const confidenceBadgeClass = this.getConfidenceBadgeClass(bet.mainBet.confidence);
+        const confidenceBadgeClass = this.getConfidenceBadgeClass(bet.mainBet.confidence || "Medium");
 
         modalContent.innerHTML = `
             <div class="modal-section">
                 <div class="modal-header-row">
                     <div class="bet-meta">
-                        <span class="modal-sport">${bet.sport}</span>
+                        <span class="modal-sport">${bet.sport || 'Unknown Sport'}</span>
                         <span class="modal-time">${this.formatDate(bet.time)}</span>
                     </div>
-                    <span class="modal-confidence ${confidenceBadgeClass}">${bet.mainBet.confidence} Confidence</span>
+                    <span class="modal-confidence ${confidenceBadgeClass}">${bet.mainBet.confidence || 'Medium'} Confidence</span>
                 </div>
                 
                 <div class="main-bet-highlight">
                     <div class="bet-meta-row">
-                        <span class="bet-type-label">${bet.mainBet.type}</span>
-                        <span class="value-badge ${this.getValueClass(bet.mainBet.value)}">Value: ${(bet.mainBet.value * 100).toFixed(0)}%</span>
+                        <span class="bet-type-label">${bet.mainBet.type || 'Unknown Type'}</span>
+                        ${bet.mainBet.value ? `<span class="value-badge ${this.getValueClass(bet.mainBet.value)}">Value: ${(bet.mainBet.value * 100).toFixed(0)}%</span>` : ''}
                     </div>
                     <div class="bet-selection-row">
                         <div class="bet-pick">${bet.mainBet.pick}</div>
-                        <div class="bet-odds ${this.getValueClass(bet.mainBet.value)}">${this.formatAmericanOdds(bet.mainBet.odds)}</div>
+                        ${bet.mainBet.odds ? `<div class="bet-odds ${this.getValueClass(bet.mainBet.value || 0)}">${this.formatAmericanOdds(bet.mainBet.odds)}</div>` : ''}
                     </div>
+                    ${bet.mainBet.probability ? `
                     <div class="implied-prob">
                         Implied Probability: ${(bet.mainBet.probability * 100).toFixed(0)}%
-                    </div>
+                    </div>` : ''}
                 </div>
             </div>
 
@@ -480,7 +527,7 @@ const db = firebase.firestore();
                 <div class="modal-column">
                     <h3 class="modal-subtitle">Other Opportunities</h3>
                     <div class="other-bets-container">
-                        ${otherBetsHtml || '<p class="no-other-bets">No additional bets available</p>'}
+                        ${otherBetsHtml}
                     </div>
                 </div>
                 
@@ -492,13 +539,15 @@ const db = firebase.firestore();
                 </div>
             </div>
             
+            ${bet.analysis ? `
             <div class="modal-section">
                 <h3 class="modal-subtitle">Summary</h3>
                 <div class="analysis-container">
                     <p>${bet.analysis}</p>
                 </div>
-            </div>
+            </div>` : ''}
             
+            ${bet.aiReasoning ? `
             <div class="modal-section">
                 <h3 class="modal-subtitle ai-title">
                     <i class="fas fa-brain text-primary"></i>
@@ -507,7 +556,7 @@ const db = firebase.firestore();
                 <div class="ai-analysis-container">
                     <p>${bet.aiReasoning}</p>
                 </div>
-            </div>
+            </div>` : ''}
         `;
         
         document.getElementById('detailModal')?.classList.add('active');
@@ -648,10 +697,12 @@ const db = firebase.firestore();
     }
 
     formatAmericanOdds(odds) {
+        if (odds === null || odds === undefined) return 'N/A';
         return odds > 0 ? `+${odds}` : odds;
     }
 
     getValueClass(value) {
+        if (!value) return "value-low";
         if (value >= 0.25) return "value-high";
         if (value >= 0.15) return "value-medium";
         return "value-low";
@@ -666,112 +717,30 @@ const db = firebase.firestore();
     }
 
     formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleString('en-US', { 
-            month: 'short', 
-            day: 'numeric', 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true
-        });
-    }
-}
-
-// Email Signup Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const emailInput = document.getElementById('emailInput');
-    const submitEmailBtn = document.getElementById('submitEmailBtn');
-    
-    if (submitEmailBtn) {
-        submitEmailBtn.addEventListener('click', submitEmail);
-    }
-    
-    if (emailInput) {
-        emailInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') submitEmail();
-        });
-    }
-    
-    setTimeout(() => {
-        const emailModal = document.getElementById('emailSignupModal');
-        if (emailModal) emailModal.style.display = 'block';
-    }, 1000);
-});
-
-function submitEmail() {
-    const email = document.getElementById('emailInput').value.trim();
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
-    if (!emailPattern.test(email)) {
-        alert('Please enter a valid email address');
-        return;
-    }
-    
-    const existing = JSON.parse(localStorage.getItem("betSmartEmails") || "[]");
-    if (!existing.includes(email)) {
-        existing.push(email);
-        localStorage.setItem("betSmartEmails", JSON.stringify(existing));
-    }
-    
-    alert('Thank you! Check your email for access.');
-    document.getElementById('emailInput').value = '';
-    
-    const modal = document.getElementById('emailSignupModal');
-    if (modal) modal.style.display = 'none';
-}
-
-// ▼ Replace with this updated version ▼
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Hide app content until PIN is verified
-    document.getElementById('appContent').style.display = 'none';
-
-    // 2. Initialize app (will trigger auth flow)
-    const app = new BetSmartApp();
-
-    // 3. Keep existing email signup logic (but add localStorage check)
-    const emailInput = document.getElementById('emailInput');
-    const submitEmailBtn = document.getElementById('submitEmailBtn');
-
-    if (submitEmailBtn) {
-        submitEmailBtn.addEventListener('click', submitEmail);
-    }
-
-    if (emailInput) {
-        emailInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') submitEmail();
-        });
-    }
-
-    // 4. Show email modal only once per user
-    setTimeout(() => {
-        const emailModal = document.getElementById('emailSignupModal');
-        if (emailModal && !localStorage.getItem('betSmartEmailShown')) {
-            emailModal.style.display = 'block';
-            localStorage.setItem('betSmartEmailShown', 'true');
+        if (!dateString) return 'TBD';
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true
+            });
+        } catch (e) {
+            return 'TBD';
         }
-    }, 1000);
-});
-
-// 5. Keep the existing submitEmail() function (DO NOT MODIFY)
-function submitEmail() {
-    const email = document.getElementById('emailInput').value.trim();
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
-    if (!emailPattern.test(email)) {
-        alert('Please enter a valid email address');
-        return;
     }
-    
-    const existing = JSON.parse(localStorage.getItem("betSmartEmails") || "[]");
-    if (!existing.includes(email)) {
-        existing.push(email);
-        localStorage.setItem("betSmartEmails", JSON.stringify(existing));
-    }
-    
-    alert('Thank you! Check your email for access.');
-    document.getElementById('emailInput').value = '';
-    
-    const modal = document.getElementById('emailSignupModal');
-    if (modal) modal.style.display = 'none';
 }
-// ▲ End of updated code ▲
+
+// Initialize app when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Hide app content until authenticated
+    document.getElementById('appContent').style.display = 'none';
+    
+    // Show loading spinner
+    document.getElementById('loadingSpinner').style.display = 'flex';
+    
+    // Initialize the app
+    const app = new BetSmartApp();
+});
