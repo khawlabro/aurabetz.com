@@ -63,29 +63,32 @@ class BetSmartApp {
     }
 
     verifyPinWithFirebase(pin) {
-        this.db.collection("validPins").doc(pin).get()
-            .then((doc) => {
-                if (doc.exists) {
-                    // PIN is valid
-                    localStorage.setItem('betSmartAuth', pin);
-                    document.getElementById('authWall').style.display = 'none';
-                    this.trackAccess(pin);
-                    
-                    // Sign in anonymously to maintain auth state
-                    return this.auth.signInAnonymously();
-                } else {
-                    throw new Error("Invalid PIN");
-                }
-            })
-            .then(() => {
-                this.initApp();
-            })
-            .catch((error) => {
-                console.error("PIN verification failed:", error);
-                document.getElementById('pinError').textContent = "Invalid PIN";
-                document.getElementById('pinError').style.display = 'block';
-            });
-    }
+    // Changed to query where pin field matches entered PIN
+    this.db.collection("validPins")
+        .where("pin", "==", pin)  // Look for documents where pin field equals entered PIN
+        .get()
+        .then((querySnapshot) => {
+            if (!querySnapshot.empty) {  // If we found any documents
+                // PIN is valid
+                localStorage.setItem('betSmartAuth', pin);
+                document.getElementById('authWall').style.display = 'none';
+                this.trackAccess(pin);
+                
+                // Sign in anonymously to maintain auth state
+                return this.auth.signInAnonymously();
+            } else {
+                throw new Error("Invalid PIN");
+            }
+        })
+        .then(() => {
+            this.initApp();
+        })
+        .catch((error) => {
+            console.error("PIN verification failed:", error);
+            document.getElementById('pinError').textContent = "Invalid PIN";
+            document.getElementById('pinError').style.display = 'block';
+        });
+}
 
     initApp() {
         this.init();
