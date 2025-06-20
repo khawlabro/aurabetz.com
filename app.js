@@ -69,22 +69,24 @@ class BetSmartApp {
     }
 
     verifyPinWithFirebase(pin) {
-    // Changed to query where pin field matches entered PIN
     this.db.collection("validPins")
-        .where("pin", "==", pin)  // Look for documents where pin field equals entered PIN
+        .where("pin", "==", pin)
         .get()
         .then((querySnapshot) => {
-            if (!querySnapshot.empty) {  // If we found any documents
-                // PIN is valid
+            if (!querySnapshot.empty) {
                 localStorage.setItem('betSmartAuth', pin);
                 document.getElementById('authWall').style.display = 'none';
                 this.trackAccess(pin);
-                
-                // Sign in anonymously to maintain auth state
+
+                // 🔐 Sign in anonymously
                 return this.auth.signInAnonymously();
             } else {
                 throw new Error("Invalid PIN");
             }
+        })
+        .then(() => {
+            // ✅ Wait for the token to be available before continuing
+            return this.auth.currentUser.getIdToken(true);
         })
         .then(() => {
             this.initApp();
@@ -95,6 +97,7 @@ class BetSmartApp {
             document.getElementById('pinError').style.display = 'block';
         });
 }
+
 
     initApp() {
     // FIRST hide everything and show loading
