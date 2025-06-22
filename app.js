@@ -1,108 +1,189 @@
 // BetSmart App - Main application class
 class BetSmartApp {
     constructor() {
+        // Initialize properties
         this.bets = [];
         this.gameData = {};
         this.selectedSport = 'All Sports';
         this.sortBy = 'value';
         this.highValueOnly = false;
         this.DATA_URL = this.resolveDataUrl();
-        
+        this.isInitialized = false;
+
         // Initialize Firebase
-        this.firebaseConfig = {
-            apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
-            authDomain: "aurabetz.firebaseapp.com",
-            projectId: "aurabetz",
-            storageBucket: "aurabetz.appspot.com",
-            messagingSenderId: "531651661385",
-            appId: "1:531651661385:web:d82a50a33bb77297b7f998",
-            measurementId: "G-7L19JWBH21"
-        };
-        
-        this.app = firebase.initializeApp(this.firebaseConfig);
-        this.auth = firebase.auth();
-        this.db = firebase.firestore();
-        
+        this.initializeFirebase();
         this.initAuth();
+    }
+
+    initializeFirebase() {
+        try {
+            this.firebaseConfig = {
+                apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
+                authDomain: "aurabetz.firebaseapp.com",
+                projectId: "aurabetz",
+                storageBucket: "aurabetz.appspot.com",
+                messagingSenderId: "531651661385",
+                appId: "1:531651661385:web:d82a50a33bb77297b7f998",
+                measurementId: "G-7L19JWBH21"
+            };
+
+            // Check if Firebase is already initialized
+            if (!firebase.apps.length) {
+                this.app = firebase.initializeApp(this.firebaseConfig);
+            } else {
+                this.app = firebase.app();
+            }
+
+            this.auth = firebase.auth();
+            this.db = firebase.firestore();
+            
+            // Set persistence
+            this.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+                .catch(error => {
+                    console.error("Error setting auth persistence:", error);
+                });
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+            this.handleAuthError(error);
+        }
     }
 
     initAuth() {
         try {
-            // Check Firebase auth state
+            // Hide loading spinner when auth state is determined
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            
             this.auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // User is authenticated (either via PIN or email)
+                    // User is authenticated
+                    if (loadingSpinner) loadingSpinner.style.display = 'none';
                     this.initApp();
                 } else {
-                    // Show auth wall with both PIN and Email options
+                    // No user, show auth wall
+                    if (loadingSpinner) loadingSpinner.style.display = 'none';
                     this.showAuthWall();
                 }
+            }, (error) => {
+                console.error("Auth state error:", error);
+                if (loadingSpinner) loadingSpinner.style.display = 'none';
+                this.handleAuthError(error);
             });
         } catch (error) {
+            console.error("Auth initialization error:", error);
             this.handleAuthError(error);
         }
     }
 
     showAuthWall() {
-        const authWall = document.getElementById('authWall');
-        if (!authWall) throw new Error("Auth wall element not found");
-        
-        authWall.style.display = 'flex';
-        document.getElementById('authTabs').style.display = 'flex';
-        document.getElementById('pinAuth').style.display = 'none';
-        document.getElementById('emailAuth').style.display = 'none';
+        try {
+            const authWall = document.getElementById('authWall');
+            if (!authWall) throw new Error("Auth wall element not found");
+            
+            authWall.style.display = 'flex';
+            
+            // Reset form states
+            document.getElementById('pinError').style.display = 'none';
+            document.getElementById('emailError').style.display = 'none';
+            document.getElementById('pinInput').value = '';
+            document.getElementById('emailInput').value = '';
+            document.getElementById('passwordInput').value = '';
 
-        // Tab switchers
-        document.getElementById('showPinAuth').addEventListener('click', () => {
+            // Set default tab
             document.getElementById('pinAuth').style.display = 'block';
             document.getElementById('emailAuth').style.display = 'none';
-        });
 
-        document.getElementById('showEmailAuth').addEventListener('click', () => {
-            document.getElementById('emailAuth').style.display = 'block';
-            document.getElementById('pinAuth').style.display = 'none';
-        });
+            // Tab switchers
+            document.getElementById('showPinAuth').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('pinAuth').style.display = 'block';
+                document.getElementById('emailAuth').style.display = 'none';
+                document.getElementById('pinError').style.display = 'none';
+                document.getElementById('emailError').style.display = 'none';
+            });
 
-        // PIN submission handler
-        document.getElementById('submitPin').addEventListener('click', () => {
-            const enteredPin = document.getElementById('pinInput').value;
-            if (!enteredPin) {
-                document.getElementById('pinError').textContent = "Please enter a PIN";
-                document.getElementById('pinError').style.display = 'block';
-                return;
-            }
-            this.verifyPinWithFirebase(enteredPin);
-        });
+            document.getElementById('showEmailAuth').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('emailAuth').style.display = 'block';
+                document.getElementById('pinAuth').style.display = 'none';
+                document.getElementById('pinError').style.display = 'none';
+                document.getElementById('emailError').style.display = 'none';
+            });
 
-        // Email/password handlers
-        document.getElementById('emailSignIn').addEventListener('click', () => {
-            const email = document.getElementById('emailInput').value;
-            const password = document.getElementById('passwordInput').value;
-            this.signInWithEmail(email, password);
-        });
+            // PIN submission handler
+            document.getElementById('submitPin').addEventListener('click', (e) => {
+                e.preventDefault();
+                const enteredPin = document.getElementById('pinInput').value.trim();
+                if (!enteredPin) {
+                    document.getElementById('pinError').textContent = "Please enter a PIN";
+                    document.getElementById('pinError').style.display = 'block';
+                    return;
+                }
+                this.verifyPinWithFirebase(enteredPin);
+            });
 
-        document.getElementById('emailSignUp').addEventListener('click', () => {
-            const email = document.getElementById('emailInput').value;
-            const password = document.getElementById('passwordInput').value;
-            this.signUpWithEmail(email, password);
-        });
+            // Email/password handlers
+            document.getElementById('emailSignIn').addEventListener('click', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('emailInput').value.trim();
+                const password = document.getElementById('passwordInput').value;
+                
+                if (!email || !password) {
+                    document.getElementById('emailError').textContent = "Please enter both email and password";
+                    document.getElementById('emailError').style.display = 'block';
+                    return;
+                }
+                
+                this.signInWithEmail(email, password);
+            });
 
-        // Enter key support
-        document.getElementById('pinInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('submitPin').click();
-        });
+            document.getElementById('emailSignUp').addEventListener('click', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('emailInput').value.trim();
+                const password = document.getElementById('passwordInput').value;
+                
+                if (!email || !password) {
+                    document.getElementById('emailError').textContent = "Please enter both email and password";
+                    document.getElementById('emailError').style.display = 'block';
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    document.getElementById('emailError').textContent = "Password should be at least 6 characters";
+                    document.getElementById('emailError').style.display = 'block';
+                    return;
+                }
+                
+                this.signUpWithEmail(email, password);
+            });
 
-        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('emailSignIn').click();
-        });
+            // Enter key support
+            document.getElementById('pinInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('submitPin').click();
+                }
+            });
+
+            document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('emailSignIn').click();
+                }
+            });
+        } catch (error) {
+            console.error("Error showing auth wall:", error);
+            this.handleAuthError(error);
+        }
     }
 
     verifyPinWithFirebase(pin) {
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        if (loadingSpinner) loadingSpinner.style.display = 'flex';
+        
         this.db.collection("validPins").doc(pin).get()
             .then((doc) => {
                 if (doc.exists) {
                     localStorage.setItem('betSmartAuth', pin);
-                    document.getElementById('authWall').style.display = 'none';
                     this.trackAccess(pin);
                     return this.auth.signInAnonymously();
                 } else {
@@ -110,36 +191,49 @@ class BetSmartApp {
                 }
             })
             .then(() => {
+                if (loadingSpinner) loadingSpinner.style.display = 'none';
+                document.getElementById('authWall').style.display = 'none';
                 this.initApp();
             })
             .catch((error) => {
                 console.error("PIN verification failed:", error);
+                if (loadingSpinner) loadingSpinner.style.display = 'none';
                 document.getElementById('pinError').textContent = "Invalid PIN";
                 document.getElementById('pinError').style.display = 'block';
             });
     }
 
     signInWithEmail(email, password) {
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        if (loadingSpinner) loadingSpinner.style.display = 'flex';
+        
         this.auth.signInWithEmailAndPassword(email, password)
             .then(() => {
+                if (loadingSpinner) loadingSpinner.style.display = 'none';
                 document.getElementById('authWall').style.display = 'none';
                 this.initApp();
             })
             .catch((error) => {
                 console.error("Email sign in failed:", error);
+                if (loadingSpinner) loadingSpinner.style.display = 'none';
                 document.getElementById('emailError').textContent = this.getAuthErrorMessage(error);
                 document.getElementById('emailError').style.display = 'block';
             });
     }
 
     signUpWithEmail(email, password) {
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        if (loadingSpinner) loadingSpinner.style.display = 'flex';
+        
         this.auth.createUserWithEmailAndPassword(email, password)
             .then(() => {
+                if (loadingSpinner) loadingSpinner.style.display = 'none';
                 document.getElementById('authWall').style.display = 'none';
                 this.initApp();
             })
             .catch((error) => {
                 console.error("Email sign up failed:", error);
+                if (loadingSpinner) loadingSpinner.style.display = 'none';
                 document.getElementById('emailError').textContent = this.getAuthErrorMessage(error);
                 document.getElementById('emailError').style.display = 'block';
             });
@@ -159,14 +253,24 @@ class BetSmartApp {
                 return 'Email already in use';
             case 'auth/weak-password':
                 return 'Password should be at least 6 characters';
+            case 'auth/network-request-failed':
+                return 'Network error. Please check your connection.';
             default:
                 return 'Authentication failed. Please try again.';
         }
     }
 
     initApp() {
-        this.init();
-        document.getElementById('appContent').style.display = 'block';
+        if (this.isInitialized) return;
+        
+        try {
+            document.getElementById('appContent').style.display = 'block';
+            this.init();
+            this.isInitialized = true;
+        } catch (error) {
+            console.error("App initialization error:", error);
+            this.handleAuthError(error);
+        }
     }
 
     trackAccess(pin) {
@@ -805,12 +909,40 @@ class BetSmartApp {
 
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Hide app content until authenticated
-    document.getElementById('appContent').style.display = 'none';
-    
-    // Show loading spinner
-    document.getElementById('loadingSpinner').style.display = 'flex';
-    
-    // Initialize the app
-    const app = new BetSmartApp();
+    try {
+        // Hide app content until authenticated
+        document.getElementById('appContent').style.display = 'none';
+        
+        // Show loading spinner
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        if (loadingSpinner) {
+            loadingSpinner.style.display = 'flex';
+            loadingSpinner.innerHTML = `
+                <div class="spinner-content">
+                    <i class="fas fa-circle-notch spinner-icon"></i>
+                    <p style="margin-top:20px">Loading BetSmart...</p>
+                </div>`;
+        }
+        
+        // Initialize the app
+        const app = new BetSmartApp();
+    } catch (error) {
+        console.error("Initialization error:", error);
+        const spinner = document.getElementById('loadingSpinner');
+        if (spinner) {
+            spinner.innerHTML = `
+                <div class="spinner-content">
+                    <i class="fas fa-exclamation-triangle" style="color: red; font-size: 2rem;"></i>
+                    <p style="color: red; margin-top: 20px;">
+                        Critical error loading application. Please refresh the page.
+                    </p>
+                    <button onclick="window.location.reload()" 
+                            style="margin-top: 10px; padding: 8px 16px; 
+                                   background: var(--primary); color: white; 
+                                   border: none; border-radius: 4px; cursor: pointer;">
+                        Refresh Page
+                    </button>
+                </div>`;
+        }
+    }
 });
