@@ -1,36 +1,31 @@
 // BetSmart App - Main application class
 class BetSmartApp {
     constructor() {
-    this.bets = [];
-    this.gameData = {};
-    this.selectedSport = 'All Sports';
-    this.sortBy = 'value';
-    this.highValueOnly = false;
-    this.DATA_URL = this.resolveDataUrl();
-    
-    // Modified Firebase initialization
-    this.firebaseConfig = {
-        apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
-        authDomain: "aurabetz.firebaseapp.com",
-        projectId: "aurabetz",
-        storageBucket: "aurabetz.firebasestorage.app",
-        messagingSenderId: "531651661385",
-        appId: "1:531651661385:web:d82a50a33bb77297b7f998",
-        measurementId: "G-7L19JWBH21"
-    };
-    
-    // Check if Firebase is already initialized
-    if (!firebase.apps.length) {
+        this.bets = [];
+        this.gameData = {};
+        this.selectedSport = 'All Sports';
+        this.sortBy = 'value';
+        this.highValueOnly = false;
+        this.DATA_URL = this.resolveDataUrl();
+        
+        // Firebase configuration
+        this.firebaseConfig = {
+            apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
+            authDomain: "aurabetz.firebaseapp.com",
+            projectId: "aurabetz",
+            storageBucket: "aurabetz.firebasestorage.app",
+            messagingSenderId: "531651661385",
+            appId: "1:531651661385:web:d82a50a33bb77297b7f998",
+            measurementId: "G-7L19JWBH21"
+        };
+        
+        // Initialize Firebase services
         this.app = firebase.initializeApp(this.firebaseConfig);
-    } else {
-        this.app = firebase.app();
+        this.auth = firebase.auth();
+        this.db = firebase.firestore();
+        
+        this.initAuth();
     }
-    
-    this.auth = firebase.auth();
-    this.db = firebase.firestore();
-    
-    this.initAuth();
-}
 
     initAuth() {
         try {
@@ -46,7 +41,7 @@ class BetSmartApp {
                     authWall.style.display = 'flex';
 
                     // PIN submission handler
-                    document.getElementById('submitPin').addEventListener('click', () => {
+                    document.getElementById('submitPin')?.addEventListener('click', () => {
                         const enteredPin = document.getElementById('pinInput').value;
                         if (!enteredPin) {
                             document.getElementById('pinError').textContent = "Please enter a PIN";
@@ -58,7 +53,7 @@ class BetSmartApp {
                     });
 
                     // Enter key support
-                    document.getElementById('pinInput').addEventListener('keypress', (e) => {
+                    document.getElementById('pinInput')?.addEventListener('keypress', (e) => {
                         if (e.key === 'Enter') document.getElementById('submitPin').click();
                     });
                 }
@@ -69,53 +64,57 @@ class BetSmartApp {
     }
 
     verifyPinWithFirebase(pin) {
-    this.db.collection("validPins")
-        .where("pin", "==", pin)
-        .get()
-        .then((querySnapshot) => {
-            if (!querySnapshot.empty) {
-                localStorage.setItem('betSmartAuth', pin);
-                document.getElementById('authWall').style.display = 'none';
-                this.trackAccess(pin);
+        this.db.collection("validPins")
+            .where("pin", "==", pin)
+            .get()
+            .then((querySnapshot) => {
+                if (!querySnapshot.empty) {
+                    localStorage.setItem('betSmartAuth', pin);
+                    document.getElementById('authWall').style.display = 'none';
+                    this.trackAccess(pin);
 
-                // 🔐 Sign in anonymously
-                return this.auth.signInAnonymously();
-            } else {
-                throw new Error("Invalid PIN");
-            }
-        })
-        .then(() => {
-            // ✅ Wait for the token to be available before continuing
-            return this.auth.currentUser.getIdToken(true);
-        })
-        .then(() => {
-            this.initApp();
-        })
-        .catch((error) => {
-            console.error("PIN verification failed:", error);
-            document.getElementById('pinError').textContent = "Invalid PIN";
-            document.getElementById('pinError').style.display = 'block';
-        });
-}
-
+                    // Sign in anonymously
+                    return this.auth.signInAnonymously();
+                } else {
+                    throw new Error("Invalid PIN");
+                }
+            })
+            .then(() => {
+                // Wait for the token to be available before continuing
+                return this.auth.currentUser.getIdToken(true);
+            })
+            .then(() => {
+                this.initApp();
+            })
+            .catch((error) => {
+                console.error("PIN verification failed:", error);
+                const pinError = document.getElementById('pinError');
+                if (pinError) {
+                    pinError.textContent = "Invalid PIN";
+                    pinError.style.display = 'block';
+                }
+            });
+    }
 
     initApp() {
-    // FIRST hide everything and show loading
-    document.getElementById('appContent').style.display = 'none';
-    document.getElementById('loadingSpinner').style.display = 'flex';
-    
-    // THEN initialize
-    this.init().then(() => {
-        // AFTER initialization is complete:
-        this.render(); // Regenerate all UI elements
-        this.setupEventListeners(); // Rebind ALL listeners
-        this.checkDarkMode(); // Reset dark mode
+        // FIRST hide everything and show loading
+        document.getElementById('appContent').style.display = 'none';
+        document.getElementById('loadingSpinner').style.display = 'flex';
         
-        // FINALLY show UI
-        document.getElementById('appContent').style.display = 'block';
-        document.getElementById('loadingSpinner').style.display = 'none';
-    });
-}
+        // THEN initialize
+        this.init().then(() => {
+            // AFTER initialization is complete:
+            this.render(); // Regenerate all UI elements
+            this.setupEventListeners(); // Rebind ALL listeners
+            this.checkDarkMode(); // Reset dark mode
+            
+            // FINALLY show UI
+            document.getElementById('appContent').style.display = 'block';
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }).catch(error => {
+            this.handleAuthError(error);
+        });
+    }
 
     trackAccess(pin) {
         try {
@@ -133,10 +132,6 @@ class BetSmartApp {
             console.error("Tracking failed (non-critical):", error);
         }
     }
-
-    // ... [Keep all other existing methods exactly the same] ...
-    // All methods below this point remain unchanged from your previous implementation
-    // Only the auth-related code above has been modified
 
     handleAuthError(error) {
         console.error("Auth error:", error);
@@ -226,23 +221,23 @@ class BetSmartApp {
     }
 
     init() {
-    return new Promise((resolve, reject) => {
-        try {
-            this.loadData().then(() => {
-                this.render();
-                this.setupEventListeners();
-                this.checkDarkMode();
-                resolve(); // Signal completion
-            }).catch((err) => {
-                this.handleAuthError(err);
-                reject(err);
-            });
-        } catch (error) {
-            this.handleAuthError(error);
-            reject(error);
-        }
-    });
-}
+        return new Promise((resolve, reject) => {
+            try {
+                this.loadData().then(() => {
+                    this.render();
+                    this.setupEventListeners();
+                    this.checkDarkMode();
+                    resolve(); // Signal completion
+                }).catch((err) => {
+                    this.handleAuthError(err);
+                    reject(err);
+                });
+            } catch (error) {
+                this.handleAuthError(error);
+                reject(error);
+            }
+        });
+    }
 
     async loadData() {
         try {
@@ -281,148 +276,146 @@ class BetSmartApp {
     }
 
     setupEventListeners() {
-    // First remove all existing event listeners to prevent duplicates
-    this.removeAllEventListeners();
+        // First remove all existing event listeners to prevent duplicates
+        this.removeAllEventListeners();
 
-    // Dark Mode Toggle
-    this.safeAddEventListener('#darkModeToggle', 'click', () => this.toggleDarkMode());
+        // Dark Mode Toggle
+        this.safeAddEventListener('#darkModeToggle', 'click', () => this.toggleDarkMode());
 
-    // Subscribe Button
-    this.safeAddEventListener('#subscribeBtn', 'click', () => this.showSubscribeModal());
+        // Subscribe Button
+        this.safeAddEventListener('#subscribeBtn', 'click', () => this.showSubscribeModal());
 
-    // Sport Tabs
-    document.querySelectorAll('.tab').forEach(tab => {
-        this.safeAddEventListener(tab, 'click', (e) => {
-            this.selectedSport = e.currentTarget.getAttribute('data-sport');
-            this.updateActiveSportTab();
+        // Sport Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            this.safeAddEventListener(tab, 'click', (e) => {
+                this.selectedSport = e.currentTarget.getAttribute('data-sport');
+                this.updateActiveSportTab();
+                this.renderBets(this.filterAndSortBets());
+            });
+        });
+
+        // Sort Options
+        this.safeAddEventListener('#sortOptions', 'change', (e) => {
+            this.sortBy = e.target.value;
             this.renderBets(this.filterAndSortBets());
         });
-    });
 
-    // Sort Options
-    this.safeAddEventListener('#sortOptions', 'change', (e) => {
-        this.sortBy = e.target.value;
-        this.renderBets(this.filterAndSortBets());
-    });
+        // High Value Filter
+        this.safeAddEventListener('#highValueOnly', 'change', (e) => {
+            this.highValueOnly = e.target.checked;
+            this.renderBets(this.filterAndSortBets());
+        });
 
-    // High Value Filter
-    this.safeAddEventListener('#highValueOnly', 'change', (e) => {
-        this.highValueOnly = e.target.checked;
-        this.renderBets(this.filterAndSortBets());
-    });
-
-    // Detail Modal
-    this.safeAddEventListener('#closeModal', 'click', () => this.hideDetailModal());
-    this.safeAddEventListener('#detailModal', 'click', (e) => {
-        if (e.target === e.currentTarget) {
-            this.hideDetailModal();
-        }
-    });
-
-    // Game Modal
-    this.safeAddEventListener('#theGameBtn', 'click', () => {
-        this.showGameModal();
-        this.updateGameProgress();
-    });
-    this.safeAddEventListener('#closeGameModal', 'click', () => this.hideGameModal());
-    this.safeAddEventListener('#gameModal', 'click', (e) => {
-        if (e.target === e.currentTarget) {
-            this.hideGameModal();
-        }
-    });
-
-    // Subscribe Modal
-    this.safeAddEventListener('#closeSubscribeModal', 'click', () => this.hideSubscribeModal());
-    this.safeAddEventListener('#subscribeModal', 'click', (e) => {
-        if (e.target === e.currentTarget) {
-            this.hideSubscribeModal();
-        }
-    });
-
-    // Delegated events for dynamic elements
-    this.safeAddEventListener(document, 'click', (e) => {
-        // View Analysis Buttons
-        if (e.target.classList.contains('view-analysis-btn')) {
-            const card = e.target.closest('.bet-card');
-            if (card) {
-                const betId = parseInt(card.getAttribute('data-bet-id'));
-                if (!isNaN(betId)) {
-                    this.showDetailModal(betId);
-                    e.stopPropagation();
-                }
-            }
-        }
-
-        // Payment Select Buttons
-        if (e.target.classList.contains('payment-select-btn')) {
-            const paymentOption = e.target.closest('.payment-option');
-            if (paymentOption) {
-                const paymentMethod = paymentOption.querySelector('h3')?.textContent;
-                if (paymentMethod) {
-                    alert(`Selected ${paymentMethod}. Payment processing would be implemented here.`);
-                    this.hideSubscribeModal();
-                }
-            }
-        }
-    });
-
-    // Diamond Progress
-    document.querySelectorAll('.diamond').forEach(diamond => {
-        this.safeAddEventListener(diamond, 'click', (e) => {
-            const day = parseInt(e.currentTarget.getAttribute('data-day'));
-            if (!isNaN(day) && day === this.gameData.currentDay) {
-                this.completeCurrentDay(true);
+        // Detail Modal
+        this.safeAddEventListener('#closeModal', 'click', () => this.hideDetailModal());
+        this.safeAddEventListener('#detailModal', 'click', (e) => {
+            if (e.target === e.currentTarget) {
+                this.hideDetailModal();
             }
         });
-    });
-}
 
-// New helper methods to add to your class:
-
-safeAddEventListener(selectorOrElement, event, handler) {
-    const element = typeof selectorOrElement === 'string' 
-        ? document.querySelector(selectorOrElement) 
-        : selectorOrElement;
-    
-    if (!element) return;
-    
-    // First remove any existing listener
-    element.removeEventListener(event, handler);
-    // Then add the new one
-    element.addEventListener(event, handler);
-}
-
-removeAllEventListeners() {
-    // This is a simplified version - in a real app you might want to track listeners
-    // and remove them specifically, but this works for most cases
-    const elements = [
-        '#darkModeToggle',
-        '#subscribeBtn',
-        '#sortOptions',
-        '#highValueOnly',
-        '#closeModal',
-        '#detailModal',
-        '#theGameBtn',
-        '#closeGameModal',
-        '#gameModal',
-        '#closeSubscribeModal',
-        '#subscribeModal',
-        document, // For delegated events
-        ...document.querySelectorAll('.tab'),
-        ...document.querySelectorAll('.diamond')
-    ];
-
-    elements.forEach(element => {
-        if (typeof element === 'string') {
-            const el = document.querySelector(element);
-            if (el) {
-                el.replaceWith(el.cloneNode(true));
+        // Game Modal
+        this.safeAddEventListener('#theGameBtn', 'click', () => {
+            this.showGameModal();
+            this.updateGameProgress();
+        });
+        this.safeAddEventListener('#closeGameModal', 'click', () => this.hideGameModal());
+        this.safeAddEventListener('#gameModal', 'click', (e) => {
+            if (e.target === e.currentTarget) {
+                this.hideGameModal();
             }
-        } else {
-            element.replaceWith(element.cloneNode(true));
-        }
-    });
-}
+        });
+
+        // Subscribe Modal
+        this.safeAddEventListener('#closeSubscribeModal', 'click', () => this.hideSubscribeModal());
+        this.safeAddEventListener('#subscribeModal', 'click', (e) => {
+            if (e.target === e.currentTarget) {
+                this.hideSubscribeModal();
+            }
+        });
+
+        // Delegated events for dynamic elements
+        this.safeAddEventListener(document, 'click', (e) => {
+            // View Analysis Buttons
+            if (e.target.classList.contains('view-analysis-btn')) {
+                const card = e.target.closest('.bet-card');
+                if (card) {
+                    const betId = parseInt(card.getAttribute('data-bet-id'));
+                    if (!isNaN(betId)) {
+                        this.showDetailModal(betId);
+                        e.stopPropagation();
+                    }
+                }
+            }
+
+            // Payment Select Buttons
+            if (e.target.classList.contains('payment-select-btn')) {
+                const paymentOption = e.target.closest('.payment-option');
+                if (paymentOption) {
+                    const paymentMethod = paymentOption.querySelector('h3')?.textContent;
+                    if (paymentMethod) {
+                        alert(`Selected ${paymentMethod}. Payment processing would be implemented here.`);
+                        this.hideSubscribeModal();
+                    }
+                }
+            }
+        });
+
+        // Diamond Progress
+        document.querySelectorAll('.diamond').forEach(diamond => {
+            this.safeAddEventListener(diamond, 'click', (e) => {
+                const day = parseInt(e.currentTarget.getAttribute('data-day'));
+                if (!isNaN(day) && day === this.gameData.currentDay) {
+                    this.completeCurrentDay(true);
+                }
+            });
+        });
+    }
+
+    safeAddEventListener(selectorOrElement, event, handler) {
+        const element = typeof selectorOrElement === 'string' 
+            ? document.querySelector(selectorOrElement) 
+            : selectorOrElement;
+        
+        if (!element) return;
+        
+        // First remove any existing listener
+        element.removeEventListener(event, handler);
+        // Then add the new one
+        element.addEventListener(event, handler);
+    }
+
+    removeAllEventListeners() {
+        // This is a simplified version - in a real app you might want to track listeners
+        // and remove them specifically, but this works for most cases
+        const elements = [
+            '#darkModeToggle',
+            '#subscribeBtn',
+            '#sortOptions',
+            '#highValueOnly',
+            '#closeModal',
+            '#detailModal',
+            '#theGameBtn',
+            '#closeGameModal',
+            '#gameModal',
+            '#closeSubscribeModal',
+            '#subscribeModal',
+            document, // For delegated events
+            ...document.querySelectorAll('.tab'),
+            ...document.querySelectorAll('.diamond')
+        ];
+
+        elements.forEach(element => {
+            if (typeof element === 'string') {
+                const el = document.querySelector(element);
+                if (el) {
+                    el.replaceWith(el.cloneNode(true));
+                }
+            } else {
+                element.replaceWith(element.cloneNode(true));
+            }
+        });
+    }
 
     showSubscribeModal() {
         document.getElementById('subscribeModal')?.classList.add('active');
@@ -840,6 +833,20 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Show loading spinner
     document.getElementById('loadingSpinner').style.display = 'flex';
+    
+    // Initialize Firebase services before creating the app
+    const firebaseConfig = {
+        apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
+        authDomain: "aurabetz.firebaseapp.com",
+        projectId: "aurabetz",
+        storageBucket: "aurabetz.appspot.com",
+        messagingSenderId: "531651661385",
+        appId: "1:531651661385:web:d82a50a33bb77297b7f998",
+        measurementId: "G-7L19JWBH21"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
     
     // Initialize the app
     const app = new BetSmartApp();
