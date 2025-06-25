@@ -457,29 +457,31 @@
     <script>
 document.addEventListener('DOMContentLoaded', () => {
     try {
-        // Hide app content until authenticated
-        document.getElementById('appContent').style.display = 'none';
+        const appContent = document.getElementById('appContent');
+        const loadingSpinner = document.getElementById('loadingSpinner');
         
-        // Show loading spinner
-        document.getElementById('loadingSpinner').style.display = 'flex';
+        if (appContent) appContent.style.display = 'none';
+        if (loadingSpinner) loadingSpinner.style.display = 'flex';
         
-        // Initialize the app
         const app = new BetSmartApp();
     } catch (error) {
         console.error("Initialization error:", error);
-        document.getElementById('loadingSpinner').innerHTML = `
-            <div class="spinner-content">
-                <i class="fas fa-exclamation-triangle" style="color: red; font-size: 2rem;"></i>
-                <p style="color: red; margin-top: 20px;">
-                    Failed to load BetSmart. Please check console for errors.
-                </p>
-                <button onclick="window.location.reload()" 
-                        style="margin-top: 10px; padding: 8px 16px; 
-                               background: #007bff; color: white; 
-                               border: none; border-radius: 4px; cursor: pointer;">
-                    Refresh Page
-                </button>
-            </div>`;
+        const spinner = document.getElementById('loadingSpinner');
+        if (spinner) {
+            spinner.innerHTML = `
+                <div class="spinner-content">
+                    <i class="fas fa-exclamation-triangle" style="color: red; font-size: 2rem;"></i>
+                    <p style="color: red; margin-top: 20px;">
+                        Failed to load BetSmart. Please check console for errors.
+                    </p>
+                    <button onclick="window.location.reload()" 
+                            style="margin-top: 10px; padding: 8px 16px; 
+                                   background: #007bff; color: white; 
+                                   border: none; border-radius: 4px; cursor: pointer;">
+                        Refresh Page
+                    </button>
+                </div>`;
+        }
     }
 });
 </script>
