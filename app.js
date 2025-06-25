@@ -9,15 +9,15 @@ class BetSmartApp {
         this.DATA_URL = this.resolveDataUrl();
         this.initialized = false;
         
-        // Modified Firebase initialization
+        // Updated Firebase initialization with your new config
         this.firebaseConfig = {
-            apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
-            authDomain: "aurabetz.firebaseapp.com",
-            projectId: "aurabetz",
-            storageBucket: "aurabetz.appspot.com",
-            messagingSenderId: "531651661385",
-            appId: "1:531651661385:web:d82a50a33bb77297b7f998",
-            measurementId: "G-7L19JWBH21"
+            apiKey: "AIzaSyDalVcdFUamoA90pSvNX2hfIkyH7hMZk9I",
+            authDomain: "aurabetz1.firebaseapp.com",
+            projectId: "aurabetz1",
+            storageBucket: "aurabetz1.appspot.com",
+            messagingSenderId: "254316956886",
+            appId: "1:254316956886:web:3ea3341005161efbe88d77",
+            measurementId: "G-R8WRSY7L57"
         };
         
         // Check if Firebase is already initialized
@@ -33,6 +33,7 @@ class BetSmartApp {
         this.initAuth();
     }
 
+    // [Rest of your existing code remains exactly the same...]
     initAuth() {
         try {
             // Check for cached PIN first
@@ -111,8 +112,8 @@ class BetSmartApp {
         if (this.initialized) return;
         
         // Show loading spinner
-        //document.getElementById('appContent').style.display = 'none';
-        //document.getElementById('loadingSpinner').style.display = 'flex';
+        document.getElementById('appContent').style.display = 'none';
+        document.getElementById('loadingSpinner').style.display = 'flex';
         
         // Initialize the app
         this.init().then(() => {
