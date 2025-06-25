@@ -430,48 +430,12 @@
         </div>
     </div>
 
-    <!-- Firebase + App Initialization -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-    
-    <script>
-      // Firebase Config
-      const firebaseConfig = {
-        apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
-        authDomain: "aurabetz.firebaseapp.com",
-        projectId: "aurabetz",
-        storageBucket: "aurabetz.firebasestorage.app",
-        messagingSenderId: "531651661385",
-        appId: "1:531651661385:web:d82a50a33bb77297b7f998",
-        measurementId: "G-7L19JWBH21"
-      };
-      
-      // Initialize Firebase
-      try {
-        firebase.initializeApp(firebaseConfig);
-        
-        // Check if initialization was successful
-        if (firebase.apps.length > 0) {
-          firebase.auth().onAuthStateChanged(() => {
-            document.getElementById('loadingSpinner').style.display = 'none';
-            document.getElementById('appContent').style.display = 'block';
-          });
-        } else {
-          throw new Error("Firebase initialization failed");
-        }
-      } catch (e) {
-        console.error("Firebase error:", e);
-        document.getElementById('loadingSpinner').innerHTML = `
-          <div class="spinner-content">
-            <p style="color: red;">Error loading application. Please refresh the page.</p>
-            <button onclick="window.location.reload()" style="margin-top: 10px; padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer;">
-              Refresh Page
-            </button>
-          </div>`;
-      }
-    </script>
-    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore-compat.js"></script>
+
+    <!-- App Initialization -->
     <script src="app.js"></script>
 </body>
 </html>
