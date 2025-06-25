@@ -1,39 +1,47 @@
 // BetSmart App - Main application class
 class BetSmartApp {
     constructor() {
-    this.bets = [];
-    this.gameData = {};
-    this.selectedSport = 'All Sports';
-    this.sortBy = 'value';
-    this.highValueOnly = false;
-    this.DATA_URL = this.resolveDataUrl();
-    
-    // Modified Firebase initialization
-    this.firebaseConfig = {
-        apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
-        authDomain: "aurabetz.firebaseapp.com",
-        projectId: "aurabetz",
-        storageBucket: "aurabetz.firebasestorage.app",
-        messagingSenderId: "531651661385",
-        appId: "1:531651661385:web:d82a50a33bb77297b7f998",
-        measurementId: "G-7L19JWBH21"
-    };
-    
-    // Check if Firebase is already initialized
-    if (!firebase.apps.length) {
-        this.app = firebase.initializeApp(this.firebaseConfig);
-    } else {
-        this.app = firebase.app();
+        this.bets = [];
+        this.gameData = {};
+        this.selectedSport = 'All Sports';
+        this.sortBy = 'value';
+        this.highValueOnly = false;
+        this.DATA_URL = this.resolveDataUrl();
+        this.initialized = false;
+        
+        // Modified Firebase initialization
+        this.firebaseConfig = {
+            apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
+            authDomain: "aurabetz.firebaseapp.com",
+            projectId: "aurabetz",
+            storageBucket: "aurabetz.appspot.com",
+            messagingSenderId: "531651661385",
+            appId: "1:531651661385:web:d82a50a33bb77297b7f998",
+            measurementId: "G-7L19JWBH21"
+        };
+        
+        // Check if Firebase is already initialized
+        if (!firebase.apps.length) {
+            this.app = firebase.initializeApp(this.firebaseConfig);
+        } else {
+            this.app = firebase.app();
+        }
+        
+        this.auth = firebase.auth();
+        this.db = firebase.firestore();
+        
+        this.initAuth();
     }
-    
-    this.auth = firebase.auth();
-    this.db = firebase.firestore();
-    
-    this.initAuth();
-}
 
     initAuth() {
         try {
+            // Check for cached PIN first
+            const cachedPin = localStorage.getItem('betSmartAuth');
+            if (cachedPin) {
+                this.verifyPinWithFirebase(cachedPin);
+                return;
+            }
+
             // Check Firebase auth state
             this.auth.onAuthStateChanged((user) => {
                 if (user) {
@@ -69,53 +77,58 @@ class BetSmartApp {
     }
 
     verifyPinWithFirebase(pin) {
-    this.db.collection("validPins")
-        .where("pin", "==", pin)
-        .get()
-        .then((querySnapshot) => {
-            if (!querySnapshot.empty) {
-                localStorage.setItem('betSmartAuth', pin);
-                document.getElementById('authWall').style.display = 'none';
-                this.trackAccess(pin);
-
-                // 🔐 Sign in anonymously
-                return this.auth.signInAnonymously();
-            } else {
-                throw new Error("Invalid PIN");
-            }
-        })
-        .then(() => {
-            // ✅ Wait for the token to be available before continuing
-            return this.auth.currentUser.getIdToken(true);
-        })
-        .then(() => {
-            this.initApp();
-        })
-        .catch((error) => {
-            console.error("PIN verification failed:", error);
-            document.getElementById('pinError').textContent = "Invalid PIN";
-            document.getElementById('pinError').style.display = 'block';
-        });
-}
-
+        document.getElementById('pinError').style.display = 'none';
+        document.getElementById('loadingSpinner').style.display = 'flex';
+        
+        this.db.collection("validPins")
+            .where("pin", "==", pin)
+            .get()
+            .then((querySnapshot) => {
+                if (!querySnapshot.empty) {
+                    localStorage.setItem('betSmartAuth', pin);
+                    document.getElementById('authWall').style.display = 'none';
+                    this.trackAccess(pin);
+                    return this.auth.signInAnonymously();
+                } else {
+                    throw new Error("Invalid PIN");
+                }
+            })
+            .then(() => {
+                return this.auth.currentUser.getIdToken(true);
+            })
+            .then(() => {
+                this.initApp();
+            })
+            .catch((error) => {
+                console.error("PIN verification failed:", error);
+                document.getElementById('loadingSpinner').style.display = 'none';
+                document.getElementById('pinError').textContent = "Invalid PIN";
+                document.getElementById('pinError').style.display = 'block';
+            });
+    }
 
     initApp() {
-    // FIRST hide everything and show loading
-    document.getElementById('appContent').style.display = 'none';
-    document.getElementById('loadingSpinner').style.display = 'flex';
-    
-    // THEN initialize
-    this.init().then(() => {
-        // AFTER initialization is complete:
-        this.render(); // Regenerate all UI elements
-        this.setupEventListeners(); // Rebind ALL listeners
-        this.checkDarkMode(); // Reset dark mode
+        if (this.initialized) return;
         
-        // FINALLY show UI
-        document.getElementById('appContent').style.display = 'block';
-        document.getElementById('loadingSpinner').style.display = 'none';
-    });
-}
+        // Show loading spinner
+        document.getElementById('appContent').style.display = 'none';
+        document.getElementById('loadingSpinner').style.display = 'flex';
+        
+        // Initialize the app
+        this.init().then(() => {
+            this.initialized = true;
+            this.render();
+            this.setupEventListeners();
+            this.checkDarkMode();
+            
+            // Hide loading spinner and show app content
+            document.getElementById('appContent').style.display = 'block';
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }).catch(error => {
+            console.error("App initialization failed:", error);
+            this.handleAuthError(error);
+        });
+    }
 
     trackAccess(pin) {
         try {
@@ -133,10 +146,6 @@ class BetSmartApp {
             console.error("Tracking failed (non-critical):", error);
         }
     }
-
-    // ... [Keep all other existing methods exactly the same] ...
-    // All methods below this point remain unchanged from your previous implementation
-    // Only the auth-related code above has been modified
 
     handleAuthError(error) {
         console.error("Auth error:", error);
@@ -272,8 +281,9 @@ class BetSmartApp {
             this.bets = this.getDefaultBets();
             this.gameData = this.getDefaultGameData();
             alert("Warning: Using demo data. Some features may be limited.");
+            // Re-throw the error so it can be handled by initApp
+            throw error;
         }
-        this.render();
     }
 
     render() {
