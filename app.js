@@ -162,7 +162,7 @@ class BetSmartApp {
     resolveDataUrl() {
         try {
             if (this.isGitHubPages()) {
-                return '/aurabetz-1.0/data/bets.json'; 
+                return '/aurabetz-client/data/bets.json';
             }
             return 'data/bets.json';
         } catch (e) {
