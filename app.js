@@ -83,35 +83,45 @@ this.firebaseConfig = {
     }
 
     verifyPinWithFirebase(pin) {
-        document.getElementById('pinError').style.display = 'none';
-        document.getElementById('loadingSpinner').style.display = 'flex';
-        
-        this.db.collection("validPins")
-            .where("pin", "==", pin)
-            .get()
-            .then((querySnapshot) => {
-                if (!querySnapshot.empty) {
-                    localStorage.setItem('betSmartAuth', pin);
-                    document.getElementById('authWall').style.display = 'none';
-                    this.trackAccess(pin);
-                    return this.auth.signInAnonymously();
-                } else {
-                    throw new Error("Invalid PIN");
-                }
-            })
-            .then(() => {
-                return this.auth.currentUser.getIdToken(true);
-            })
-            .then(() => {
-                this.initApp();
-            })
-            .catch((error) => {
-                console.error("PIN verification failed:", error);
-                document.getElementById('loadingSpinner').style.display = 'none';
-                document.getElementById('pinError').textContent = "Invalid PIN";
-                document.getElementById('pinError').style.display = 'block';
-            });
-    }
+    const pinError = document.getElementById('pinError');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    
+    // Clear previous errors and show loading
+    pinError.style.display = 'none';
+    loadingSpinner.style.display = 'flex';
+
+    // Verify PIN against Firestore
+    this.db.collection("validPins")
+        .where("pin", "==", pin)
+        .get()
+        .then((querySnapshot) => {
+            if (querySnapshot.empty) {
+                throw new Error("Invalid PIN");
+            }
+            
+            // PIN is valid - store in localStorage
+            localStorage.setItem('betSmartAuth', pin);
+            
+            // Hide auth wall
+            document.getElementById('authWall').style.display = 'none';
+            
+            // Track access (optional)
+            this.trackAccess(pin);
+            
+            // Sign in anonymously
+            return this.auth.signInAnonymously();
+        })
+        .then(() => {
+            // Initialize the app
+            this.initApp();
+        })
+        .catch((error) => {
+            console.error("PIN verification failed:", error);
+            loadingSpinner.style.display = 'none';
+            pinError.textContent = error.message || "Invalid PIN";
+            pinError.style.display = 'block';
+        });
+}
 
     initApp() {
     if (this.initialized) return;
