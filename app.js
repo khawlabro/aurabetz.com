@@ -11,16 +11,15 @@ class BetSmartApp {
         this.initialized = false;
         
         // Updated Firebase initialization with your new config
-        this.firebaseConfig = {
-            apiKey: "AIzaSyDalVcdFUamoA90pSvNX2hfIkyH7hMZk9I",
-            authDomain: "aurabetz1.firebaseapp.com",
-            projectId: "aurabetz1",
-            storageBucket: "aurabetz1.appspot.com",
-            messagingSenderId: "254316956886",
-            appId: "1:254316956886:web:3ea3341005161efbe88d77",
-            measurementId: "G-R8WRSY7L57"
-
-        };
+this.firebaseConfig = {
+    apiKey: "AIzaSyDalVcdFUamoA90pSvNX2hfIkyH7hMZk9I",
+    authDomain: "aurabetz1.firebaseapp.com",
+    projectId: "aurabetz1",
+    storageBucket: "aurabetz1.appspot.com",
+    messagingSenderId: "254316956886",
+    appId: "1:254316956886:web:3ea3341005161efbe88d77",
+    measurementId: "G-R8WRSY7L57"
+};  // <-- This closing brace was missing
 
         console.log("Firebase app initialized:", this.app); // Add this line
         console.log("Firebase auth:", this.auth); // Add this line
