@@ -111,8 +111,8 @@ class BetSmartApp {
         if (this.initialized) return;
         
         // Show loading spinner
-        document.getElementById('appContent').style.display = 'none';
-        document.getElementById('loadingSpinner').style.display = 'flex';
+        //document.getElementById('appContent').style.display = 'none';
+        //document.getElementById('loadingSpinner').style.display = 'flex';
         
         // Initialize the app
         this.init().then(() => {
