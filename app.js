@@ -114,27 +114,27 @@ this.firebaseConfig = {
     }
 
     initApp() {
-        if (this.initialized) return;
+    if (this.initialized) return;
+    
+    // Show loading spinner
+    document.getElementById('appContent').style.display = 'none';
+    document.getElementById('loadingSpinner').style.display = 'flex';
+    
+    // Initialize the app
+    this.init().then(() => {
+        this.initialized = true;
+        this.render();
+        this.setupEventListeners();
+        this.checkDarkMode();
         
-        // Show loading spinner
-        document.getElementById('appContent').style.display = 'none';
-        document.getElementById('loadingSpinner').style.display = 'flex';
-        
-        // Initialize the app
-        this.init().then(() => {
-            this.initialized = true;
-            this.render();
-            this.setupEventListeners();
-            this.checkDarkMode();
-            
-            // Hide loading spinner and show app content
-            document.getElementById('appContent').style.display = 'block';
-            document.getElementById('loadingSpinner').style.display = 'none';
-        }).catch(error => {
-            console.error("App initialization failed:", error);
-            this.handleAuthError(error);
-        });
-    }
+        // Hide loading spinner and show app content
+        document.getElementById('loadingSpinner').style.display = 'none';
+        document.getElementById('appContent').style.display = 'block';
+    }).catch(error => {
+        console.error("App initialization failed:", error);
+        this.handleAuthError(error);
+    });
+}
 
     trackAccess(pin) {
         try {
