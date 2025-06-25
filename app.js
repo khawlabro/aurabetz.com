@@ -162,7 +162,7 @@ async initApp() {
         // 2. Load data with timeout fallback
         const dataLoad = this.loadData();
         const timeout = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error("Data loading timeout")), 5000);
+    setTimeout(() => reject(new Error("Data loading timeout")), 5000));
 
         await Promise.race([dataLoad, timeout]);
         
