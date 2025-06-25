@@ -1,6 +1,7 @@
 // BetSmart App - Main application class
 class BetSmartApp {
     constructor() {
+        console.log("Initializing BetSmartApp..."); // Add this line
         this.bets = [];
         this.gameData = {};
         this.selectedSport = 'All Sports';
@@ -18,6 +19,10 @@ class BetSmartApp {
             messagingSenderId: "254316956886",
             appId: "1:254316956886:web:3ea3341005161efbe88d77",
             measurementId: "G-R8WRSY7L57"
+
+            console.log("Firebase app initialized:", this.app); // Add this line
+    console.log("Firebase auth:", this.auth); // Add this line
+    console.log("Firestore:", this.db); // Add this line
         };
         
         // Check if Firebase is already initialized
