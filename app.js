@@ -1,16 +1,15 @@
-// BetSmart App - Main application class
+// BetSmart Sports Betting Analysis App
 class BetSmartApp {
     constructor() {
-        console.log("Initializing BetSmartApp...");
+        // Initialize app state
         this.bets = [];
         this.gameData = {};
         this.selectedSport = 'All Sports';
         this.sortBy = 'value';
         this.highValueOnly = false;
-        this.DATA_URL = this.resolveDataUrl();
         this.initialized = false;
         
-        // Initialize Firebase
+        // Set up Firebase
         this.firebaseConfig = {
             apiKey: "AIzaSyDalVcdFUamoA90pSvNX2hfIkyH7hMZk9I",
             authDomain: "aurabetz1.firebaseapp.com",
@@ -22,190 +21,568 @@ class BetSmartApp {
         };
 
         try {
-            if (!firebase.apps.length) {
-                this.app = firebase.initializeApp(this.firebaseConfig);
-            } else {
-                this.app = firebase.app();
-            }
+            // Initialize Firebase if not already initialized
+            this.app = firebase.apps.length 
+                ? firebase.app() 
+                : firebase.initializeApp(this.firebaseConfig);
             
             this.auth = firebase.auth();
             this.db = firebase.firestore();
-            console.log("Firebase initialized successfully");
             
+            console.log("Firebase initialized successfully");
             this.initAuth();
         } catch (error) {
             console.error("Firebase initialization failed:", error);
-            this.handleAuthError(error);
+            this.handleError("Failed to initialize Firebase services");
         }
     }
 
+    // Initialize authentication flow
     initAuth() {
-        try {
-            // Check for cached PIN first
-            const cachedPin = localStorage.getItem('betSmartAuth');
-            if (cachedPin) {
-                this.verifyPinWithFirebase(cachedPin);
-                return;
-            }
-
-            // Check Firebase auth state
-            this.auth.onAuthStateChanged((user) => {
-                if (user) {
-                    console.log("User authenticated:", user);
-                    this.initApp();
-                } else {
-                    console.log("No authenticated user, showing auth wall");
-                    const authWall = document.getElementById('authWall');
-                    if (!authWall) {
-                        throw new Error("Auth wall element not found");
-                    }
-                    authWall.style.display = 'flex';
-
-                    // Set up PIN submission
-                    const submitPin = document.getElementById('submitPin');
-                    const pinInput = document.getElementById('pinInput');
-                    
-                    if (submitPin && pinInput) {
-                        submitPin.addEventListener('click', () => {
-                            const enteredPin = pinInput.value;
-                            if (!enteredPin) {
-                                document.getElementById('pinError').textContent = "Please enter a PIN";
-                                document.getElementById('pinError').style.display = 'block';
-                                return;
-                            }
-                            this.verifyPinWithFirebase(enteredPin);
-                        });
-
-                        pinInput.addEventListener('keypress', (e) => {
-                            if (e.key === 'Enter') submitPin.click();
-                        });
-                    }
-                }
-            });
-        } catch (error) {
-            console.error("Auth initialization error:", error);
-            this.handleAuthError(error);
-        }
-    }
-
-    verifyPinWithFirebase(pin) {
-        const pinError = document.getElementById('pinError');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        
-        if (!pinError || !loadingSpinner) {
-            console.error("Required elements not found for PIN verification");
+        // Check for cached PIN first
+        const cachedPin = localStorage.getItem('betSmartAuth');
+        if (cachedPin) {
+            this.verifyPin(cachedPin);
             return;
         }
 
-        pinError.style.display = 'none';
-        loadingSpinner.style.display = 'flex';
-
-        this.db.collection("validPins")
-            .where("pin", "==", pin)
-            .get()
-            .then((querySnapshot) => {
-                if (querySnapshot.empty) {
-                    throw new Error("Invalid PIN");
-                }
-                
-                localStorage.setItem('betSmartAuth', pin);
-                document.getElementById('authWall').style.display = 'none';
-                this.trackAccess(pin);
-                return this.auth.signInAnonymously();
-            })
-            .then(() => {
+        // Set up auth state listener
+        this.auth.onAuthStateChanged(user => {
+            if (user) {
+                console.log("User authenticated");
                 this.initApp();
-            })
-            .catch((error) => {
-                console.error("PIN verification failed:", error);
-                loadingSpinner.style.display = 'none';
-                pinError.textContent = error.message || "Invalid PIN";
-                pinError.style.display = 'block';
-            });
+            } else {
+                console.log("No authenticated user, showing auth wall");
+                this.showAuthWall();
+            }
+        }, error => {
+            console.error("Auth state error:", error);
+            this.handleError("Authentication error");
+        });
     }
 
-    initApp() {
+    // Show the authentication wall
+    showAuthWall() {
+        const authWall = document.getElementById('authWall');
+        if (!authWall) {
+            this.handleError("Authentication wall element not found");
+            return;
+        }
+
+        authWall.style.display = 'flex';
+        
+        // Set up PIN submission
+        const pinInput = document.getElementById('pinInput');
+        const submitBtn = document.getElementById('submitPin');
+        
+        if (!pinInput || !submitBtn) {
+            this.handleError("PIN input elements not found");
+            return;
+        }
+
+        const submitHandler = () => {
+            const pin = pinInput.value.trim();
+            if (!pin) {
+                this.showPinError("Please enter a PIN");
+                return;
+            }
+            this.verifyPin(pin);
+        };
+
+        submitBtn.addEventListener('click', submitHandler);
+        pinInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') submitHandler();
+        });
+    }
+
+    // Verify PIN with Firebase
+    async verifyPin(pin) {
+        const pinError = document.getElementById('pinError');
+        if (pinError) pinError.style.display = 'none';
+        
+        this.showLoading(true);
+
+        try {
+            // Check if PIN exists in Firestore
+            const querySnapshot = await this.db.collection("validPins")
+                .where("pin", "==", pin)
+                .get();
+
+            if (querySnapshot.empty) {
+                throw new Error("Invalid PIN");
+            }
+
+            // PIN is valid - store it and sign in
+            localStorage.setItem('betSmartAuth', pin);
+            document.getElementById('authWall').style.display = 'none';
+            
+            // Sign in anonymously
+            await this.auth.signInAnonymously();
+            this.trackAccess(pin);
+            
+            // Initialize the app
+            this.initApp();
+        } catch (error) {
+            console.error("PIN verification failed:", error);
+            this.showLoading(false);
+            this.showPinError(error.message || "Invalid PIN");
+        }
+    }
+
+    // Initialize the main application
+    async initApp() {
         if (this.initialized) return;
         
-        console.log("Initializing application...");
+        this.showLoading(true);
         document.getElementById('appContent').style.display = 'none';
-        document.getElementById('loadingSpinner').style.display = 'flex';
-        
-        this.init().then(() => {
-            this.initialized = true;
+
+        try {
+            // Load data from JSON file
+            await this.loadData();
+            
+            // Initialize UI
             this.render();
             this.setupEventListeners();
             this.checkDarkMode();
             
+            // Show the app content
             document.getElementById('loadingSpinner').style.display = 'none';
             document.getElementById('appContent').style.display = 'block';
-            console.log("Application initialized successfully");
-        }).catch(error => {
+            
+            this.initialized = true;
+            console.log("App initialized successfully");
+        } catch (error) {
             console.error("App initialization failed:", error);
-            this.handleAuthError(error);
-            document.getElementById('authWall').style.display = 'none';
+            this.handleError("Failed to initialize application");
+        }
+    }
+
+    // Load data from JSON file
+    async loadData() {
+        try {
+            const dataUrl = this.getDataUrl();
+            console.log("Loading data from:", dataUrl);
+            
+            const response = await fetch(dataUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log("Data loaded:", data);
+            
+            if (!data.bets || !Array.isArray(data.bets)) {
+                throw new Error("Invalid data format: bets array missing");
+            }
+            
+            // Filter and validate bets
+            this.bets = data.bets.filter(bet => 
+                bet.id &&
+                bet.event && 
+                bet.event.trim() && 
+                bet.mainBet && 
+                bet.mainBet.pick
+            );
+            
+            // Validate game data or use defaults
+            this.gameData = data.gameData || this.getDefaultGameData();
+            
+            // Ensure current day bet exists
+            if (!this.gameData.bets.some(b => b.day === this.gameData.currentDay)) {
+                this.resetGame();
+            }
+            
+            console.log(`Loaded ${this.bets.length} valid bets`);
+        } catch (error) {
+            console.error("Data load failed:", error);
+            
+            // Only use defaults if we can't load the file
+            if (error.message.includes("Failed to fetch")) {
+                alert("Warning: Using demo data as we couldn't load your bets file");
+                this.bets = this.getDefaultBets();
+                this.gameData = this.getDefaultGameData();
+            }
+            
+            throw error;
+        }
+    }
+
+    // Get the correct data URL based on environment
+    getDataUrl() {
+        // For local development
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return '/data/bets.json';
+        }
+        // For GitHub Pages
+        if (window.location.host.includes('github.io')) {
+            return '/aurabetz-client/data/bets.json';
+        }
+        // Default case
+        return 'data/bets.json';
+    }
+
+    // Render the bets grid
+    render() {
+        const filteredBets = this.filterAndSortBets();
+        const container = document.getElementById('betsContainer');
+        
+        if (!container) {
+            console.error("Bets container not found");
+            return;
+        }
+        
+        container.innerHTML = filteredBets.length === 0
+            ? '<div class="no-results">No betting opportunities match your current filters.</div>'
+            : filteredBets.map(bet => this.createBetCard(bet)).join('');
+        
+        // Add click handlers to bet cards
+        document.querySelectorAll('.bet-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('view-analysis-btn')) {
+                    const betId = parseInt(card.dataset.betId);
+                    if (!isNaN(betId)) this.showBetDetails(betId);
+                }
+            });
         });
     }
 
-    trackAccess(pin) {
-        try {
-            if (window.location.hostname !== 'localhost') {
-                this.db.collection("accessLogs").add({
-                    pin: "****" + pin.slice(-2),
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    error: null,
-                    success: true
-                }).catch((err) => {
-                    console.error("Firestore write failed:", err);
+    // Create a bet card element
+    createBetCard(bet) {
+        if (!bet || !bet.mainBet) return '';
+        
+        const valueClass = this.getValueClass(bet.mainBet.value);
+        const confidenceClass = this.getConfidenceClass(bet.mainBet.confidence);
+        
+        return `
+            <div class="bet-card" data-bet-id="${bet.id}">
+                <div class="bet-card-content">
+                    <div class="bet-info-icon">
+                        <i class="fas fa-info-circle text-primary"></i>
+                    </div>
+                    <div class="bet-header">
+                        <span class="bet-sport">${bet.sport || 'Unknown'}</span>
+                        <span class="bet-time">${this.formatDate(bet.time)}</span>
+                    </div>
+                    <h3 class="bet-title">${bet.event}</h3>
+                    <div class="bet-main">
+                        <div class="bet-type-row">
+                            <span class="bet-type">${bet.mainBet.type || 'Unknown'}</span>
+                            ${bet.mainBet.value ? `
+                            <span class="bet-value ${valueClass}">
+                                Value: ${(bet.mainBet.value * 100).toFixed(0)}%
+                            </span>` : ''}
+                        </div>
+                        <div class="bet-selection-row">
+                            <div class="bet-pick-container">
+                                <div class="bet-pick">${bet.mainBet.pick}</div>
+                                ${bet.mainBet.odds ? `
+                                <div class="bet-odds ${valueClass}">
+                                    ${this.formatOdds(bet.mainBet.odds)}
+                                </div>` : ''}
+                            </div>
+                            <span class="confidence-badge ${confidenceClass}">
+                                ${bet.mainBet.confidence || 'Medium'} Confidence
+                            </span>
+                        </div>
+                    </div>
+                    <div class="bet-footer">
+                        ${this.getBestOdds(bet.sportsbooks) ? `
+                        <span class="best-odds">
+                            Best Odds: ${this.getBestOdds(bet.sportsbooks)}
+                        </span>` : ''}
+                        <button class="view-analysis-btn">View Analysis</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Show detailed view for a bet
+    showBetDetails(betId) {
+        const bet = this.bets.find(b => b.id === betId);
+        if (!bet) return;
+
+        const modal = document.getElementById('detailModal');
+        const title = document.getElementById('modalTitle');
+        const content = document.getElementById('modalContent');
+        
+        if (!modal || !title || !content) return;
+        
+        title.textContent = bet.event;
+        content.innerHTML = this.createBetDetailsHtml(bet);
+        modal.classList.add('active');
+    }
+
+    // Create HTML for bet details modal
+    createBetDetailsHtml(bet) {
+        const confidenceClass = this.getConfidenceClass(bet.mainBet.confidence);
+        const valueClass = this.getValueClass(bet.mainBet.value);
+        
+        return `
+            <div class="modal-section">
+                <div class="modal-header-row">
+                    <div class="bet-meta">
+                        <span class="modal-sport">${bet.sport}</span>
+                        <span class="modal-time">${this.formatDate(bet.time)}</span>
+                    </div>
+                    <span class="modal-confidence ${confidenceClass}">
+                        ${bet.mainBet.confidence || 'Medium'} Confidence
+                    </span>
+                </div>
+                
+                <div class="main-bet-highlight">
+                    <div class="bet-meta-row">
+                        <span class="bet-type-label">${bet.mainBet.type}</span>
+                        ${bet.mainBet.value ? `
+                        <span class="value-badge ${valueClass}">
+                            Value: ${(bet.mainBet.value * 100).toFixed(0)}%
+                        </span>` : ''}
+                    </div>
+                    <div class="bet-selection-row">
+                        <div class="bet-pick">${bet.mainBet.pick}</div>
+                        ${bet.mainBet.odds ? `
+                        <div class="bet-odds ${valueClass}">
+                            ${this.formatOdds(bet.mainBet.odds)}
+                        </div>` : ''}
+                    </div>
+                    ${bet.mainBet.probability ? `
+                    <div class="implied-prob">
+                        Implied Probability: ${(bet.mainBet.probability * 100).toFixed(0)}%
+                    </div>` : ''}
+                </div>
+            </div>
+
+            <div class="modal-grid">
+                <div class="modal-column">
+                    <h3 class="modal-subtitle">Other Opportunities</h3>
+                    <div class="other-bets-container">
+                        ${bet.otherBets?.length ? bet.otherBets.map(ob => `
+                            <div class="other-bet-row">
+                                <div class="other-bet-info">
+                                    <span class="other-bet-type">${ob.type}: ${ob.pick}</span>
+                                    ${ob.odds ? `
+                                    <span class="other-bet-odds">
+                                        ${this.formatOdds(ob.odds)}
+                                    </span>` : ''}
+                                </div>
+                                ${ob.value ? `
+                                <div class="other-bet-value ${this.getValueClass(ob.value)}">
+                                    Value: ${(ob.value * 100).toFixed(0)}%
+                                </div>` : ''}
+                            </div>
+                        `).join('') : '<p class="no-other-bets">No additional bets available</p>'}
+                    </div>
+                </div>
+                
+                <div class="modal-column">
+                    <h3 class="modal-subtitle">Odds Comparison</h3>
+                    <div class="odds-comparison-container">
+                        ${bet.sportsbooks?.length ? bet.sportsbooks
+                            .filter(sb => sb.odds !== undefined && sb.odds !== null)
+                            .map(sb => `
+                                <div class="odds-comparison-row">
+                                    <span>${sb.name}</span>
+                                    <span class="odds-value">${this.formatOdds(sb.odds)}</span>
+                                </div>
+                            `).join('') : '<p class="no-odds">No odds comparison available</p>'}
+                    </div>
+                </div>
+            </div>
+            
+            ${bet.analysis ? `
+            <div class="modal-section">
+                <h3 class="modal-subtitle">Summary</h3>
+                <div class="analysis-container">
+                    <p>${bet.analysis}</p>
+                </div>
+            </div>` : ''}
+            
+            ${bet.aiReasoning ? `
+            <div class="modal-section">
+                <h3 class="modal-subtitle ai-title">
+                    <i class="fas fa-brain text-primary"></i>
+                    AI Analysis
+                </h3>
+                <div class="ai-analysis-container">
+                    <p>${bet.aiReasoning}</p>
+                </div>
+            </div>` : ''}
+        `;
+    }
+
+    // Filter and sort bets based on current settings
+    filterAndSortBets() {
+        let bets = [...this.bets];
+        
+        // Filter by sport
+        if (this.selectedSport !== 'All Sports') {
+            bets = bets.filter(bet => bet.sport === this.selectedSport);
+        }
+        
+        // Filter by value
+        if (this.highValueOnly) {
+            bets = bets.filter(bet => bet.mainBet.value >= 0.20);
+        }
+        
+        // Sort based on current setting
+        switch(this.sortBy) {
+            case 'value':
+                bets.sort((a, b) => (b.mainBet.value || 0) - (a.mainBet.value || 0));
+                break;
+            case 'odds':
+                bets.sort((a, b) => (a.mainBet.odds || 0) - (b.mainBet.odds || 0));
+                break;
+            case 'confidence':
+                const confidenceValues = { 'High': 3, 'Medium': 2, 'Low': 1 };
+                bets.sort((a, b) => 
+                    confidenceValues[b.mainBet.confidence || 'Medium'] - 
+                    confidenceValues[a.mainBet.confidence || 'Medium']
+                );
+                break;
+            case 'time':
+                bets.sort((a, b) => {
+                    const dateA = a.time ? new Date(a.time) : new Date(0);
+                    const dateB = b.time ? new Date(b.time) : new Date(0);
+                    return dateA - dateB;
                 });
+                break;
+        }
+        
+        return bets;
+    }
+
+    // Set up all event listeners
+    setupEventListeners() {
+        // Sport tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                this.selectedSport = tab.dataset.sport;
+                this.updateActiveTab();
+                this.render();
+            });
+        });
+        
+        // Sort dropdown
+        document.getElementById('sortOptions')?.addEventListener('change', (e) => {
+            this.sortBy = e.target.value;
+            this.render();
+        });
+        
+        // High value filter
+        document.getElementById('highValueOnly')?.addEventListener('change', (e) => {
+            this.highValueOnly = e.target.checked;
+            this.render();
+        });
+        
+        // Dark mode toggle
+        document.getElementById('darkModeToggle')?.addEventListener('click', () => {
+            this.toggleDarkMode();
+        });
+        
+        // Modals
+        document.getElementById('closeModal')?.addEventListener('click', () => {
+            document.getElementById('detailModal')?.classList.remove('active');
+        });
+        
+        document.getElementById('theGameBtn')?.addEventListener('click', () => {
+            this.showGameModal();
+        });
+        
+        // View analysis buttons (delegated)
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('view-analysis-btn')) {
+                const card = e.target.closest('.bet-card');
+                if (card) {
+                    const betId = parseInt(card.dataset.betId);
+                    if (!isNaN(betId)) this.showBetDetails(betId);
+                }
             }
-        } catch (error) {
-            console.error("Tracking failed (non-critical):", error);
+        });
+    }
+
+    // Update active tab styling
+    updateActiveTab() {
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.toggle('tab-active', tab.dataset.sport === this.selectedSport);
+            tab.classList.toggle('tab-inactive', tab.dataset.sport !== this.selectedSport);
+        });
+    }
+
+    // Show/hide loading spinner
+    showLoading(show) {
+        const spinner = document.getElementById('loadingSpinner');
+        if (spinner) spinner.style.display = show ? 'flex' : 'none';
+    }
+
+    // Show PIN error message
+    showPinError(message) {
+        const errorElement = document.getElementById('pinError');
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
         }
     }
 
-    handleAuthError(error) {
-        console.error("Auth error:", error);
+    // Handle application errors
+    handleError(message) {
+        console.error("Application error:", message);
         const spinner = document.getElementById('loadingSpinner');
-        const authWall = document.getElementById('authWall');
-        
-        if (authWall) {
-            authWall.style.display = 'none';
-        }
         
         if (spinner) {
             spinner.innerHTML = `
                 <div class="spinner-content">
-                    <i class="fas fa-exclamation-triangle" style="color: red; font-size: 2rem;"></i>
-                    <p style="color: red; margin-top: 20px;">
-                        Error loading BetSmart: ${error.message || 'Unknown error'}
-                    </p>
-                    <button onclick="window.location.reload()" 
-                            style="margin-top: 10px; padding: 8px 16px; 
-                                   background: var(--primary); color: white; 
-                                   border: none; border-radius: 4px; cursor: pointer;">
-                        Refresh Page
-                    </button>
+                    <i class="fas fa-exclamation-triangle" style="color: red;"></i>
+                    <p style="color: red;">${message}</p>
+                    <button onclick="window.location.reload()">Refresh</button>
                 </div>`;
         }
     }
 
-    resolveDataUrl() {
+    // Utility methods
+    formatOdds(odds) {
+        return odds > 0 ? `+${odds}` : odds;
+    }
+
+    formatDate(dateString) {
+        if (!dateString) return 'TBD';
         try {
-            if (this.isGitHubPages()) {
-                return '/aurabetz-client/data/bets.json';
-            }
-            return 'data/bets.json';
-        } catch (e) {
-            console.error('Path resolution error, using fallback', e);
-            return 'data/bets.json';
+            const date = new Date(dateString);
+            return date.toLocaleString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true
+            });
+        } catch {
+            return 'TBD';
         }
     }
 
-    isGitHubPages() {
-        return window.location.host.includes('github.io');
+    getValueClass(value) {
+        if (!value) return "value-low";
+        if (value >= 0.25) return "value-high";
+        if (value >= 0.15) return "value-medium";
+        return "value-low";
     }
 
+    getConfidenceClass(confidence) {
+        switch (confidence) {
+            case "High": return "confidence-high";
+            case "Medium": return "confidence-medium";
+            default: return "confidence-low";
+        }
+    }
+
+    getBestOdds(sportsbooks) {
+        if (!sportsbooks?.length) return null;
+        const validOdds = sportsbooks.filter(sb => sb.odds != null);
+        if (!validOdds.length) return null;
+        const best = Math.max(...validOdds.map(sb => sb.odds));
+        return this.formatOdds(best);
+    }
+
+    // Default data fallbacks
     getDefaultBets() {
         return [
             {
@@ -255,672 +632,25 @@ class BetSmartApp {
             ]
         };
     }
-
-    init() {
-        return new Promise((resolve, reject) => {
-            try {
-                this.loadData().then(() => {
-                    this.render();
-                    this.setupEventListeners();
-                    this.checkDarkMode();
-                    resolve();
-                }).catch((err) => {
-                    this.handleAuthError(err);
-                    reject(err);
-                });
-            } catch (error) {
-                this.handleAuthError(error);
-                reject(error);
-            }
-        });
-    }
-
-    async loadData() {
-        try {
-            console.log("Loading data from:", this.DATA_URL);
-            const response = await fetch(this.DATA_URL);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            
-            // Filter out invalid bets
-            this.bets = (data.bets || this.getDefaultBets()).filter(bet => 
-                bet.event && 
-                bet.event.trim() !== "" && 
-                bet.mainBet && 
-                bet.mainBet.pick
-            );
-            
-            // Validate game data
-            this.gameData = data.gameData || this.getDefaultGameData();
-            
-            // Ensure current day bet exists
-            const currentDayBet = this.gameData.bets.find(b => b.day === this.gameData.currentDay);
-            if (!currentDayBet) {
-                this.resetGame();
-            }
-            
-            console.log("Loaded", this.bets.length, "valid bets");
-        } catch (error) {
-            console.error("Data load failed, using defaults:", error);
-            this.bets = this.getDefaultBets();
-            this.gameData = this.getDefaultGameData();
-            throw error;
-        }
-    }
-
-    render() {
-        this.renderBets(this.filterAndSortBets());
-    }
-
-    setupEventListeners() {
-        // First remove all existing event listeners to prevent duplicates
-        this.removeAllEventListeners();
-
-        // Dark Mode Toggle
-        this.safeAddEventListener('#darkModeToggle', 'click', () => this.toggleDarkMode());
-
-        // Subscribe Button
-        this.safeAddEventListener('#subscribeBtn', 'click', () => this.showSubscribeModal());
-
-        // Sport Tabs
-        document.querySelectorAll('.tab').forEach(tab => {
-            this.safeAddEventListener(tab, 'click', (e) => {
-                this.selectedSport = e.currentTarget.getAttribute('data-sport');
-                this.updateActiveSportTab();
-                this.renderBets(this.filterAndSortBets());
-            });
-        });
-
-        // Sort Options
-        this.safeAddEventListener('#sortOptions', 'change', (e) => {
-            this.sortBy = e.target.value;
-            this.renderBets(this.filterAndSortBets());
-        });
-
-        // High Value Filter
-        this.safeAddEventListener('#highValueOnly', 'change', (e) => {
-            this.highValueOnly = e.target.checked;
-            this.renderBets(this.filterAndSortBets());
-        });
-
-        // Detail Modal
-        this.safeAddEventListener('#closeModal', 'click', () => this.hideDetailModal());
-        this.safeAddEventListener('#detailModal', 'click', (e) => {
-            if (e.target === e.currentTarget) {
-                this.hideDetailModal();
-            }
-        });
-
-        // Game Modal
-        this.safeAddEventListener('#theGameBtn', 'click', () => {
-            this.showGameModal();
-            this.updateGameProgress();
-        });
-        this.safeAddEventListener('#closeGameModal', 'click', () => this.hideGameModal());
-        this.safeAddEventListener('#gameModal', 'click', (e) => {
-            if (e.target === e.currentTarget) {
-                this.hideGameModal();
-            }
-        });
-
-        // Subscribe Modal
-        this.safeAddEventListener('#closeSubscribeModal', 'click', () => this.hideSubscribeModal());
-        this.safeAddEventListener('#subscribeModal', 'click', (e) => {
-            if (e.target === e.currentTarget) {
-                this.hideSubscribeModal();
-            }
-        });
-
-        // Delegated events for dynamic elements
-        this.safeAddEventListener(document, 'click', (e) => {
-            // View Analysis Buttons
-            if (e.target.classList.contains('view-analysis-btn')) {
-                const card = e.target.closest('.bet-card');
-                if (card) {
-                    const betId = parseInt(card.getAttribute('data-bet-id'));
-                    if (!isNaN(betId)) {
-                        this.showDetailModal(betId);
-                        e.stopPropagation();
-                    }
-                }
-            }
-
-            // Payment Select Buttons
-            if (e.target.classList.contains('payment-select-btn')) {
-                const paymentOption = e.target.closest('.payment-option');
-                if (paymentOption) {
-                    const paymentMethod = paymentOption.querySelector('h3')?.textContent;
-                    if (paymentMethod) {
-                        alert(`Selected ${paymentMethod}. Payment processing would be implemented here.`);
-                        this.hideSubscribeModal();
-                    }
-                }
-            }
-        });
-
-        // Diamond Progress
-        document.querySelectorAll('.diamond').forEach(diamond => {
-            this.safeAddEventListener(diamond, 'click', (e) => {
-                const day = parseInt(e.currentTarget.getAttribute('data-day'));
-                if (!isNaN(day) {
-                    this.completeCurrentDay(true);
-                }
-            });
-        });
-    }
-
-    safeAddEventListener(selectorOrElement, event, handler) {
-        const element = typeof selectorOrElement === 'string' 
-            ? document.querySelector(selectorOrElement) 
-            : selectorOrElement;
-        
-        if (!element) {
-            console.warn("Element not found for selector:", selectorOrElement);
-            return;
-        }
-        
-        element.removeEventListener(event, handler);
-        element.addEventListener(event, handler);
-    }
-
-    removeAllEventListeners() {
-        const elements = [
-            '#darkModeToggle',
-            '#subscribeBtn',
-            '#sortOptions',
-            '#highValueOnly',
-            '#closeModal',
-            '#detailModal',
-            '#theGameBtn',
-            '#closeGameModal',
-            '#gameModal',
-            '#closeSubscribeModal',
-            '#subscribeModal',
-            document,
-            ...document.querySelectorAll('.tab'),
-            ...document.querySelectorAll('.diamond')
-        ];
-
-        elements.forEach(element => {
-            if (typeof element === 'string') {
-                const el = document.querySelector(element);
-                if (el) {
-                    el.replaceWith(el.cloneNode(true));
-                }
-            } else {
-                element.replaceWith(element.cloneNode(true));
-            }
-        });
-    }
-
-    showSubscribeModal() {
-        const modal = document.getElementById('subscribeModal');
-        if (modal) modal.classList.add('active');
-    }
-
-    hideSubscribeModal() {
-        const modal = document.getElementById('subscribeModal');
-        if (modal) modal.classList.remove('active');
-    }
-
-    filterAndSortBets() {
-        let filteredBets = [...this.bets];
-        
-        if (this.selectedSport !== 'All Sports') {
-            filteredBets = filteredBets.filter(bet => bet.sport === this.selectedSport);
-        }
-        
-        if (this.highValueOnly) {
-            filteredBets = filteredBets.filter(bet => bet.mainBet.value >= 0.20);
-        }
-        
-        switch(this.sortBy) {
-            case 'value':
-                filteredBets.sort((a, b) => (b.mainBet.value || 0) - (a.mainBet.value || 0));
-                break;
-            case 'odds':
-                filteredBets.sort((a, b) => (a.mainBet.odds || 0) - (b.mainBet.odds || 0));
-                break;
-            case 'confidence':
-                const confidenceMap = { 'High': 3, 'Medium': 2, 'Low': 1 };
-                filteredBets.sort((a, b) => 
-                    confidenceMap[b.mainBet.confidence || 'Medium'] - 
-                    confidenceMap[a.mainBet.confidence || 'Medium']
-                );
-                break;
-            case 'time':
-                filteredBets.sort((a, b) => {
-                    const dateA = a.time ? new Date(a.time) : new Date(0);
-                    const dateB = b.time ? new Date(b.time) : new Date(0);
-                    return dateA - dateB;
-                });
-                break;
-        }
-        
-        return filteredBets;
-    }
-
-    renderBets(betsToRender) {
-        const container = document.getElementById('betsContainer');
-        if (!container) {
-            console.error("Bets container not found");
-            return;
-        }
-        
-        container.innerHTML = '';
-
-        if (betsToRender.length === 0) {
-            container.innerHTML = '<div class="no-results">No betting opportunities match your current filters.</div>';
-            return;
-        }
-
-        betsToRender.forEach(bet => {
-            const card = this.createBetCard(bet);
-            if (card && card.childNodes.length > 0) {
-                container.appendChild(card);
-            }
-        });
-
-        document.querySelectorAll('.bet-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('view-analysis-btn')) {
-                    const betId = parseInt(card.getAttribute('data-bet-id'));
-                    if (!isNaN(betId)) {
-                        this.showDetailModal(betId);
-                    }
-                }
-            });
-        });
-    }
-
-    createBetCard(bet) {
-        if (!bet || !bet.event || !bet.mainBet || !bet.mainBet.pick) {
-            console.warn("Invalid bet data:", bet);
-            return document.createElement('div');
-        }
-
-        const valueClass = this.getValueClass(bet.mainBet.value || 0);
-        const confidenceBadgeClass = this.getConfidenceBadgeClass(bet.mainBet.confidence || "Medium");
-        
-        const card = document.createElement('div');
-        card.className = 'bet-card';
-        card.setAttribute('data-bet-id', bet.id);
-        
-        card.innerHTML = `
-            <div class="bet-card-content">
-                <div class="bet-info-icon">
-                    <i class="fas fa-info-circle text-primary"></i>
-                </div>
-                <div class="bet-header">
-                    <span class="bet-sport">${bet.sport || 'Unknown Sport'}</span>
-                    <span class="bet-time">${this.formatDate(bet.time)}</span>
-                </div>
-                <h3 class="bet-title">${bet.event}</h3>
-                <div class="bet-main">
-                    <div class="bet-type-row">
-                        <span class="bet-type">${bet.mainBet.type || 'Unknown Type'}</span>
-                        ${bet.mainBet.value ? `<span class="bet-value ${valueClass}">Value: ${(bet.mainBet.value * 100).toFixed(0)}%</span>` : ''}
-                    </div>
-                    <div class="bet-selection-row">
-                        <div class="bet-pick-container">
-                            <div class="bet-pick">${bet.mainBet.pick}</div>
-                            ${bet.mainBet.odds ? `<div class="bet-odds ${valueClass}">${this.formatAmericanOdds(bet.mainBet.odds)}</div>` : ''}
-                        </div>
-                        <span class="confidence-badge ${confidenceBadgeClass}">${bet.mainBet.confidence || 'Medium'} Confidence</span>
-                    </div>
-                </div>
-                <div class="bet-footer">
-                    ${this.getBestOdds(bet.sportsbooks) ? `<span class="best-odds">Best Odds: ${this.getBestOdds(bet.sportsbooks)}</span>` : ''}
-                    <button class="view-analysis-btn">View Analysis</button>
-                </div>
-            </div>
-        `;
-        
-        return card;
-    }
-
-    getBestOdds(sportsbooks) {
-        if (!sportsbooks || sportsbooks.length === 0) return null;
-        const validOdds = sportsbooks.filter(sb => sb.odds !== null && sb.odds !== undefined);
-        if (validOdds.length === 0) return null;
-        const bestOdds = Math.max(...validOdds.map(sb => sb.odds));
-        return this.formatAmericanOdds(bestOdds);
-    }
-
-    updateActiveSportTab() {
-        const sportTabs = document.querySelectorAll('.tab');
-        sportTabs.forEach(tab => {
-            const sport = tab.getAttribute('data-sport');
-            tab.classList.remove('tab-active');
-            tab.classList.add('tab-inactive');
-            
-            if (sport === this.selectedSport) {
-                tab.classList.remove('tab-inactive');
-                tab.classList.add('tab-active');
-            }
-        });
-    }
-
-    showDetailModal(betId) {
-        const bet = this.bets.find(b => b.id === betId);
-        if (!bet) {
-            console.warn("Bet not found for ID:", betId);
-            return;
-        }
-
-        const modalTitle = document.getElementById('modalTitle');
-        const modalContent = document.getElementById('modalContent');
-        const modal = document.getElementById('detailModal');
-        
-        if (!modalTitle || !modalContent || !modal) {
-            console.error("Modal elements not found");
-            return;
-        }
-        
-        modalTitle.textContent = bet.event;
-        
-        const sportsBookComparison = bet.sportsbooks 
-            ? bet.sportsbooks.filter(sb => sb.odds !== null && sb.odds !== undefined)
-                .map(sb => `
-                    <div class="odds-comparison-row">
-                        <span>${sb.name}</span>
-                        <span class="odds-value">${this.formatAmericanOdds(sb.odds)}</span>
-                    </div>`
-                ).join('')
-            : '<p class="no-odds">No odds comparison available</p>';
-
-        const otherBetsHtml = bet.otherBets && bet.otherBets.length > 0
-            ? bet.otherBets.map(ob => `
-                <div class="other-bet-row">
-                    <div class="other-bet-info">
-                        <span class="other-bet-type">${ob.type || 'Unknown'}: ${ob.pick || 'Unknown'}</span>
-                        ${ob.odds ? `<span class="other-bet-odds">${this.formatAmericanOdds(ob.odds)}</span>` : ''}
-                    </div>
-                    ${ob.value ? `<div class="other-bet-value ${this.getValueClass(ob.value)}">Value: ${(ob.value * 100).toFixed(0)}%</div>` : ''}
-                </div>`
-            ).join('')
-            : '<p class="no-other-bets">No additional bets available</p>';
-
-        const confidenceBadgeClass = this.getConfidenceBadgeClass(bet.mainBet.confidence || "Medium");
-
-        modalContent.innerHTML = `
-            <div class="modal-section">
-                <div class="modal-header-row">
-                    <div class="bet-meta">
-                        <span class="modal-sport">${bet.sport || 'Unknown Sport'}</span>
-                        <span class="modal-time">${this.formatDate(bet.time)}</span>
-                    </div>
-                    <span class="modal-confidence ${confidenceBadgeClass}">${bet.mainBet.confidence || 'Medium'} Confidence</span>
-                </div>
-                
-                <div class="main-bet-highlight">
-                    <div class="bet-meta-row">
-                        <span class="bet-type-label">${bet.mainBet.type || 'Unknown Type'}</span>
-                        ${bet.mainBet.value ? `<span class="value-badge ${this.getValueClass(bet.mainBet.value)}">Value: ${(bet.mainBet.value * 100).toFixed(0)}%</span>` : ''}
-                    </div>
-                    <div class="bet-selection-row">
-                        <div class="bet-pick">${bet.mainBet.pick}</div>
-                        ${bet.mainBet.odds ? `<div class="bet-odds ${this.getValueClass(bet.mainBet.value || 0)}">${this.formatAmericanOdds(bet.mainBet.odds)}</div>` : ''}
-                    </div>
-                    ${bet.mainBet.probability ? `
-                    <div class="implied-prob">
-                        Implied Probability: ${(bet.mainBet.probability * 100).toFixed(0)}%
-                    </div>` : ''}
-                </div>
-            </div>
-
-            <div class="modal-grid">
-                <div class="modal-column">
-                    <h3 class="modal-subtitle">Other Opportunities</h3>
-                    <div class="other-bets-container">
-                        ${otherBetsHtml}
-                    </div>
-                </div>
-                
-                <div class="modal-column">
-                    <h3 class="modal-subtitle">Odds Comparison</h3>
-                    <div class="odds-comparison-container">
-                        ${sportsBookComparison}
-                    </div>
-                </div>
-            </div>
-            
-            ${bet.analysis ? `
-            <div class="modal-section">
-                <h3 class="modal-subtitle">Summary</h3>
-                <div class="analysis-container">
-                    <p>${bet.analysis}</p>
-                </div>
-            </div>` : ''}
-            
-            ${bet.aiReasoning ? `
-            <div class="modal-section">
-                <h3 class="modal-subtitle ai-title">
-                    <i class="fas fa-brain text-primary"></i>
-                    AI Analysis
-                </h3>
-                <div class="ai-analysis-container">
-                    <p>${bet.aiReasoning}</p>
-                </div>
-            </div>` : ''}
-        `;
-        
-        modal.classList.add('active');
-    }
-
-    hideDetailModal() {
-        const modal = document.getElementById('detailModal');
-        if (modal) modal.classList.remove('active');
-    }
-
-    showGameModal() {
-        const modal = document.getElementById('gameModal');
-        if (modal) {
-            modal.classList.add('active');
-            this.updateGameProgress();
-        }
-    }
-
-    hideGameModal() {
-        const modal = document.getElementById('gameModal');
-        if (modal) modal.classList.remove('active');
-    }
-
-    updateGameProgress() {
-        document.querySelectorAll('.diamond').forEach(diamond => {
-            const day = parseInt(diamond.getAttribute('data-day'));
-            diamond.style.backgroundColor = '';
-            diamond.querySelector('span').style.color = '';
-            
-            if (day < this.gameData.currentDay) {
-                diamond.style.backgroundColor = 'var(--secondary)';
-                diamond.querySelector('span').style.color = 'var(--white)';
-            } else if (day === this.gameData.currentDay) {
-                diamond.style.backgroundColor = 'var(--primary)';
-                diamond.querySelector('span').style.color = 'var(--white)';
-            } else {
-                diamond.style.backgroundColor = 'var(--gray-200)';
-                diamond.querySelector('span').style.color = 'var(--gray-700)';
-                
-                if (document.body.classList.contains('dark')) {
-                    diamond.style.backgroundColor = 'var(--gray-700)';
-                    diamond.querySelector('span').style.color = 'var(--gray-300)';
-                }
-            }
-        });
-    }
-
-    completeCurrentDay(won = true) {
-        const currentBet = this.gameData.bets.find(bet => bet.day === this.gameData.currentDay);
-        
-        if (currentBet && !currentBet.completed) {
-            currentBet.completed = true;
-            currentBet.won = won;
-            
-            if (won) {
-                this.gameData.currentAmount += currentBet.potentialProfit;
-                this.gameData.completedDays++;
-                this.gameData.currentDay++;
-                
-                const diamond = document.querySelector(`.diamond[data-day="${this.gameData.currentDay - 1}"]`);
-                if (diamond) {
-                    diamond.classList.add('diamond-pulse');
-                    setTimeout(() => {
-                        diamond.classList.remove('diamond-pulse');
-                    }, 1500);
-                }
-                
-                if (this.gameData.currentDay <= 9) {
-                    this.gameData.bets.push({
-                        day: this.gameData.currentDay,
-                        sport: ['NHL', 'NBA', 'UFC', 'Soccer', 'Table Tennis'][Math.floor(Math.random() * 5)],
-                        event: "Next Game TBD",
-                        bet: "TBD",
-                        betType: "TBD",
-                        odds: +130,
-                        amount: this.gameData.currentAmount,
-                        potentialProfit: (this.gameData.currentAmount * 1.3).toFixed(2),
-                        completed: false,
-                        won: null
-                    });
-                }
-            } else {
-                alert("Sorry! You lost today's bet. The Game is over. You can restart from Day 1.");
-                this.resetGame();
-            }
-            
-            this.updateGameProgress();
-        }
-    }
-
-    resetGame() {
-        this.gameData.currentDay = 1;
-        this.gameData.completedDays = 0;
-        this.gameData.currentAmount = this.gameData.startingAmount;
-        
-        this.gameData.bets = [{
-            day: 1,
-            sport: "UFC",
-            event: "Jon Jones vs Stipe Miocic",
-            bet: "Jon Jones",
-            betType: "Moneyline",
-            odds: -180,
-            amount: 10,
-            potentialProfit: 15,
-            completed: false,
-            won: null
-        }];
-        
-        this.updateGameProgress();
-    }
-
-    toggleDarkMode() {
-        document.body.classList.toggle('dark');
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        if (darkModeToggle) {
-            const moonIcon = darkModeToggle.querySelector('.fa-moon');
-            const sunIcon = darkModeToggle.querySelector('.fa-sun');
-            
-            moonIcon.classList.toggle('hidden');
-            sunIcon.classList.toggle('hidden');
-        }
-    }
-
-    checkDarkMode() {
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.body.classList.add('dark');
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            if (darkModeToggle) {
-                const moonIcon = darkModeToggle.querySelector('.fa-moon');
-                const sunIcon = darkModeToggle.querySelector('.fa-sun');
-                
-                moonIcon.classList.add('hidden');
-                sunIcon.classList.remove('hidden');
-            }
-        }
-        
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-            if (event.matches) {
-                document.body.classList.add('dark');
-            } else {
-                document.body.classList.remove('dark');
-            }
-        });
-    }
-
-    formatAmericanOdds(odds) {
-        if (odds === null || odds === undefined) return 'N/A';
-        return odds > 0 ? `+${odds}` : odds;
-    }
-
-    getValueClass(value) {
-        if (!value) return "value-low";
-        if (value >= 0.25) return "value-high";
-        if (value >= 0.15) return "value-medium";
-        return "value-low";
-    }
-
-    getConfidenceBadgeClass(confidence) {
-        switch (confidence) {
-            case "High": return "confidence-high";
-            case "Medium": return "confidence-medium";
-            default: return "confidence-low";
-        }
-    }
-
-    formatDate(dateString) {
-        if (!dateString) return 'TBD';
-        try {
-            const date = new Date(dateString);
-            return date.toLocaleString('en-US', { 
-                month: 'short', 
-                day: 'numeric', 
-                hour: 'numeric', 
-                minute: '2-digit',
-                hour12: true
-            });
-        } catch (e) {
-            return 'TBD';
-        }
-    }
 }
 
+// Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     try {
-        const appContent = document.getElementById('appContent');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const authWall = document.getElementById('authWall');
+        // Show loading state
+        document.getElementById('appContent').style.display = 'none';
+        document.getElementById('authWall').style.display = 'none';
+        document.getElementById('loadingSpinner').style.display = 'flex';
         
-        if (!appContent || !loadingSpinner || !authWall) {
-            throw new Error('Required elements not found in DOM');
-        }
-        
-        appContent.style.display = 'none';
-        authWall.style.display = 'none';
-        loadingSpinner.style.display = 'flex';
-        
-        const app = new BetSmartApp();
-        
+        // Start the app
+        new BetSmartApp();
     } catch (error) {
         console.error("Initialization error:", error);
-        const spinner = document.getElementById('loadingSpinner');
-        if (spinner) {
-            spinner.innerHTML = `
-                <div class="spinner-content">
-                    <i class="fas fa-exclamation-triangle" style="color: red; font-size: 2rem;"></i>
-                    <p style="color: red; margin-top: 20px;">
-                        Failed to load BetSmart: ${error.message}
-                    </p>
-                    <button onclick="window.location.reload()" 
-                            style="margin-top: 10px; padding: 8px 16px; 
-                                   background: #007bff; color: white; 
-                                   border: none; border-radius: 4px; cursor: pointer;"
-                            aria-label="Refresh page">
-                        Refresh Page
-                    </button>
-                </div>`;
-        }
+        document.getElementById('loadingSpinner').innerHTML = `
+            <div class="spinner-content">
+                <i class="fas fa-exclamation-triangle" style="color: red;"></i>
+                <p style="color: red;">Failed to initialize application</p>
+                <button onclick="window.location.reload()">Try Again</button>
+            </div>`;
     }
 });
