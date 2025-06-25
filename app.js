@@ -1,4 +1,5 @@
 // BetSmart Sports Betting Analysis App
+(function() {
 class BetSmartApp {
     constructor() {
         // Initialize app state
@@ -675,22 +676,23 @@ async initApp() {
 }
 
 // Initialize the app when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    try {
-        // Show loading state
-        document.getElementById('appContent').style.display = 'none';
-        document.getElementById('authWall').style.display = 'none';
-        document.getElementById('loadingSpinner').style.display = 'flex';
-        
-        // Start the app
-        new BetSmartApp();
-    } catch (error) {
-        console.error("Initialization error:", error);
-        document.getElementById('loadingSpinner').innerHTML = `
-            <div class="spinner-content">
-                <i class="fas fa-exclamation-triangle" style="color: red;"></i>
-                <p style="color: red;">Failed to initialize application</p>
-                <button onclick="window.location.reload()">Try Again</button>
-            </div>`;
-    }
-});
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            // Show loading state
+            document.getElementById('appContent').style.display = 'none';
+            document.getElementById('authWall').style.display = 'none';
+            document.getElementById('loadingSpinner').style.display = 'flex';
+            
+            // Start the app
+            new BetSmartApp();
+        } catch (error) {
+            console.error("Initialization error:", error);
+            document.getElementById('loadingSpinner').innerHTML = `
+                <div class="spinner-content">
+                    <i class="fas fa-exclamation-triangle" style="color: red;"></i>
+                    <p style="color: red;">Failed to initialize application</p>
+                    <button onclick="window.location.reload()">Try Again</button>
+                </div>`;
+        }
+    });
+})();
