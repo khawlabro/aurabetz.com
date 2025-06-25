@@ -1,42 +1,39 @@
 // BetSmart App - Main application class
 class BetSmartApp {
     constructor() {
-        console.log("Initializing BetSmartApp..."); // Add this line
-        this.bets = [];
-        this.gameData = {};
-        this.selectedSport = 'All Sports';
-        this.sortBy = 'value';
-        this.highValueOnly = false;
-        this.DATA_URL = this.resolveDataUrl();
-        this.initialized = false;
-        
-        // Updated Firebase initialization with your new config
-this.firebaseConfig = {
-    apiKey: "AIzaSyDalVcdFUamoA90pSvNX2hfIkyH7hMZk9I",
-    authDomain: "aurabetz1.firebaseapp.com",
-    projectId: "aurabetz1",
-    storageBucket: "aurabetz1.appspot.com",
-    messagingSenderId: "254316956886",
-    appId: "1:254316956886:web:3ea3341005161efbe88d77",
-    measurementId: "G-R8WRSY7L57"
-};  // <-- This closing brace was missing
+    console.log("Initializing BetSmartApp...");
+    this.bets = [];
+    this.gameData = {};
+    this.selectedSport = 'All Sports';
+    this.sortBy = 'value';
+    this.highValueOnly = false;
+    this.DATA_URL = this.resolveDataUrl();
+    this.initialized = false;
+    
+    // Initialize Firebase first
+    this.firebaseConfig = {
+        apiKey: "AIzaSyDalVcdFUamoA90pSvNX2hfIkyH7hMZk9I",
+        authDomain: "aurabetz1.firebaseapp.com",
+        projectId: "aurabetz1",
+        storageBucket: "aurabetz1.appspot.com",
+        messagingSenderId: "254316956886",
+        appId: "1:254316956886:web:3ea3341005161efbe88d77",
+        measurementId: "G-R8WRSY7L57"
+    };
 
-        console.log("Firebase app initialized:", this.app); // Add this line
-        console.log("Firebase auth:", this.auth); // Add this line
-        console.log("Firestore:", this.db); // Add this line
-        
-        // Check if Firebase is already initialized
-        if (!firebase.apps.length) {
-            this.app = firebase.initializeApp(this.firebaseConfig);
-        } else {
-            this.app = firebase.app();
-        }
-        
-        this.auth = firebase.auth();
-        this.db = firebase.firestore();
-        
-        this.initAuth();
+    if (!firebase.apps.length) {
+        this.app = firebase.initializeApp(this.firebaseConfig);
+    } else {
+        this.app = firebase.app();
     }
+    
+    this.auth = firebase.auth();
+    this.db = firebase.firestore();
+    
+    console.log("Firebase initialized:", this.app);
+    
+    this.initAuth();
+}
 
     // [Rest of your existing code remains exactly the same...]
     initAuth() {
@@ -126,23 +123,22 @@ this.firebaseConfig = {
     initApp() {
     if (this.initialized) return;
     
-    // Show loading spinner
     document.getElementById('appContent').style.display = 'none';
     document.getElementById('loadingSpinner').style.display = 'flex';
     
-    // Initialize the app
     this.init().then(() => {
         this.initialized = true;
         this.render();
         this.setupEventListeners();
         this.checkDarkMode();
         
-        // Hide loading spinner and show app content
         document.getElementById('loadingSpinner').style.display = 'none';
         document.getElementById('appContent').style.display = 'block';
     }).catch(error => {
         console.error("App initialization failed:", error);
         this.handleAuthError(error);
+        // Make sure to hide the auth wall if initialization fails
+        document.getElementById('authWall').style.display = 'none';
     });
 }
 
