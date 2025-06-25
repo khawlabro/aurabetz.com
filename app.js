@@ -95,67 +95,107 @@ class BetSmartApp {
         });
     }
 
-    // Verify PIN with Firebase
-    async verifyPin(pin) {
-        const pinError = document.getElementById('pinError');
+    // Verify PIN with Firebase - UPDATED VERSION
+async verifyPin(pin) {
+    const pinError = document.getElementById('pinError');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    
+    try {
+        // 1. Validate PIN input
+        if (!pin || pin.length < 4) {
+            throw new Error("Please enter a valid 4-digit PIN");
+        }
+
+        // 2. Show loading state
         if (pinError) pinError.style.display = 'none';
-        
         this.showLoading(true);
 
-        try {
-            // Check if PIN exists in Firestore
-            const querySnapshot = await this.db.collection("validPins")
-                .where("pin", "==", pin)
-                .get();
+        // 3. Verify PIN exists in Firestore
+        const pinQuery = await this.db.collection("validPins")
+            .where("pin", "==", pin)
+            .get();
 
-            if (querySnapshot.empty) {
-                throw new Error("Invalid PIN");
-            }
-
-            // PIN is valid - store it and sign in
-            localStorage.setItem('betSmartAuth', pin);
-            document.getElementById('authWall').style.display = 'none';
-            
-            // Sign in anonymously
-            await this.auth.signInAnonymously();
-            this.trackAccess(pin);
-            
-            // Initialize the app
-            this.initApp();
-        } catch (error) {
-            console.error("PIN verification failed:", error);
-            this.showLoading(false);
-            this.showPinError(error.message || "Invalid PIN");
+        if (pinQuery.empty) {
+            throw new Error("Invalid PIN - Please try again");
         }
-    }
 
-    // Initialize the main application
-    async initApp() {
-        if (this.initialized) return;
+        // 4. Sign in anonymously (with retry logic)
+        let authUser;
+        try {
+            authUser = await this.auth.signInAnonymously();
+        } catch (authError) {
+            console.error("Auth error:", authError);
+            // Retry once if failed
+            authUser = await this.auth.signInAnonymously();
+        }
+
+        // 5. Store authentication state
+        localStorage.setItem('betSmartAuth', pin);
+        this.trackAccess(pin);
+
+        // 6. Proceed to app
+        document.getElementById('authWall').style.display = 'none';
+        await this.initApp();
+
+    } catch (error) {
+        console.error("PIN verification failed:", error);
+        this.showLoading(false);
         
+        // Special handling for common Firebase errors
+        const errorMessage = error.code === 'auth/network-request-failed'
+            ? "Network error - Please check your connection"
+            : error.message || "Authentication failed";
+
+        this.showPinError(errorMessage);
+    }
+}
+
+// Initialize the main application - UPDATED VERSION
+async initApp() {
+    if (this.initialized) return;
+    
+    try {
+        // 1. Set loading state
         this.showLoading(true);
         document.getElementById('appContent').style.display = 'none';
 
-        try {
-            // Load data from JSON file
-            await this.loadData();
-            
-            // Initialize UI
+        // 2. Load data with timeout fallback
+        const dataLoad = this.loadData();
+        const timeout = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error("Data loading timeout")), 5000);
+
+        await Promise.race([dataLoad, timeout]);
+        
+        // 3. Initialize UI components
+        await Promise.all([
+            this.render(),
+            this.setupEventListeners(),
+            this.checkDarkMode()
+        ]);
+
+        // 4. Show app content
+        document.getElementById('loadingSpinner').style.display = 'none';
+        document.getElementById('appContent').style.display = 'block';
+        
+        this.initialized = true;
+        console.log("App initialized successfully");
+
+    } catch (error) {
+        console.error("App initialization failed:", error);
+        
+        // Fallback to demo data if JSON fails to load
+        if (error.message.includes("Failed to fetch") || error.message.includes("timeout")) {
+            console.warn("Using demo data as fallback");
+            this.bets = this.getDefaultBets();
+            this.gameData = this.getDefaultGameData();
             this.render();
-            this.setupEventListeners();
-            this.checkDarkMode();
-            
-            // Show the app content
-            document.getElementById('loadingSpinner').style.display = 'none';
-            document.getElementById('appContent').style.display = 'block';
-            
-            this.initialized = true;
-            console.log("App initialized successfully");
-        } catch (error) {
-            console.error("App initialization failed:", error);
-            this.handleError("Failed to initialize application");
         }
+        
+        this.handleError(error.message.includes("timeout")
+            ? "Server response delayed - showing demo data"
+            : "Failed to initialize app");
     }
+}
 
     // Load data from JSON file
     async loadData() {
