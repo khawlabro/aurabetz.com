@@ -849,14 +849,46 @@ removeAllEventListeners() {
     }
 }
 
-// Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Hide app content until authenticated
-    document.getElementById('appContent').style.display = 'none';
-    
-    // Show loading spinner
-    document.getElementById('loadingSpinner').style.display = 'flex';
-    
-    // Initialize the app
-    const app = new BetSmartApp();
+    try {
+        const appContent = document.getElementById('appContent');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const authWall = document.getElementById('authWall');
+        
+        // Ensure elements exist
+        if (!appContent || !loadingSpinner || !authWall) {
+            throw new Error('Required elements not found');
+        }
+        
+        // Hide content and show spinner
+        appContent.style.display = 'none';
+        authWall.style.display = 'none';
+        loadingSpinner.style.display = 'flex';
+        
+        // Initialize app
+        const app = new BetSmartApp();
+        
+        // The app should handle showing content when ready
+        // through its initApp() method
+        
+    } catch (error) {
+        console.error("Initialization error:", error);
+        const spinner = document.getElementById('loadingSpinner');
+        if (spinner) {
+            spinner.innerHTML = `
+                <div class="spinner-content">
+                    <i class="fas fa-exclamation-triangle" style="color: red; font-size: 2rem;"></i>
+                    <p style="color: red; margin-top: 20px;">
+                        Failed to load BetSmart: ${error.message}
+                    </p>
+                    <button onclick="window.location.reload()" 
+                            style="margin-top: 10px; padding: 8px 16px; 
+                                   background: #007bff; color: white; 
+                                   border: none; border-radius: 4px; cursor: pointer;"
+                            aria-label="Refresh page">
+                        Refresh Page
+                    </button>
+                </div>`;
+        }
+    }
 });
