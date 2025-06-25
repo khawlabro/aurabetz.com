@@ -1,41 +1,44 @@
 // BetSmart App - Main application class
 class BetSmartApp {
     constructor() {
-    console.log("Initializing BetSmartApp...");
-    this.bets = [];
-    this.gameData = {};
-    this.selectedSport = 'All Sports';
-    this.sortBy = 'value';
-    this.highValueOnly = false;
-    this.DATA_URL = this.resolveDataUrl();
-    this.initialized = false;
-    
-    // Initialize Firebase first
-    this.firebaseConfig = {
-        apiKey: "AIzaSyDalVcdFUamoA90pSvNX2hfIkyH7hMZk9I",
-        authDomain: "aurabetz1.firebaseapp.com",
-        projectId: "aurabetz1",
-        storageBucket: "aurabetz1.appspot.com",
-        messagingSenderId: "254316956886",
-        appId: "1:254316956886:web:3ea3341005161efbe88d77",
-        measurementId: "G-R8WRSY7L57"
-    };
+        console.log("Initializing BetSmartApp...");
+        this.bets = [];
+        this.gameData = {};
+        this.selectedSport = 'All Sports';
+        this.sortBy = 'value';
+        this.highValueOnly = false;
+        this.DATA_URL = this.resolveDataUrl();
+        this.initialized = false;
+        
+        // Initialize Firebase
+        this.firebaseConfig = {
+            apiKey: "AIzaSyDalVcdFUamoA90pSvNX2hfIkyH7hMZk9I",
+            authDomain: "aurabetz1.firebaseapp.com",
+            projectId: "aurabetz1",
+            storageBucket: "aurabetz1.appspot.com",
+            messagingSenderId: "254316956886",
+            appId: "1:254316956886:web:3ea3341005161efbe88d77",
+            measurementId: "G-R8WRSY7L57"
+        };
 
-    if (!firebase.apps.length) {
-        this.app = firebase.initializeApp(this.firebaseConfig);
-    } else {
-        this.app = firebase.app();
+        try {
+            if (!firebase.apps.length) {
+                this.app = firebase.initializeApp(this.firebaseConfig);
+            } else {
+                this.app = firebase.app();
+            }
+            
+            this.auth = firebase.auth();
+            this.db = firebase.firestore();
+            console.log("Firebase initialized successfully");
+            
+            this.initAuth();
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+            this.handleAuthError(error);
+        }
     }
-    
-    this.auth = firebase.auth();
-    this.db = firebase.firestore();
-    
-    console.log("Firebase initialized:", this.app);
-    
-    this.initAuth();
-}
 
-    // [Rest of your existing code remains exactly the same...]
     initAuth() {
         try {
             // Check for cached PIN first
@@ -48,99 +51,101 @@ class BetSmartApp {
             // Check Firebase auth state
             this.auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // User is authenticated
+                    console.log("User authenticated:", user);
                     this.initApp();
                 } else {
-                    // Show auth wall
+                    console.log("No authenticated user, showing auth wall");
                     const authWall = document.getElementById('authWall');
-                    if (!authWall) throw new Error("Auth wall element not found");
+                    if (!authWall) {
+                        throw new Error("Auth wall element not found");
+                    }
                     authWall.style.display = 'flex';
 
-                    // PIN submission handler
-                    document.getElementById('submitPin').addEventListener('click', () => {
-                        const enteredPin = document.getElementById('pinInput').value;
-                        if (!enteredPin) {
-                            document.getElementById('pinError').textContent = "Please enter a PIN";
-                            document.getElementById('pinError').style.display = 'block';
-                            return;
-                        }
+                    // Set up PIN submission
+                    const submitPin = document.getElementById('submitPin');
+                    const pinInput = document.getElementById('pinInput');
+                    
+                    if (submitPin && pinInput) {
+                        submitPin.addEventListener('click', () => {
+                            const enteredPin = pinInput.value;
+                            if (!enteredPin) {
+                                document.getElementById('pinError').textContent = "Please enter a PIN";
+                                document.getElementById('pinError').style.display = 'block';
+                                return;
+                            }
+                            this.verifyPinWithFirebase(enteredPin);
+                        });
 
-                        this.verifyPinWithFirebase(enteredPin);
-                    });
-
-                    // Enter key support
-                    document.getElementById('pinInput').addEventListener('keypress', (e) => {
-                        if (e.key === 'Enter') document.getElementById('submitPin').click();
-                    });
+                        pinInput.addEventListener('keypress', (e) => {
+                            if (e.key === 'Enter') submitPin.click();
+                        });
+                    }
                 }
             });
         } catch (error) {
+            console.error("Auth initialization error:", error);
             this.handleAuthError(error);
         }
     }
 
     verifyPinWithFirebase(pin) {
-    const pinError = document.getElementById('pinError');
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    
-    // Clear previous errors and show loading
-    pinError.style.display = 'none';
-    loadingSpinner.style.display = 'flex';
+        const pinError = document.getElementById('pinError');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        
+        if (!pinError || !loadingSpinner) {
+            console.error("Required elements not found for PIN verification");
+            return;
+        }
 
-    // Verify PIN against Firestore
-    this.db.collection("validPins")
-        .where("pin", "==", pin)
-        .get()
-        .then((querySnapshot) => {
-            if (querySnapshot.empty) {
-                throw new Error("Invalid PIN");
-            }
-            
-            // PIN is valid - store in localStorage
-            localStorage.setItem('betSmartAuth', pin);
-            
-            // Hide auth wall
-            document.getElementById('authWall').style.display = 'none';
-            
-            // Track access (optional)
-            this.trackAccess(pin);
-            
-            // Sign in anonymously
-            return this.auth.signInAnonymously();
-        })
-        .then(() => {
-            // Initialize the app
-            this.initApp();
-        })
-        .catch((error) => {
-            console.error("PIN verification failed:", error);
-            loadingSpinner.style.display = 'none';
-            pinError.textContent = error.message || "Invalid PIN";
-            pinError.style.display = 'block';
-        });
-}
+        pinError.style.display = 'none';
+        loadingSpinner.style.display = 'flex';
+
+        this.db.collection("validPins")
+            .where("pin", "==", pin)
+            .get()
+            .then((querySnapshot) => {
+                if (querySnapshot.empty) {
+                    throw new Error("Invalid PIN");
+                }
+                
+                localStorage.setItem('betSmartAuth', pin);
+                document.getElementById('authWall').style.display = 'none';
+                this.trackAccess(pin);
+                return this.auth.signInAnonymously();
+            })
+            .then(() => {
+                this.initApp();
+            })
+            .catch((error) => {
+                console.error("PIN verification failed:", error);
+                loadingSpinner.style.display = 'none';
+                pinError.textContent = error.message || "Invalid PIN";
+                pinError.style.display = 'block';
+            });
+    }
 
     initApp() {
-    if (this.initialized) return;
-    
-    document.getElementById('appContent').style.display = 'none';
-    document.getElementById('loadingSpinner').style.display = 'flex';
-    
-    this.init().then(() => {
-        this.initialized = true;
-        this.render();
-        this.setupEventListeners();
-        this.checkDarkMode();
+        if (this.initialized) return;
         
-        document.getElementById('loadingSpinner').style.display = 'none';
-        document.getElementById('appContent').style.display = 'block';
-    }).catch(error => {
-        console.error("App initialization failed:", error);
-        this.handleAuthError(error);
-        // Make sure to hide the auth wall if initialization fails
-        document.getElementById('authWall').style.display = 'none';
-    });
-}
+        console.log("Initializing application...");
+        document.getElementById('appContent').style.display = 'none';
+        document.getElementById('loadingSpinner').style.display = 'flex';
+        
+        this.init().then(() => {
+            this.initialized = true;
+            this.render();
+            this.setupEventListeners();
+            this.checkDarkMode();
+            
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('appContent').style.display = 'block';
+            console.log("Application initialized successfully");
+        }).catch(error => {
+            console.error("App initialization failed:", error);
+            this.handleAuthError(error);
+            document.getElementById('authWall').style.display = 'none';
+        });
+    }
 
     trackAccess(pin) {
         try {
@@ -162,13 +167,18 @@ class BetSmartApp {
     handleAuthError(error) {
         console.error("Auth error:", error);
         const spinner = document.getElementById('loadingSpinner');
+        const authWall = document.getElementById('authWall');
+        
+        if (authWall) {
+            authWall.style.display = 'none';
+        }
         
         if (spinner) {
             spinner.innerHTML = `
                 <div class="spinner-content">
                     <i class="fas fa-exclamation-triangle" style="color: red; font-size: 2rem;"></i>
                     <p style="color: red; margin-top: 20px;">
-                        Error loading BetSmart. Please refresh or check your connection.
+                        Error loading BetSmart: ${error.message || 'Unknown error'}
                     </p>
                     <button onclick="window.location.reload()" 
                             style="margin-top: 10px; padding: 8px 16px; 
@@ -247,35 +257,37 @@ class BetSmartApp {
     }
 
     init() {
-    return new Promise((resolve, reject) => {
-        try {
-            this.loadData().then(() => {
-                this.render();
-                this.setupEventListeners();
-                this.checkDarkMode();
-                resolve(); // Signal completion
-            }).catch((err) => {
-                this.handleAuthError(err);
-                reject(err);
-            });
-        } catch (error) {
-            this.handleAuthError(error);
-            reject(error);
-        }
-    });
-}
+        return new Promise((resolve, reject) => {
+            try {
+                this.loadData().then(() => {
+                    this.render();
+                    this.setupEventListeners();
+                    this.checkDarkMode();
+                    resolve();
+                }).catch((err) => {
+                    this.handleAuthError(err);
+                    reject(err);
+                });
+            } catch (error) {
+                this.handleAuthError(error);
+                reject(error);
+            }
+        });
+    }
 
     async loadData() {
         try {
+            console.log("Loading data from:", this.DATA_URL);
             const response = await fetch(this.DATA_URL);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const data = await response.json();
             
             // Filter out invalid bets
             this.bets = (data.bets || this.getDefaultBets()).filter(bet => 
                 bet.event && 
                 bet.event.trim() !== "" && 
-                !bet.event.toLowerCase().includes("bitch") &&
                 bet.mainBet && 
                 bet.mainBet.pick
             );
@@ -288,12 +300,12 @@ class BetSmartApp {
             if (!currentDayBet) {
                 this.resetGame();
             }
+            
+            console.log("Loaded", this.bets.length, "valid bets");
         } catch (error) {
             console.error("Data load failed, using defaults:", error);
             this.bets = this.getDefaultBets();
             this.gameData = this.getDefaultGameData();
-            alert("Warning: Using demo data. Some features may be limited.");
-            // Re-throw the error so it can be handled by initApp
             throw error;
         }
     }
@@ -303,155 +315,154 @@ class BetSmartApp {
     }
 
     setupEventListeners() {
-    // First remove all existing event listeners to prevent duplicates
-    this.removeAllEventListeners();
+        // First remove all existing event listeners to prevent duplicates
+        this.removeAllEventListeners();
 
-    // Dark Mode Toggle
-    this.safeAddEventListener('#darkModeToggle', 'click', () => this.toggleDarkMode());
+        // Dark Mode Toggle
+        this.safeAddEventListener('#darkModeToggle', 'click', () => this.toggleDarkMode());
 
-    // Subscribe Button
-    this.safeAddEventListener('#subscribeBtn', 'click', () => this.showSubscribeModal());
+        // Subscribe Button
+        this.safeAddEventListener('#subscribeBtn', 'click', () => this.showSubscribeModal());
 
-    // Sport Tabs
-    document.querySelectorAll('.tab').forEach(tab => {
-        this.safeAddEventListener(tab, 'click', (e) => {
-            this.selectedSport = e.currentTarget.getAttribute('data-sport');
-            this.updateActiveSportTab();
+        // Sport Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            this.safeAddEventListener(tab, 'click', (e) => {
+                this.selectedSport = e.currentTarget.getAttribute('data-sport');
+                this.updateActiveSportTab();
+                this.renderBets(this.filterAndSortBets());
+            });
+        });
+
+        // Sort Options
+        this.safeAddEventListener('#sortOptions', 'change', (e) => {
+            this.sortBy = e.target.value;
             this.renderBets(this.filterAndSortBets());
         });
-    });
 
-    // Sort Options
-    this.safeAddEventListener('#sortOptions', 'change', (e) => {
-        this.sortBy = e.target.value;
-        this.renderBets(this.filterAndSortBets());
-    });
+        // High Value Filter
+        this.safeAddEventListener('#highValueOnly', 'change', (e) => {
+            this.highValueOnly = e.target.checked;
+            this.renderBets(this.filterAndSortBets());
+        });
 
-    // High Value Filter
-    this.safeAddEventListener('#highValueOnly', 'change', (e) => {
-        this.highValueOnly = e.target.checked;
-        this.renderBets(this.filterAndSortBets());
-    });
-
-    // Detail Modal
-    this.safeAddEventListener('#closeModal', 'click', () => this.hideDetailModal());
-    this.safeAddEventListener('#detailModal', 'click', (e) => {
-        if (e.target === e.currentTarget) {
-            this.hideDetailModal();
-        }
-    });
-
-    // Game Modal
-    this.safeAddEventListener('#theGameBtn', 'click', () => {
-        this.showGameModal();
-        this.updateGameProgress();
-    });
-    this.safeAddEventListener('#closeGameModal', 'click', () => this.hideGameModal());
-    this.safeAddEventListener('#gameModal', 'click', (e) => {
-        if (e.target === e.currentTarget) {
-            this.hideGameModal();
-        }
-    });
-
-    // Subscribe Modal
-    this.safeAddEventListener('#closeSubscribeModal', 'click', () => this.hideSubscribeModal());
-    this.safeAddEventListener('#subscribeModal', 'click', (e) => {
-        if (e.target === e.currentTarget) {
-            this.hideSubscribeModal();
-        }
-    });
-
-    // Delegated events for dynamic elements
-    this.safeAddEventListener(document, 'click', (e) => {
-        // View Analysis Buttons
-        if (e.target.classList.contains('view-analysis-btn')) {
-            const card = e.target.closest('.bet-card');
-            if (card) {
-                const betId = parseInt(card.getAttribute('data-bet-id'));
-                if (!isNaN(betId)) {
-                    this.showDetailModal(betId);
-                    e.stopPropagation();
-                }
-            }
-        }
-
-        // Payment Select Buttons
-        if (e.target.classList.contains('payment-select-btn')) {
-            const paymentOption = e.target.closest('.payment-option');
-            if (paymentOption) {
-                const paymentMethod = paymentOption.querySelector('h3')?.textContent;
-                if (paymentMethod) {
-                    alert(`Selected ${paymentMethod}. Payment processing would be implemented here.`);
-                    this.hideSubscribeModal();
-                }
-            }
-        }
-    });
-
-    // Diamond Progress
-    document.querySelectorAll('.diamond').forEach(diamond => {
-        this.safeAddEventListener(diamond, 'click', (e) => {
-            const day = parseInt(e.currentTarget.getAttribute('data-day'));
-            if (!isNaN(day) && day === this.gameData.currentDay) {
-                this.completeCurrentDay(true);
+        // Detail Modal
+        this.safeAddEventListener('#closeModal', 'click', () => this.hideDetailModal());
+        this.safeAddEventListener('#detailModal', 'click', (e) => {
+            if (e.target === e.currentTarget) {
+                this.hideDetailModal();
             }
         });
-    });
-}
 
-// New helper methods to add to your class:
-
-safeAddEventListener(selectorOrElement, event, handler) {
-    const element = typeof selectorOrElement === 'string' 
-        ? document.querySelector(selectorOrElement) 
-        : selectorOrElement;
-    
-    if (!element) return;
-    
-    // First remove any existing listener
-    element.removeEventListener(event, handler);
-    // Then add the new one
-    element.addEventListener(event, handler);
-}
-
-removeAllEventListeners() {
-    // This is a simplified version - in a real app you might want to track listeners
-    // and remove them specifically, but this works for most cases
-    const elements = [
-        '#darkModeToggle',
-        '#subscribeBtn',
-        '#sortOptions',
-        '#highValueOnly',
-        '#closeModal',
-        '#detailModal',
-        '#theGameBtn',
-        '#closeGameModal',
-        '#gameModal',
-        '#closeSubscribeModal',
-        '#subscribeModal',
-        document, // For delegated events
-        ...document.querySelectorAll('.tab'),
-        ...document.querySelectorAll('.diamond')
-    ];
-
-    elements.forEach(element => {
-        if (typeof element === 'string') {
-            const el = document.querySelector(element);
-            if (el) {
-                el.replaceWith(el.cloneNode(true));
+        // Game Modal
+        this.safeAddEventListener('#theGameBtn', 'click', () => {
+            this.showGameModal();
+            this.updateGameProgress();
+        });
+        this.safeAddEventListener('#closeGameModal', 'click', () => this.hideGameModal());
+        this.safeAddEventListener('#gameModal', 'click', (e) => {
+            if (e.target === e.currentTarget) {
+                this.hideGameModal();
             }
-        } else {
-            element.replaceWith(element.cloneNode(true));
+        });
+
+        // Subscribe Modal
+        this.safeAddEventListener('#closeSubscribeModal', 'click', () => this.hideSubscribeModal());
+        this.safeAddEventListener('#subscribeModal', 'click', (e) => {
+            if (e.target === e.currentTarget) {
+                this.hideSubscribeModal();
+            }
+        });
+
+        // Delegated events for dynamic elements
+        this.safeAddEventListener(document, 'click', (e) => {
+            // View Analysis Buttons
+            if (e.target.classList.contains('view-analysis-btn')) {
+                const card = e.target.closest('.bet-card');
+                if (card) {
+                    const betId = parseInt(card.getAttribute('data-bet-id'));
+                    if (!isNaN(betId)) {
+                        this.showDetailModal(betId);
+                        e.stopPropagation();
+                    }
+                }
+            }
+
+            // Payment Select Buttons
+            if (e.target.classList.contains('payment-select-btn')) {
+                const paymentOption = e.target.closest('.payment-option');
+                if (paymentOption) {
+                    const paymentMethod = paymentOption.querySelector('h3')?.textContent;
+                    if (paymentMethod) {
+                        alert(`Selected ${paymentMethod}. Payment processing would be implemented here.`);
+                        this.hideSubscribeModal();
+                    }
+                }
+            }
+        });
+
+        // Diamond Progress
+        document.querySelectorAll('.diamond').forEach(diamond => {
+            this.safeAddEventListener(diamond, 'click', (e) => {
+                const day = parseInt(e.currentTarget.getAttribute('data-day'));
+                if (!isNaN(day) {
+                    this.completeCurrentDay(true);
+                }
+            });
+        });
+    }
+
+    safeAddEventListener(selectorOrElement, event, handler) {
+        const element = typeof selectorOrElement === 'string' 
+            ? document.querySelector(selectorOrElement) 
+            : selectorOrElement;
+        
+        if (!element) {
+            console.warn("Element not found for selector:", selectorOrElement);
+            return;
         }
-    });
-}
+        
+        element.removeEventListener(event, handler);
+        element.addEventListener(event, handler);
+    }
+
+    removeAllEventListeners() {
+        const elements = [
+            '#darkModeToggle',
+            '#subscribeBtn',
+            '#sortOptions',
+            '#highValueOnly',
+            '#closeModal',
+            '#detailModal',
+            '#theGameBtn',
+            '#closeGameModal',
+            '#gameModal',
+            '#closeSubscribeModal',
+            '#subscribeModal',
+            document,
+            ...document.querySelectorAll('.tab'),
+            ...document.querySelectorAll('.diamond')
+        ];
+
+        elements.forEach(element => {
+            if (typeof element === 'string') {
+                const el = document.querySelector(element);
+                if (el) {
+                    el.replaceWith(el.cloneNode(true));
+                }
+            } else {
+                element.replaceWith(element.cloneNode(true));
+            }
+        });
+    }
 
     showSubscribeModal() {
-        document.getElementById('subscribeModal')?.classList.add('active');
+        const modal = document.getElementById('subscribeModal');
+        if (modal) modal.classList.add('active');
     }
 
     hideSubscribeModal() {
-        document.getElementById('subscribeModal')?.classList.remove('active');
+        const modal = document.getElementById('subscribeModal');
+        if (modal) modal.classList.remove('active');
     }
 
     filterAndSortBets() {
@@ -493,7 +504,10 @@ removeAllEventListeners() {
 
     renderBets(betsToRender) {
         const container = document.getElementById('betsContainer');
-        if (!container) return;
+        if (!container) {
+            console.error("Bets container not found");
+            return;
+        }
         
         container.innerHTML = '';
 
@@ -504,21 +518,26 @@ removeAllEventListeners() {
 
         betsToRender.forEach(bet => {
             const card = this.createBetCard(bet);
-            if (card.childNodes.length > 0) {
+            if (card && card.childNodes.length > 0) {
                 container.appendChild(card);
             }
         });
 
         document.querySelectorAll('.bet-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                const betId = parseInt(card.getAttribute('data-bet-id'));
-                this.showDetailModal(betId);
+                if (!e.target.classList.contains('view-analysis-btn')) {
+                    const betId = parseInt(card.getAttribute('data-bet-id'));
+                    if (!isNaN(betId)) {
+                        this.showDetailModal(betId);
+                    }
+                }
             });
         });
     }
 
     createBetCard(bet) {
-        if (!bet.event || !bet.mainBet || !bet.mainBet.pick) {
+        if (!bet || !bet.event || !bet.mainBet || !bet.mainBet.pick) {
+            console.warn("Invalid bet data:", bet);
             return document.createElement('div');
         }
 
@@ -586,12 +605,19 @@ removeAllEventListeners() {
 
     showDetailModal(betId) {
         const bet = this.bets.find(b => b.id === betId);
-        if (!bet) return;
+        if (!bet) {
+            console.warn("Bet not found for ID:", betId);
+            return;
+        }
 
         const modalTitle = document.getElementById('modalTitle');
         const modalContent = document.getElementById('modalContent');
+        const modal = document.getElementById('detailModal');
         
-        if (!modalTitle || !modalContent) return;
+        if (!modalTitle || !modalContent || !modal) {
+            console.error("Modal elements not found");
+            return;
+        }
         
         modalTitle.textContent = bet.event;
         
@@ -681,19 +707,25 @@ removeAllEventListeners() {
             </div>` : ''}
         `;
         
-        document.getElementById('detailModal')?.classList.add('active');
+        modal.classList.add('active');
     }
 
     hideDetailModal() {
-        document.getElementById('detailModal')?.classList.remove('active');
+        const modal = document.getElementById('detailModal');
+        if (modal) modal.classList.remove('active');
     }
 
     showGameModal() {
-        document.getElementById('gameModal')?.classList.add('active');
+        const modal = document.getElementById('gameModal');
+        if (modal) {
+            modal.classList.add('active');
+            this.updateGameProgress();
+        }
     }
 
     hideGameModal() {
-        document.getElementById('gameModal')?.classList.remove('active');
+        const modal = document.getElementById('gameModal');
+        if (modal) modal.classList.remove('active');
     }
 
     updateGameProgress() {
@@ -861,21 +893,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadingSpinner = document.getElementById('loadingSpinner');
         const authWall = document.getElementById('authWall');
         
-        // Ensure elements exist
         if (!appContent || !loadingSpinner || !authWall) {
-            throw new Error('Required elements not found');
+            throw new Error('Required elements not found in DOM');
         }
         
-        // Hide content and show spinner
         appContent.style.display = 'none';
         authWall.style.display = 'none';
         loadingSpinner.style.display = 'flex';
         
-        // Initialize app
         const app = new BetSmartApp();
-        
-        // The app should handle showing content when ready
-        // through its initApp() method
         
     } catch (error) {
         console.error("Initialization error:", error);
