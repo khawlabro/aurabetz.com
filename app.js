@@ -28,18 +28,21 @@ class BetSmartApp {
 
     initAuth() {
         try {
-            // Check Firebase auth state
+            const authTimeout = setTimeout(() => {
+                this.handleAuthError(new Error("Authentication timed out. Please check your connection and try refreshing the page."));
+            }, 8000); // 8-second timeout
+
             this.auth.onAuthStateChanged((user) => {
+                clearTimeout(authTimeout);
+                document.getElementById('loadingSpinner').style.display = 'none';
+
                 if (user) {
-                    // User is authenticated
                     this.initApp();
                 } else {
-                    // Show auth wall
                     const authWall = document.getElementById('authWall');
                     if (!authWall) throw new Error("Auth wall element not found");
                     authWall.style.display = 'flex';
 
-                    // PIN submission handler
                     document.getElementById('submitPin').addEventListener('click', () => {
                         const enteredPin = document.getElementById('pinInput').value;
                         if (!enteredPin) {
@@ -47,11 +50,9 @@ class BetSmartApp {
                             document.getElementById('pinError').style.display = 'block';
                             return;
                         }
-
                         this.verifyPinWithFirebase(enteredPin);
                     });
 
-                    // Enter key support
                     document.getElementById('pinInput').addEventListener('keypress', (e) => {
                         if (e.key === 'Enter') document.getElementById('submitPin').click();
                     });
@@ -118,15 +119,17 @@ class BetSmartApp {
                 <div class="spinner-content">
                     <i class="fas fa-exclamation-triangle" style="color: red; font-size: 2rem;"></i>
                     <p style="color: red; margin-top: 20px;">
-                        Error loading BetSmart. Please refresh or check your connection.
+                        Error loading BetSmart
                     </p>
-                    <button onclick="window.location.reload()" 
-                            style="margin-top: 10px; padding: 8px 16px; 
-                                   background: var(--primary); color: white; 
+                    <p style="color: #6c757d; font-size: 0.9rem; margin-top: 10px;">${error.message}</p>
+                    <button onclick="window.location.reload()"
+                            style="margin-top: 15px; padding: 8px 16px;
+                                   background: var(--primary); color: white;
                                    border: none; border-radius: 4px; cursor: pointer;">
                         Refresh Page
                     </button>
                 </div>`;
+            spinner.style.display = 'flex';
         }
     }
 
@@ -731,12 +734,27 @@ class BetSmartApp {
 
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Hide app content until authenticated
-    document.getElementById('appContent').style.display = 'none';
-    
-    // Show loading spinner
-    document.getElementById('loadingSpinner').style.display = 'flex';
-    
-    // Initialize the app
-    const app = new BetSmartApp();
+    const spinner = document.getElementById('loadingSpinner');
+    const appContent = document.getElementById('appContent');
+
+    // Show loading spinner and hide content initially
+    if(spinner) spinner.style.display = 'flex';
+    if(appContent) appContent.style.display = 'none';
+
+    try {
+        // Initialize the app
+        const app = new BetSmartApp();
+    } catch (error) {
+        console.error("Failed to initialize BetSmartApp:", error);
+        if (spinner) {
+            spinner.innerHTML = `
+                <div class="spinner-content">
+                    <i class="fas fa-exclamation-triangle" style="color: red; font-size: 2rem;"></i>
+                    <p style="color: red; margin-top: 20px;">
+                        Fatal Error: Could not start the application.
+                    </p>
+                    <p style="color: #666; font-size: 0.9em; margin-top: 10px;">${error.message}</p>
+                </div>`;
+        }
+    }
 });
