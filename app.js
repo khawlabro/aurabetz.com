@@ -27,40 +27,57 @@ class BetSmartApp {
     }
 
     initAuth() {
-        try {
-            const authTimeout = setTimeout(() => {
-                this.handleAuthError(new Error("Authentication timed out. Please check your connection and try refreshing the page."));
-            }, 8000); // 8-second timeout
+        // Always sign out to ensure the PIN wall is shown on each visit.
+        this.auth.signOut().finally(() => {
+            try {
+                const authTimeout = setTimeout(() => {
+                    this.handleAuthError(new Error("Authentication timed out. Please check your connection."));
+                }, 8000);
 
-            this.auth.onAuthStateChanged((user) => {
-                clearTimeout(authTimeout);
-                document.getElementById('loadingSpinner').style.display = 'none';
+                this.auth.onAuthStateChanged((user) => {
+                    clearTimeout(authTimeout);
+                    document.getElementById('loadingSpinner').style.display = 'none';
 
-                if (user) {
-                    this.initApp();
-                } else {
-                    const authWall = document.getElementById('authWall');
-                    if (!authWall) throw new Error("Auth wall element not found");
-                    authWall.style.display = 'flex';
+                    if (user) {
+                        // User is authenticated via PIN, initialize the main app.
+                        this.initApp();
+                    } else {
+                        // No user, show the authentication wall.
+                        const authWall = document.getElementById('authWall');
+                        if (!authWall) throw new Error("Auth wall element not found");
+                        authWall.style.display = 'flex';
 
-                    document.getElementById('submitPin').addEventListener('click', () => {
-                        const enteredPin = document.getElementById('pinInput').value;
-                        if (!enteredPin) {
-                            document.getElementById('pinError').textContent = "Please enter a PIN";
-                            document.getElementById('pinError').style.display = 'block';
-                            return;
-                        }
-                        this.verifyPinWithFirebase(enteredPin);
-                    });
+                        // Ensure the PIN listener is only set up once to avoid duplicates.
+                        const submitPinBtn = document.getElementById('submitPin');
+                        const pinInput = document.getElementById('pinInput');
+                        
+                        const handlePinSubmit = () => {
+                            const enteredPin = pinInput.value;
+                            if (!enteredPin) {
+                                document.getElementById('pinError').textContent = "Please enter a PIN";
+                                document.getElementById('pinError').style.display = 'block';
+                                return;
+                            }
+                            this.verifyPinWithFirebase(enteredPin);
+                        };
 
-                    document.getElementById('pinInput').addEventListener('keypress', (e) => {
-                        if (e.key === 'Enter') document.getElementById('submitPin').click();
-                    });
-                }
-            });
-        } catch (error) {
-            this.handleAuthError(error);
-        }
+                        // Clone and replace the button to remove any old listeners.
+                        const newSubmitPinBtn = submitPinBtn.cloneNode(true);
+                        submitPinBtn.parentNode.replaceChild(newSubmitPinBtn, submitPinBtn);
+                        newSubmitPinBtn.addEventListener('click', handlePinSubmit);
+
+                        pinInput.addEventListener('keypress', (e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handlePinSubmit();
+                            }
+                        });
+                    }
+                });
+            } catch (error) {
+                this.handleAuthError(error);
+            }
+        });
     }
 
     verifyPinWithFirebase(pin) {
@@ -72,14 +89,11 @@ class BetSmartApp {
                     document.getElementById('authWall').style.display = 'none';
                     this.trackAccess(pin);
                     
-                    // Sign in anonymously to maintain auth state
+                    // Sign in anonymously. onAuthStateChanged will handle initApp().
                     return this.auth.signInAnonymously();
                 } else {
                     throw new Error("Invalid PIN");
                 }
-            })
-            .then(() => {
-                this.initApp();
             })
             .catch((error) => {
                 console.error("PIN verification failed:", error);
