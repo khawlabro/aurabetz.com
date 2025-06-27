@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="app.js" defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BetSmart - Daily Sports Betting Analysis</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
         #loadingSpinner {
             position: fixed;
@@ -37,7 +35,7 @@
 </head>
 <body>
     <!-- Loading Spinner -->
-    <div id="loadingSpinner" role="status" aria-live="polite">
+    <div id="loadingSpinner">
         <div class="spinner-content">
             <i class="fas fa-circle-notch spinner-icon"></i>
             <p style="margin-top:20px">Loading BetSmart...</p>
@@ -45,34 +43,17 @@
     </div>
 
     <!-- Authentication Wall -->
-    <div id="authWall" class="auth-modal">
-        <div class="auth-modal-content">
-            <h2>Welcome to BetSmart</h2>
-            
-            <!-- PIN Login Section -->
-            <div class="auth-section">
-                <h3>Enter PIN</h3>
-                <input type="password" id="pinInput" placeholder="Enter your PIN" class="auth-input">
-                <button id="submitPin" class="auth-button" aria-label="Submit PIN to access app">Access App</button>
-                <div id="pinError" class="error-message"></div>
-            </div>
-            
-            <!-- OR Divider -->
-            <div class="auth-divider">OR</div>
-            
-            <!-- Email Login Section -->
-            <div class="auth-section">
-                <h3>Email Login</h3>
-                <input type="email" id="emailInputLogin" placeholder="Your email" class="auth-input">
-                <input type="password" id="passwordInput" placeholder="Your password" class="auth-input">
-                <button id="submitEmail" class="auth-button">Sign In</button>
-                <div id="emailError" class="error-message"></div>
-            </div>
-        </div>
+<div id="authWall" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1001; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 2rem; border-radius: 8px; text-align: center; max-width: 400px;">
+        <h2>Enter PIN to Access BetSmart</h2>
+        <input type="password" id="pinInput" placeholder="Enter PIN" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px;">
+        <button id="submitPin" style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Access App</button>
+        <div id="pinError" style="display: none; color: red; margin-top: 10px;"></div>
     </div>
+</div>
     
     <!-- Main App Content -->
-    <main id="appContent">
+    <div id="appContent" style="display:none">
         <div class="container">
             <!-- Header -->
             <header class="header">
@@ -87,7 +68,7 @@
                             <i class="fas fa-envelope"></i>
                             <span>Subscribe</span>
                         </button>
-                        <button id="darkModeToggle" class="btn-icon dark-mode-toggle" aria-label="Toggle dark mode">
+                        <button id="darkModeToggle" class="btn-icon dark-mode-toggle">
                             <i class="fas fa-moon"></i>
                             <i class="fas fa-sun hidden"></i>
                         </button>
@@ -97,20 +78,20 @@
             </header>
 
             <!-- Sports Filter Tabs -->
-            <nav class="tabs" id="sportTabs">
+            <div class="tabs" id="sportTabs">
                 <button class="tab tab-active" data-sport="All Sports">All Sports</button>
                 <button class="tab tab-inactive" data-sport="UFC">UFC</button>
                 <button class="tab tab-inactive" data-sport="NHL">NHL</button>
                 <button class="tab tab-inactive" data-sport="NBA">NBA</button>
                 <button class="tab tab-inactive" data-sport="Soccer">Soccer</button>
                 <button class="tab tab-inactive" data-sport="Table Tennis">Table Tennis</button>
-            </nav>
+            </div>
 
             <!-- Filters and Sorting -->
-            <section class="filters">
+            <div class="filters">
                 <div class="flex items-center gap-2">
                     <span>Sort by:</span>
-                    <select id="sortOptions" aria-label="Sort betting options">
+                    <select id="sortOptions">
                         <option value="value">Best Value</option>
                         <option value="odds">Best Odds</option>
                         <option value="confidence">Highest Confidence</option>
@@ -119,16 +100,16 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="checkbox-label">
-                        <input type="checkbox" id="highValueOnly" aria-label="Show only high value bets">
+                        <input type="checkbox" id="highValueOnly">
                         <span>Show Only High Value</span>
                     </label>
                 </div>
-            </section>
+            </div>
 
             <!-- Bets Grid -->
-            <section id="betsContainer" class="bets-grid">
+            <div id="betsContainer" class="bets-grid">
                 <!-- Sample UFC Bet Card -->
-                <article class="bet-card">
+                <div class="bet-card">
                     <div class="bet-header">
                         <span class="bet-sport">UFC</span>
                         <span class="bet-time">Jun 1, 7:00 PM</span>
@@ -149,10 +130,10 @@
                         <span class="best-odds">Best Odds: -240</span>
                         <button class="view-analysis-btn">View Analysis</button>
                     </div>
-                </article>
+                </div>
 
                 <!-- Sample UFC Bet Card 2 -->
-                <article class="bet-card">
+                <div class="bet-card">
                     <div class="bet-header">
                         <span class="bet-sport">UFC</span>
                         <span class="bet-time">Jun 14, 7:45 PM</span>
@@ -173,16 +154,16 @@
                         <span class="best-odds">Best Odds: -160</span>
                         <button class="view-analysis-btn">View Analysis</button>
                     </div>
-                </article>
-            </section>
+                </div>
+            </div>
         </div>
 
         <!-- Modal for Detailed View -->
-        <div id="detailModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div id="detailModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 id="modalTitle" class="modal-title"></h2>
-                    <button id="closeModal" class="modal-close" aria-label="Close modal">
+                    <button id="closeModal" class="modal-close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -191,21 +172,21 @@
         </div>
 
         <!-- The Game Modal -->
-        <div id="gameModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="gameModalTitle">
+        <div id="gameModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 id="gameModalTitle" class="modal-title flex items-center gap-2">
+                    <h2 class="modal-title flex items-center gap-2">
                         <i class="fas fa-gem text-primary"></i>
                         The Game: 9-Day Challenge
                     </h2>
-                    <button id="closeGameModal" class="modal-close" aria-label="Close game modal">
+                    <button id="closeGameModal" class="modal-close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="grid">
                         <!-- Left Side: The Progress Tree -->
-                        <section>
+                        <div>
                             <div class="progress-tree-container">
                                 <h3>Your Progress Tree</h3>
                                 <div class="diamond-tree">
@@ -282,10 +263,10 @@
                                     </div>
                                 </div>
                             </div>
-                        </section>
+                        </div>
                         
                         <!-- Right Side: Game Info and Today's Bet -->
-                        <section>
+                        <div>
                             <div class="game-info-section">
                                 <h3>How It Works</h3>
                                 <div class="info-box">
@@ -300,7 +281,7 @@
                             
                             <div class="todays-pick-section">
                                 <h3>Today's Pick (Day 2)</h3>
-                                <article class="bet-card">
+                                <div class="bet-card">
                                     <div class="bet-header">
                                         <span class="bet-sport">NHL</span>
                                         <span class="bet-time">Nov 11, 7:00 PM</span>
@@ -321,7 +302,7 @@
                                         <span class="best-odds">Best Odds: +140</span>
                                         <button class="view-analysis-btn">View Analysis</button>
                                     </div>
-                                </article>
+                                </div>
                             </div>
                             
                             <div class="progress-section">
@@ -345,17 +326,17 @@
                                     </div>
                                 </div>
                             </div>
-                        </section>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Email Signup Modal -->
-        <div id="emailSignupModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="signupModalTitle">
+        <div id="emailSignupModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 id="signupModalTitle" class="modal-title">BetSmart</h2>
+                    <h2 class="modal-title">BetSmart</h2>
                     <p>AI-Powered Sports Betting Analysis</p>
                 </div>
                 <div class="modal-body">
@@ -370,7 +351,7 @@
                     <div class="divider"></div>
 
                     <h3>Enter your email address</h3>
-                    <input type="email" id="emailInputSignup" class="form-control" placeholder="you@example.com" required aria-label="Your email address">
+                    <input type="email" id="emailInput" class="form-control" placeholder="you@example.com" required>
                     <button id="submitEmailBtn" class="btn btn-primary">Get Free Access</button>
 
                     <p class="privacy-note">
@@ -386,11 +367,11 @@
         </div>
 
         <!-- Subscribe Modal -->
-        <div id="subscribeModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="subscribeModalTitle">
+        <div id="subscribeModal" class="modal">
             <div class="modal-content" style="max-width: 500px;">
                 <div class="modal-header">
-                    <h2 id="subscribeModalTitle" class="modal-title">Subscribe to BetSmart Pro</h2>
-                    <button id="closeSubscribeModal" class="modal-close" aria-label="Close subscribe modal">
+                    <h2 class="modal-title">Subscribe to BetSmart Pro</h2>
+                    <button id="closeSubscribeModal" class="modal-close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -447,48 +428,16 @@
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
-    <!-- App Initialization -->
-    <script src="app.js" defer></script>
-
-    <!-- Initialization Script -->
+    <!-- Firebase + App Initialization -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        try {
-            const appContent = document.getElementById('appContent');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            
-            if (appContent) appContent.style.display = 'none';
-            if (loadingSpinner) loadingSpinner.style.display = 'flex';
-            
-            const app = new BetSmartApp();
-        } catch (error) {
-            console.error("Initialization error:", error);
-            const spinner = document.getElementById('loadingSpinner');
-            if (spinner) {
-                spinner.innerHTML = `
-                    <div class="spinner-content">
-                        <i class="fas fa-exclamation-triangle" style="color: red; font-size: 2rem;"></i>
-                        <p style="color: red; margin-top: 20px;">
-                            Failed to load BetSmart. Please check console for errors.
-                        </p>
-                        <button onclick="window.location.reload()" 
-                                style="margin-top: 10px; padding: 8px 16px; 
-                                       background: #007bff; color: white; 
-                                       border: none; border-radius: 4px; cursor: pointer;"
-                                aria-label="Refresh page">
-                            Refresh Page
-                        </button>
-                    </div>`;
-            }
-        }
-    });
     </script>
+    
+    <script src="app.js"></script>
 </body>
 </html>
