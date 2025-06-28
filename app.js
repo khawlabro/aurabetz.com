@@ -38,6 +38,7 @@ class BetSmartApp {
                     document.getElementById('loadingSpinner').style.display = 'none';
 
                     if (user) {
+                        document.getElementById('authWall').style.display = 'none';
                         this.initApp();
                     } else {
                         this.setupAuthForms();
