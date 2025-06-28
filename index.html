@@ -44,11 +44,33 @@
 
     <!-- Authentication Wall -->
 <div id="authWall" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1001; justify-content: center; align-items: center;">
-    <div style="background: white; padding: 2rem; border-radius: 8px; text-align: center; max-width: 400px;">
-        <h2>Enter PIN to Access BetSmart</h2>
-        <input type="password" id="pinInput" placeholder="Enter PIN" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px;">
-        <button id="submitPin" style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Access App</button>
-        <div id="pinError" style="display: none; color: red; margin-top: 10px;"></div>
+    <div id="authContainer" style="background: white; padding: 2rem; border-radius: 8px; text-align: center; max-width: 400px; width: 90%;">
+
+        <!-- PIN Login Form -->
+        <div id="pinLoginForm">
+            <h2>Enter PIN to Access</h2>
+            <input type="password" id="pinInput" placeholder="Enter PIN" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px;">
+            <button id="submitPin" style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Access App</button>
+            <div id="pinError" class="auth-error" style="display: none; color: red; margin-top: 10px;"></div>
+            <p style="margin-top: 15px; font-size: 0.9em;">
+                <a href="#" id="showEmailLogin" style="color: #007bff; text-decoration: none;">Use Email & Password Instead</a>
+            </p>
+        </div>
+
+        <!-- Email/Password Login Form -->
+        <div id="emailLoginForm" style="display: none;">
+            <h2>Sign In or Sign Up</h2>
+            <input type="email" id="emailInput" placeholder="Email" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px;">
+            <input type="password" id="passwordInput" placeholder="Password" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px;">
+            <div id="authError" class="auth-error" style="display: none; color: red; margin-bottom: 10px;"></div>
+            <div style="display: flex; gap: 10px;">
+                <button id="signInBtn" style="flex: 1; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Sign In</button>
+                <button id="signUpBtn" style="flex: 1; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Sign Up</button>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.9em;">
+                <a href="#" id="showPinLogin" style="color: #007bff; text-decoration: none;">Use PIN Instead</a>
+            </p>
+        </div>
     </div>
 </div>
     
