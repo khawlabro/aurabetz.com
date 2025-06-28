@@ -14,9 +14,9 @@ class BetSmartApp {
             authDomain: "aurabetz.firebaseapp.com",
             projectId: "aurabetz1",
             storageBucket: "aurabetz.firebasestorage.app",
-            messagingSenderId: "531651661385",
-            appId: "1:531651661385:web:d82a50a33bb77297b7f998",
-            measurementId: "G-7L19JWBH21"
+            messagingSenderId: "254316956886",
+            appId: "1:254316956886:web:3ea3341005161efbe88d77",
+            measurementId: "G-R8WRSY7L57"
         };
         
         this.app = firebase.initializeApp(this.firebaseConfig);
