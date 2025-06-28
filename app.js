@@ -14,9 +14,9 @@ class BetSmartApp {
             authDomain: "aurabetz.firebaseapp.com",
             projectId: "aurabetz1",
             storageBucket: "aurabetz.firebasestorage.app",
-            messagingSenderId: "254316956886",
-            appId: "1:254316956886:web:3ea3341005161efbe88d77",
-            measurementId: "G-R8WRSY7L57"
+            messagingSenderId: "531651661385",
+            appId: "1:531651661385:web:d82a50a33bb77297b7f998",
+            measurementId: "G-7L19JWBH21"
         };
         
         this.app = firebase.initializeApp(this.firebaseConfig);
@@ -27,7 +27,6 @@ class BetSmartApp {
     }
 
     initAuth() {
-        // Always sign out to ensure the PIN wall is shown on each visit.
         this.auth.signOut().finally(() => {
             try {
                 const authTimeout = setTimeout(() => {
@@ -39,45 +38,69 @@ class BetSmartApp {
                     document.getElementById('loadingSpinner').style.display = 'none';
 
                     if (user) {
-                        // User is authenticated via PIN, initialize the main app.
                         this.initApp();
                     } else {
-                        // No user, show the authentication wall.
-                        const authWall = document.getElementById('authWall');
-                        if (!authWall) throw new Error("Auth wall element not found");
-                        authWall.style.display = 'flex';
-
-                        // Ensure the PIN listener is only set up once to avoid duplicates.
-                        const submitPinBtn = document.getElementById('submitPin');
-                        const pinInput = document.getElementById('pinInput');
-                        
-                        const handlePinSubmit = () => {
-                            const enteredPin = pinInput.value;
-                            if (!enteredPin) {
-                                document.getElementById('pinError').textContent = "Please enter a PIN";
-                                document.getElementById('pinError').style.display = 'block';
-                                return;
-                            }
-                            this.verifyPinWithFirebase(enteredPin);
-                        };
-
-                        // Clone and replace the button to remove any old listeners.
-                        const newSubmitPinBtn = submitPinBtn.cloneNode(true);
-                        submitPinBtn.parentNode.replaceChild(newSubmitPinBtn, submitPinBtn);
-                        newSubmitPinBtn.addEventListener('click', handlePinSubmit);
-
-                        pinInput.addEventListener('keypress', (e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                handlePinSubmit();
-                            }
-                        });
+                        this.setupAuthForms();
+                        document.getElementById('authWall').style.display = 'flex';
                     }
                 });
             } catch (error) {
                 this.handleAuthError(error);
             }
         });
+    }
+
+    setupAuthForms() {
+        // Form toggling
+        document.getElementById('showEmailLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('pinLoginForm').style.display = 'none';
+            document.getElementById('emailLoginForm').style.display = 'block';
+        });
+
+        document.getElementById('showPinLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('emailLoginForm').style.display = 'none';
+            document.getElementById('pinLoginForm').style.display = 'block';
+        });
+
+        // PIN submission
+        document.getElementById('submitPin').addEventListener('click', () => {
+            const pin = document.getElementById('pinInput').value;
+            if (pin) this.verifyPinWithFirebase(pin);
+        });
+
+        // Email/Password submission
+        document.getElementById('signInBtn').addEventListener('click', () => this.handleEmailSignIn());
+        document.getElementById('signUpBtn').addEventListener('click', () => this.handleEmailSignUp());
+    }
+
+    handleEmailSignIn() {
+        const email = document.getElementById('emailInput').value;
+        const password = document.getElementById('passwordInput').value;
+        if (!email || !password) {
+            this.showAuthError("Email and password are required.");
+            return;
+        }
+        this.auth.signInWithEmailAndPassword(email, password)
+            .catch(error => this.showAuthError(error.message));
+    }
+
+    handleEmailSignUp() {
+        const email = document.getElementById('emailInput').value;
+        const password = document.getElementById('passwordInput').value;
+        if (!email || !password) {
+            this.showAuthError("Email and password are required.");
+            return;
+        }
+        this.auth.createUserWithEmailAndPassword(email, password)
+            .catch(error => this.showAuthError(error.message));
+    }
+
+    showAuthError(message) {
+        const errorDiv = document.getElementById('authError');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
     }
 
     verifyPinWithFirebase(pin) {
