@@ -10,9 +10,9 @@ class BetSmartApp {
         
         // Initialize Firebase (using your config)
         this.firebaseConfig = {
-            apiKey: "AIzaSyCzXxF1HkUYB6EJq5jAVz8X3pM4NkPg8iA",
+            apiKey: "AIzaSyDalVcdFUamoA90pSvNX2hfIkyH7hMZk9I",
             authDomain: "aurabetz.firebaseapp.com",
-            projectId: "aurabetz",
+            projectId: "aurabetz1",
             storageBucket: "aurabetz.firebasestorage.app",
             messagingSenderId: "531651661385",
             appId: "1:531651661385:web:d82a50a33bb77297b7f998",
@@ -81,20 +81,11 @@ class BetSmartApp {
     }
 
     verifyPinWithFirebase(pin) {
-        // DEMO MODE: Allow access with a specific PIN without checking Firebase.
-        if (pin === '0000') {
-            console.log("Entering demo mode.");
-            localStorage.setItem('betSmartAuth', 'demo');
-            document.getElementById('authWall').style.display = 'none';
-            this.trackAccess('demo');
-            this.auth.signInAnonymously().catch(err => this.handleAuthError(err));
-            return; // Bypass Firestore check
-        }
-
-        this.db.collection("validPins").doc(pin).get()
-            .then((doc) => {
-                if (doc.exists) {
+        this.db.collection("validPins").where("pin", "==", pin).get()
+            .then((querySnapshot) => {
+                if (!querySnapshot.empty) {
                     // PIN is valid
+                    console.log("PIN verified successfully.");
                     localStorage.setItem('betSmartAuth', pin);
                     document.getElementById('authWall').style.display = 'none';
                     this.trackAccess(pin);
@@ -102,12 +93,13 @@ class BetSmartApp {
                     // Sign in anonymously. onAuthStateChanged will handle initApp().
                     return this.auth.signInAnonymously();
                 } else {
+                    // No document found with the entered PIN.
                     throw new Error("Invalid PIN");
                 }
             })
             .catch((error) => {
                 console.error("PIN verification failed:", error);
-                document.getElementById('pinError').textContent = "Invalid PIN. (Hint: Try '0000' for demo access)";
+                document.getElementById('pinError').textContent = "Invalid PIN. Please try again.";
                 document.getElementById('pinError').style.display = 'block';
             });
     }
