@@ -81,6 +81,16 @@ class BetSmartApp {
     }
 
     verifyPinWithFirebase(pin) {
+        // DEMO MODE: Allow access with a specific PIN without checking Firebase.
+        if (pin === '0000') {
+            console.log("Entering demo mode.");
+            localStorage.setItem('betSmartAuth', 'demo');
+            document.getElementById('authWall').style.display = 'none';
+            this.trackAccess('demo');
+            this.auth.signInAnonymously().catch(err => this.handleAuthError(err));
+            return; // Bypass Firestore check
+        }
+
         this.db.collection("validPins").doc(pin).get()
             .then((doc) => {
                 if (doc.exists) {
@@ -97,7 +107,7 @@ class BetSmartApp {
             })
             .catch((error) => {
                 console.error("PIN verification failed:", error);
-                document.getElementById('pinError').textContent = "Invalid PIN";
+                document.getElementById('pinError').textContent = "Invalid PIN. (Hint: Try '0000' for demo access)";
                 document.getElementById('pinError').style.display = 'block';
             });
     }
