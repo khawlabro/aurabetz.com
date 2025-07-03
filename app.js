@@ -95,6 +95,16 @@ class BetSmartApp {
             return;
         }
         this.auth.createUserWithEmailAndPassword(email, password)
+            .then(userCredential => {
+                // After successful sign-up, create a user document in Firestore
+                const user = userCredential.user;
+                return this.db.collection('users').doc(user.uid).set({
+                    email: user.email,
+                    isSubscribed: false,
+                    subscriptionEnd: null,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            })
             .catch(error => this.showAuthError(error.message));
     }
 
