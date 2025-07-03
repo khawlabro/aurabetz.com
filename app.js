@@ -52,25 +52,6 @@ class BetSmartApp {
     }
 
     setupAuthForms() {
-        // Form toggling
-        document.getElementById('showEmailLogin').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('pinLoginForm').style.display = 'none';
-            document.getElementById('emailLoginForm').style.display = 'block';
-        });
-
-        document.getElementById('showPinLogin').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('emailLoginForm').style.display = 'none';
-            document.getElementById('pinLoginForm').style.display = 'block';
-        });
-
-        // PIN submission
-        document.getElementById('submitPin').addEventListener('click', () => {
-            const pin = document.getElementById('pinInput').value;
-            if (pin) this.verifyPinWithFirebase(pin);
-        });
-
         // Email/Password submission
         document.getElementById('signInBtn').addEventListener('click', () => this.handleEmailSignIn());
         document.getElementById('signUpBtn').addEventListener('click', () => this.handleEmailSignUp());
@@ -114,29 +95,6 @@ class BetSmartApp {
         errorDiv.style.display = 'block';
     }
 
-    verifyPinWithFirebase(pin) {
-        this.db.collection("validPins").where("pin", "==", pin).get()
-            .then((querySnapshot) => {
-                if (!querySnapshot.empty) {
-                    // PIN is valid
-                    console.log("PIN verified successfully.");
-                    localStorage.setItem('betSmartAuth', pin);
-                    document.getElementById('authWall').style.display = 'none';
-                    this.trackAccess(pin);
-                    
-                    // Sign in anonymously. onAuthStateChanged will handle initApp().
-                    return this.auth.signInAnonymously();
-                } else {
-                    // No document found with the entered PIN.
-                    throw new Error("Invalid PIN");
-                }
-            })
-            .catch((error) => {
-                console.error("PIN verification failed:", error);
-                document.getElementById('pinError').textContent = "Invalid PIN. Please try again.";
-                document.getElementById('pinError').style.display = 'block';
-            });
-    }
 
     initApp() {
         this.init();
