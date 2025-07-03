@@ -237,37 +237,5 @@
         }
       ]
     }
-  ],
-  "gameData": {
-    "currentDay": 2,
-    "completedDays": 1,
-    "startingAmount": 10,
-    "currentAmount": 25,
-    "bets": [
-      {
-        "day": 1,
-        "sport": "UFC",
-        "event": "Islam Makhachev vs Dustin Poirier",
-        "bet": "Islam Makhachev",
-        "betType": "Moneyline",
-        "odds": -250,
-        "amount": 10,
-        "potentialProfit": 4,
-        "completed": true,
-        "won": true
-      },
-      {
-        "day": 2,
-        "sport": "NBA",
-        "event": "Boston Celtics vs Dallas Mavericks",
-        "bet": "Celtics -6.5",
-        "betType": "Point Spread",
-        "odds": -110,
-        "amount": 25,
-        "potentialProfit": 22.73,
-        "completed": false,
-        "won": null
-      }
-    ]
+  ]
   }
-}
