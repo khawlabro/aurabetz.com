@@ -147,7 +147,7 @@
     {
       "id": 8,
       "sport": "UFC",
-      "event": "test 1",
+      "event": "Big Mike vs Osamba",
       "time": "",
       "mainBet": {
         "type": "",
@@ -174,6 +174,100 @@
           "odds": null
         }
       ]
+    },
+    {
+      "id": 9,
+      "sport": "UFC",
+      "event": "bitch",
+      "time": "",
+      "mainBet": {
+        "type": "",
+        "pick": "",
+        "odds": null,
+        "probability": null,
+        "value": null,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "",
+      "aiReasoning": "",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": null
+        },
+        {
+          "name": "FanDuel",
+          "odds": null
+        },
+        {
+          "name": "BetMGM",
+          "odds": null
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "sport": "UFC",
+      "event": "WOW SIGNAL",
+      "time": "",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Ya Boy",
+        "odds": 5000,
+        "probability": 0.7,
+        "value": 0.7,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "This is going to be good",
+      "aiReasoning": "AI knows it's a win",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": 5000
+        },
+        {
+          "name": "FanDuel",
+          "odds": 5005
+        },
+        {
+          "name": "BetMGM",
+          "odds": 4995
+        }
+      ]
     }
-  ]
+  ],
+  "gameData": {
+    "currentDay": 2,
+    "completedDays": 1,
+    "startingAmount": 10,
+    "currentAmount": 25,
+    "bets": [
+      {
+        "day": 1,
+        "sport": "UFC",
+        "event": "Islam Makhachev vs Dustin Poirier",
+        "bet": "Islam Makhachev",
+        "betType": "Moneyline",
+        "odds": -250,
+        "amount": 10,
+        "potentialProfit": 4,
+        "completed": true,
+        "won": true
+      },
+      {
+        "day": 2,
+        "sport": "NBA",
+        "event": "Boston Celtics vs Dallas Mavericks",
+        "bet": "Celtics -6.5",
+        "betType": "Point Spread",
+        "odds": -110,
+        "amount": 25,
+        "potentialProfit": 22.73,
+        "completed": false,
+        "won": null
+      }
+    ]
+  }
 }
