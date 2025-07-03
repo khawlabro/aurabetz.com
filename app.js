@@ -38,10 +38,11 @@ class BetSmartApp {
                     document.getElementById('loadingSpinner').style.display = 'none';
 
                     if (user) {
-                        document.getElementById('authWall').style.display = 'none';
-                        this.initApp();
+                        this.checkUserStatus(user);
                     } else {
                         this.setupAuthForms();
+                        document.getElementById('authForm').style.display = 'block';
+                        document.getElementById('accessDeniedContainer').style.display = 'none';
                         document.getElementById('authWall').style.display = 'flex';
                     }
                 });
@@ -81,8 +82,7 @@ class BetSmartApp {
                 const user = userCredential.user;
                 return this.db.collection('users').doc(user.uid).set({
                     email: user.email,
-                    isSubscribed: false,
-                    subscriptionEnd: null,
+                    status: 'PENDING',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
             })
@@ -93,6 +93,32 @@ class BetSmartApp {
         const errorDiv = document.getElementById('authError');
         errorDiv.textContent = message;
         errorDiv.style.display = 'block';
+    }
+
+    checkUserStatus(user) {
+        const userDocRef = this.db.collection('users').doc(user.uid);
+        userDocRef.get().then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                if (userData.status === 'ACTIVE') {
+                    document.getElementById('authWall').style.display = 'none';
+                    this.initApp();
+                } else {
+                    document.getElementById('authForm').style.display = 'none';
+                    document.getElementById('accessDeniedContainer').style.display = 'block';
+                    document.getElementById('authWall').style.display = 'flex';
+                    document.getElementById('signOutBtn').addEventListener('click', () => this.auth.signOut());
+                }
+            } else {
+                // If user document doesn't exist, deny access
+                document.getElementById('authForm').style.display = 'none';
+                document.getElementById('accessDeniedContainer').style.display = 'block';
+                document.getElementById('authWall').style.display = 'flex';
+                document.getElementById('signOutBtn').addEventListener('click', () => this.auth.signOut());
+            }
+        }).catch((error) => {
+            this.handleAuthError(error);
+        });
     }
 
 
