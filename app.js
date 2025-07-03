@@ -41,7 +41,7 @@ class BetSmartApp {
                         this.checkUserStatus(user);
                     } else {
                         this.setupAuthForms();
-                        document.getElementById('authForm').style.display = 'block';
+                        document.getElementById('authContainer').style.display = 'block';
                         document.getElementById('accessDeniedContainer').style.display = 'none';
                         document.getElementById('authWall').style.display = 'flex';
                     }
@@ -104,14 +104,14 @@ class BetSmartApp {
                     document.getElementById('authWall').style.display = 'none';
                     this.initApp();
                 } else {
-                    document.getElementById('authForm').style.display = 'none';
+                    document.getElementById('authContainer').style.display = 'none';
                     document.getElementById('accessDeniedContainer').style.display = 'block';
                     document.getElementById('authWall').style.display = 'flex';
                     document.getElementById('signOutBtn').addEventListener('click', () => this.auth.signOut());
                 }
             } else {
                 // If user document doesn't exist, deny access
-                document.getElementById('authForm').style.display = 'none';
+                document.getElementById('authContainer').style.display = 'none';
                 document.getElementById('accessDeniedContainer').style.display = 'block';
                 document.getElementById('authWall').style.display = 'flex';
                 document.getElementById('signOutBtn').addEventListener('click', () => this.auth.signOut());
