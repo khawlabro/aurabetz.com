@@ -19,43 +19,58 @@ class BetSmartApp {
             measurementId: "G-7L19JWBH21"
         };
         
-        this.app = firebase.initializeApp(this.firebaseConfig);
+        // Defer initialization to a dedicated method
+        this.initFirebase();
+    }
+
+    initFirebase() {
+        // Check if Firebase is already initialized
+        if (!firebase.apps.length) {
+            this.app = firebase.initializeApp(this.firebaseConfig);
+        } else {
+            this.app = firebase.app(); // Get the default app
+        }
         this.auth = firebase.auth();
         this.db = firebase.firestore();
-        
         this.initAuth();
     }
 
     initAuth() {
-        this.auth.signOut().finally(() => {
-            try {
-                const authTimeout = setTimeout(() => {
-                    this.handleAuthError(new Error("Authentication timed out. Please check your connection."));
-                }, 8000);
+        this.auth.onAuthStateChanged((user) => {
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            if (loadingSpinner) loadingSpinner.style.display = 'none';
 
-                this.auth.onAuthStateChanged((user) => {
-                    clearTimeout(authTimeout);
-                    document.getElementById('loadingSpinner').style.display = 'none';
-
-                    if (user) {
-                        if (user.emailVerified) {
-                            document.getElementById('authWall').style.display = 'none';
-                            this.initApp();
-                        } else {
-                            document.getElementById('resendVerificationBtn').style.display = 'block';
-                            this.showAuthError("Please verify your email address before signing in. Check your inbox for the verification email.");
-                            document.getElementById('authWall').style.display = 'flex';
-                        }
-                    } else {
-                        document.getElementById('resendVerificationBtn').style.display = 'none';
-                        this.setupAuthForms();
-                        document.getElementById('authWall').style.display = 'flex';
-                    }
-                });
-            } catch (error) {
-                this.handleAuthError(error);
+            if (user) {
+                if (user.emailVerified) {
+                    this.showApp();
+                } else {
+                    this.showVerificationMessage();
+                }
+            } else {
+                this.showAuthWall();
             }
         });
+    }
+
+    showApp() {
+        document.getElementById('authWall').style.display = 'none';
+        document.getElementById('appContent').style.display = 'block';
+        this.initApp();
+    }
+
+    showVerificationMessage() {
+        document.getElementById('authWall').style.display = 'flex';
+        document.getElementById('appContent').style.display = 'none';
+        this.showAuthError("Please verify your email. Check your inbox for a verification link.");
+        document.getElementById('resendVerificationBtn').style.display = 'block';
+        this.setupAuthForms(); // Ensure buttons are active
+    }
+
+    showAuthWall() {
+        document.getElementById('authWall').style.display = 'flex';
+        document.getElementById('appContent').style.display = 'none';
+        document.getElementById('resendVerificationBtn').style.display = 'none';
+        this.setupAuthForms();
     }
 
     setupAuthForms() {
@@ -75,9 +90,8 @@ class BetSmartApp {
 
         this.auth.signInWithEmailAndPassword(email, password)
             .then(userCredential => {
+                // onAuthStateChanged will handle the UI update.
                 if (!userCredential.user.emailVerified) {
-                    this.auth.signOut();
-                    document.getElementById('resendVerificationBtn').style.display = 'block';
                     this.showAuthError("Please verify your email address before signing in. Check your inbox for the verification email.");
                 }
             })
@@ -91,33 +105,30 @@ class BetSmartApp {
             this.showAuthError("Email and password are required.");
             return;
         }
-        
+
         this.auth.createUserWithEmailAndPassword(email, password)
             .then(userCredential => {
+                const user = userCredential.user;
                 // Send verification email
-                return userCredential.user.sendEmailVerification({
-                    url: window.location.href, // Redirect URL after verification
-                    handleCodeInApp: false
+                user.sendEmailVerification({
+                    url: window.location.href, // URL to return to after verification
+                    handleCodeInApp: true
+                }).then(() => {
+                    this.showAuthError(`A verification email has been sent to ${email}. Please check your inbox.`);
+                    document.getElementById('resendVerificationBtn').style.display = 'block';
                 });
-            })
-            .then(() => {
-                // After verification email is sent, create user document
-                const user = this.auth.currentUser;
+
+                // Create user document in Firestore
                 return this.db.collection('users').doc(user.uid).set({
                     email: user.email,
                     isSubscribed: false,
                     subscriptionEnd: null,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    emailVerified: false
+                    emailVerified: false // This will be updated by a trigger or upon next login
                 });
             })
             .then(() => {
-                // Show success message with verification instructions
-                this.showAuthError(`Verification email sent to ${email}. Please verify your email before signing in.`);
-                document.getElementById('resendVerificationBtn').style.display = 'block';
-                
-                // Sign out the user until they verify
-                return this.auth.signOut();
+                // Don't sign out, let onAuthStateChanged handle the UI
             })
             .catch(error => {
                 this.showAuthError(error.message);
@@ -127,15 +138,16 @@ class BetSmartApp {
     resendVerificationEmail() {
         const user = this.auth.currentUser;
         if (user) {
-            user.sendEmailVerification()
-                .then(() => {
-                    this.showAuthError("Verification email resent. Please check your inbox.");
-                })
-                .catch(error => {
-                    this.showAuthError(error.message);
-                });
+            user.sendEmailVerification({
+                url: window.location.href,
+                handleCodeInApp: true
+            }).then(() => {
+                this.showAuthError("A new verification email has been sent. Please check your inbox.");
+            }).catch(error => {
+                this.showAuthError(`Error resending email: ${error.message}`);
+            });
         } else {
-            this.showAuthError("No user found. Please sign in first.");
+            this.showAuthError("You must be signed in to resend a verification email.");
         }
     }
 
@@ -794,8 +806,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if(spinner) spinner.style.display = 'flex';
     if(appContent) appContent.style.display = 'none';
 
+    // Initialize the app after the DOM is loaded.
+    // The BetSmartApp constructor will handle the rest.
     try {
-        const app = new BetSmartApp();
+        new BetSmartApp();
     } catch (error) {
         console.error("Failed to initialize BetSmartApp:", error);
         if (spinner) {
