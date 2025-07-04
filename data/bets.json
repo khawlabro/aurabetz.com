@@ -1,6 +1,37 @@
 {
   "bets": [
     {
+      "id": 0,
+      "sport": "UFC",
+      "event": "BOIOBINEWOINRWOI",
+      "time": "2015-NOWNONWONWONW",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "JOE OAWIOIFEN",
+        "odds": 12,
+        "probability": 0.3,
+        "value": 0.3,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "awergaehtraeha aea teh ateh tea",
+      "aiReasoning": "hte aehtate tathah ae htea  tea",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": 12
+        },
+        {
+          "name": "FanDuel",
+          "odds": 17
+        },
+        {
+          "name": "BetMGM",
+          "odds": 7
+        }
+      ]
+    },
+    {
       "id": 1,
       "sport": "UFC",
       "event": "Islam Makhachev vs Dustin Poirier",
@@ -83,15 +114,15 @@
       ]
     },
     {
-      "id": 3,
+      "id": 6,
       "sport": "UFC",
-      "event": "test",
+      "event": "Florida Panthers vs Edmenton Oilers",
       "time": "",
       "mainBet": {
-        "type": "test",
-        "pick": "test",
-        "odds": 1,
-        "probability": 1,
+        "type": "Moneyline",
+        "pick": "Florida Panthers",
+        "odds": null,
+        "probability": null,
         "value": null,
         "confidence": "High"
       },
@@ -101,17 +132,84 @@
       "sportsbooks": [
         {
           "name": "DraftKings",
-          "odds": 1
+          "odds": null
         },
         {
           "name": "FanDuel",
-          "odds": 6
+          "odds": null
         },
         {
           "name": "BetMGM",
-          "odds": -4
+          "odds": null
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "sport": "Soccer",
+      "event": "Milan vs Barcelona",
+      "time": "",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Barcelona",
+        "odds": -350,
+        "probability": 0.5,
+        "value": 0.5,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "",
+      "aiReasoning": "",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -350
+        },
+        {
+          "name": "FanDuel",
+          "odds": -345
+        },
+        {
+          "name": "BetMGM",
+          "odds": -355
         }
       ]
     }
-  ]
+  ],
+  "gameData": {
+    "currentDay": 2,
+    "completedDays": 1,
+    "startingAmount": 10,
+    "currentAmount": 25,
+    "bets": [
+      {
+        "day": 1,
+        "sport": "UFC",
+        "event": "Islam Makhachev vs Dustin Poirier",
+        "bet": "Islam Makhachev",
+        "betType": "Moneyline",
+        "odds": -250,
+        "amount": 10,
+        "potentialProfit": 4,
+        "completed": true,
+        "won": true
+      },
+      {
+        "day": 2,
+        "sport": "NBA",
+        "event": "Boston Celtics vs Dallas Mavericks",
+        "bet": "Celtics -6.5",
+        "betType": "Point Spread",
+        "odds": -110,
+        "amount": 25,
+        "potentialProfit": 22.73,
+        "completed": false,
+        "won": null
+      }
+    ]
+  },
+  "_metadata": {
+    "savedAt": "2025-07-04T01:11:39.282Z",
+    "version": "2.0"
+  }
 }
