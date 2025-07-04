@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
 :root {
     /* Color Variables */
     --primary: #6366f1;
@@ -108,6 +109,12 @@ a:hover {
 .header h1 {
     font-size: 2rem;
     margin: 0;
+}
+
+.brand-title {
+    font-family: 'MedievalSharp', cursive;
+    font-size: 2.5rem;
+    color: var(--primary);
 }
 
 .header p {
@@ -1110,25 +1117,4 @@ input[type="checkbox"] {
 
 .auth-footer span:last-child::before {
     content: "⭐";
-}
-
-/* For the resend verification button */
-#resendVerificationBtn {
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ddd;
-}
-
-#resendVerificationBtn:hover {
-    background-color: #e0e0e0;
-}
-
-.dark #resendVerificationBtn {
-    background-color: #333;
-    color: #fff;
-    border-color: #444;
-}
-
-.dark #resendVerificationBtn:hover {
-    background-color: #444;
 }
