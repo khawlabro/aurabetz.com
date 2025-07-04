@@ -531,6 +531,11 @@ input[type="checkbox"] {
     margin: 0;
 }
 
+.subscribe-title {
+    font-family: 'MedievalSharp', cursive;
+    color: var(--white);
+}
+
 .modal-close {
     background: none;
     border: none;
