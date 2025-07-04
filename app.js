@@ -1,4 +1,4 @@
-// BetSmart App - Main application class
+// BetSmart App - Main application class with Email Verification
 class BetSmartApp {
     constructor() {
         this.bets = [];
@@ -38,9 +38,16 @@ class BetSmartApp {
                     document.getElementById('loadingSpinner').style.display = 'none';
 
                     if (user) {
-                        document.getElementById('authWall').style.display = 'none';
-                        this.initApp();
+                        if (user.emailVerified) {
+                            document.getElementById('authWall').style.display = 'none';
+                            this.initApp();
+                        } else {
+                            document.getElementById('resendVerificationBtn').style.display = 'block';
+                            this.showAuthError("Please verify your email address before signing in. Check your inbox for the verification email.");
+                            document.getElementById('authWall').style.display = 'flex';
+                        }
                     } else {
+                        document.getElementById('resendVerificationBtn').style.display = 'none';
                         this.setupAuthForms();
                         document.getElementById('authWall').style.display = 'flex';
                     }
@@ -55,6 +62,7 @@ class BetSmartApp {
         // Email/Password submission
         document.getElementById('signInBtn').addEventListener('click', () => this.handleEmailSignIn());
         document.getElementById('signUpBtn').addEventListener('click', () => this.handleEmailSignUp());
+        document.getElementById('resendVerificationBtn').addEventListener('click', () => this.resendVerificationEmail());
     }
 
     handleEmailSignIn() {
@@ -64,7 +72,15 @@ class BetSmartApp {
             this.showAuthError("Email and password are required.");
             return;
         }
+
         this.auth.signInWithEmailAndPassword(email, password)
+            .then(userCredential => {
+                if (!userCredential.user.emailVerified) {
+                    this.auth.signOut();
+                    document.getElementById('resendVerificationBtn').style.display = 'block';
+                    this.showAuthError("Please verify your email address before signing in. Check your inbox for the verification email.");
+                }
+            })
             .catch(error => this.showAuthError(error.message));
     }
 
@@ -75,18 +91,52 @@ class BetSmartApp {
             this.showAuthError("Email and password are required.");
             return;
         }
+        
         this.auth.createUserWithEmailAndPassword(email, password)
             .then(userCredential => {
-                // After successful sign-up, create a user document in Firestore
-                const user = userCredential.user;
+                // Send verification email
+                return userCredential.user.sendEmailVerification({
+                    url: window.location.href, // Redirect URL after verification
+                    handleCodeInApp: false
+                });
+            })
+            .then(() => {
+                // After verification email is sent, create user document
+                const user = this.auth.currentUser;
                 return this.db.collection('users').doc(user.uid).set({
                     email: user.email,
                     isSubscribed: false,
                     subscriptionEnd: null,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    emailVerified: false
                 });
             })
-            .catch(error => this.showAuthError(error.message));
+            .then(() => {
+                // Show success message with verification instructions
+                this.showAuthError(`Verification email sent to ${email}. Please verify your email before signing in.`);
+                document.getElementById('resendVerificationBtn').style.display = 'block';
+                
+                // Sign out the user until they verify
+                return this.auth.signOut();
+            })
+            .catch(error => {
+                this.showAuthError(error.message);
+            });
+    }
+
+    resendVerificationEmail() {
+        const user = this.auth.currentUser;
+        if (user) {
+            user.sendEmailVerification()
+                .then(() => {
+                    this.showAuthError("Verification email resent. Please check your inbox.");
+                })
+                .catch(error => {
+                    this.showAuthError(error.message);
+                });
+        } else {
+            this.showAuthError("No user found. Please sign in first.");
+        }
     }
 
     showAuthError(message) {
@@ -94,7 +144,6 @@ class BetSmartApp {
         errorDiv.textContent = message;
         errorDiv.style.display = 'block';
     }
-
 
     initApp() {
         this.init();
@@ -227,7 +276,6 @@ class BetSmartApp {
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
             
-            // Filter out invalid bets
             this.bets = (data.bets || this.getDefaultBets()).filter(bet => 
                 bet.event && 
                 bet.event.trim() !== "" && 
@@ -236,10 +284,8 @@ class BetSmartApp {
                 bet.mainBet.pick
             );
             
-            // Validate game data
             this.gameData = data.gameData || this.getDefaultGameData();
             
-            // Ensure current day bet exists
             const currentDayBet = this.gameData.bets.find(b => b.day === this.gameData.currentDay);
             if (!currentDayBet) {
                 this.resetGame();
@@ -745,12 +791,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const spinner = document.getElementById('loadingSpinner');
     const appContent = document.getElementById('appContent');
 
-    // Show loading spinner and hide content initially
     if(spinner) spinner.style.display = 'flex';
     if(appContent) appContent.style.display = 'none';
 
     try {
-        // Initialize the app
         const app = new BetSmartApp();
     } catch (error) {
         console.error("Failed to initialize BetSmartApp:", error);
