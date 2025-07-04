@@ -1111,3 +1111,24 @@ input[type="checkbox"] {
 .auth-footer span:last-child::before {
     content: "⭐";
 }
+
+/* For the resend verification button */
+#resendVerificationBtn {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+#resendVerificationBtn:hover {
+    background-color: #e0e0e0;
+}
+
+.dark #resendVerificationBtn {
+    background-color: #333;
+    color: #fff;
+    border-color: #444;
+}
+
+.dark #resendVerificationBtn:hover {
+    background-color: #444;
+}
