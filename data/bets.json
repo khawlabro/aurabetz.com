@@ -1,7 +1,7 @@
 {
   "bets": [
     {
-      "id": 0,
+      "id": 1,
       "sport": "Table Tennis",
       "event": "(Finished - Won) Milan Klement vs Frantisek Just",
       "time": "July 9, 7:00 PM 2025",
@@ -32,7 +32,7 @@
       ]
     },
     {
-      "id": 1,
+      "id": 0,
       "sport": "Table Tennis",
       "event": "(Finished - Won) Bruna Takahashi vs Dina Meshref",
       "time": "10:40 PM, July 06, 2025",
