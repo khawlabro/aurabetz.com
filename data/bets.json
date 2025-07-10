@@ -1,6 +1,37 @@
 {
   "bets": [
     {
+      "id": 0,
+      "sport": "Table Tennis",
+      "event": "(Finished - Won) Milan Klement vs Frantisek Just",
+      "time": "July 9, 7:00 PM 2025",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Milan Klement",
+        "odds": -286,
+        "probability": 67,
+        "value": 0.09,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "Style Matchup (Klement +9%): Versatility vs. aggressive play.\nDefensive Consistency (Klement +8%): Strong counters.\nHead-to-Head History (Klement +6%): 32-20 record.\nMental Resilience (Klement +7%): Confidence from wins.\nFirst-Set Win Rate (Klement +7%): Early dominance.",
+      "aiReasoning": "Klement’s recent form (7-3, wins over Syhora, Bares) and versatile style give him a clear edge over Just’s aggressive but inconsistent play (6-4, losses to Bares, Postelt). Klement’s adaptability in mid-length rallies, as seen in his 3-2 win over Just (Mar 2025), counters Just’s forehand smashes.\n\nBetting Recommendations: Klement Moneyline (-159): +9.14% EV, solid value due to recent form, head-to-head dominance, and versatility.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -286
+        },
+        {
+          "name": "FanDuel",
+          "odds": -281
+        },
+        {
+          "name": "BetMGM",
+          "odds": -291
+        }
+      ]
+    },
+    {
       "id": 1,
       "sport": "Table Tennis",
       "event": "(Finished - Won) Bruna Takahashi vs Dina Meshref",
@@ -13,7 +44,9 @@
         "value": 0.12,
         "confidence": "High"
       },
-      "otherBets": ["N/A"],
+      "otherBets": [
+        "N/A"
+      ],
       "analysis": "Takahashi’s world ranking (18 vs. 28), recent upsets (4-0 vs. Szocs, 3-2 vs. Shin), and offensive style (backhand-heavy, aggressive serves) give her a clear edge over Meshref’s defensive game, which struggles against top attackers (e.g., 0-3 vs. Odo, 1-3 vs. Sun),.",
       "aiReasoning": "Betting Recommendations: Takahashi Moneyline (-200): +12.43% EV, solid value due to ranking, form, and style advantage.",
       "sportsbooks": [
@@ -65,7 +98,7 @@
     ]
   },
   "_metadata": {
-    "savedAt": "2025-07-07T16:51:29.857Z",
+    "savedAt": "2025-07-10T13:02:26.402Z",
     "version": "2.0"
   }
 }
