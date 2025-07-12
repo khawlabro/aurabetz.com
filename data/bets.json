@@ -70,7 +70,7 @@
       "mainBet": {
         "type": "Moneyline",
         "pick": "S. Lin/M. Kuai (CHN)",
-        "odds": 1.28,
+        "odds": -286,
         "probability": 0.6,
         "value": 0.1,
         "confidence": "High"
@@ -128,7 +128,7 @@
       "id": 5,
       "sport": "UFC",
       "event": "Jake Matthews vs Chidi Njokuani",
-      "time": "2025-07-12T22:15:00Z",
+      "time": "2025-07-12T23:15:00Z",
       "mainBet": {
         "type": "Moneyline",
         "pick": "Jake Matthews",
