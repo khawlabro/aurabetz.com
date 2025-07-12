@@ -1,4 +1,4 @@
-// BetSmart App - Main application class
+// BetSmart App - Complete Management System
 class BetSmartApp {
     constructor() {
         this.bets = [];
@@ -75,7 +75,6 @@ class BetSmartApp {
     }
 
     setupAuthForms() {
-        // Email/Password submission
         document.getElementById('signInBtn').addEventListener('click', () => this.handleEmailSignIn());
         document.getElementById('signUpBtn').addEventListener('click', () => this.handleEmailSignUp());
     }
@@ -100,7 +99,6 @@ class BetSmartApp {
         }
         this.auth.createUserWithEmailAndPassword(email, password)
             .then(userCredential => {
-                // After successful sign-up, create a user document in Firestore
                 const user = userCredential.user;
                 return this.db.collection('users').doc(user.uid).set({
                     email: user.email,
@@ -117,8 +115,6 @@ class BetSmartApp {
         errorDiv.textContent = message;
         errorDiv.style.display = 'block';
     }
-
-
 
     initApp() {
         this.init();
@@ -251,14 +247,23 @@ class BetSmartApp {
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
             
-            // Filter out invalid bets
-            this.bets = (data.bets || this.getDefaultBets()).filter(bet => 
-                bet.event && 
-                bet.event.trim() !== "" && 
-                !bet.event.toLowerCase().includes("bitch") &&
-                bet.mainBet && 
-                bet.mainBet.pick
-            );
+            // Enhanced validation for bets
+            this.bets = (data.bets || this.getDefaultBets()).filter(bet => {
+                const isValid = typeof bet.id === 'number' && 
+                               bet.event && 
+                               bet.event.trim() !== "" && 
+                               bet.mainBet && 
+                               bet.mainBet.pick &&
+                               (bet.mainBet.probability === undefined || 
+                                (typeof bet.mainBet.probability === 'number' && bet.mainBet.probability <= 1));
+                
+                // Convert percentage probabilities to decimal if needed
+                if (isValid && bet.mainBet.probability > 1) {
+                    bet.mainBet.probability = bet.mainBet.probability / 100;
+                }
+                
+                return isValid;
+            });
             
             // Validate game data
             this.gameData = data.gameData || this.getDefaultGameData();
@@ -769,12 +774,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const spinner = document.getElementById('loadingSpinner');
     const appContent = document.getElementById('appContent');
 
-    // Show loading spinner and hide content initially
     if(spinner) spinner.style.display = 'flex';
     if(appContent) appContent.style.display = 'none';
 
     try {
-        // Initialize the app
         const app = new BetSmartApp();
     } catch (error) {
         console.error("Failed to initialize BetSmartApp:", error);
