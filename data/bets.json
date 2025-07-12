@@ -2,7 +2,7 @@
   "bets": [
     {
       "id": 1,
-      "sport": "UFC",
+      "sport": "Table Tennis",
       "event": "(Won) Milan Klement vs Frantisek Just",
       "time": "2025-07-10T00:00:00Z",
       "mainBet": {
@@ -65,7 +65,7 @@
     {
       "id": 3,
       "sport": "Table Tennis",
-      "event": "S. Lin/M. Kuai (CHN) vs J. Lim/Y. Shin (KOR)",
+      "event": "(LIVE MATCH STARTS SOON) S. Lin/M. Kuai (CHN) vs J. Lim/Y. Shin (KOR)",
       "time": "2025-07-11 00:0000",
       "mainBet": {
         "type": "Moneyline",
