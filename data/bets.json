@@ -92,6 +92,37 @@
           "odds": -3.7199999999999998
         }
       ]
+    },
+    {
+      "id": 4,
+      "sport": "UFC",
+      "event": "Kennedy Nzechukwu vs Valter Walker",
+      "time": "2025-07-12T22:00:00Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Valter Walker",
+        "odds": 165,
+        "probability": 0.58,
+        "value": 0.26,
+        "confidence": "Medium"
+      },
+      "otherBets": [],
+      "analysis": "The odds (-200 vs. +165) overvalue Nzechukwu’s striking and recent KOs while undervaluing Walker’s submission threat and durability (never finished in 14 fights. X posts highlight Walker’s upset potential, with some analysts favoring him at +175/+200",
+      "aiReasoning": "Walker’s elite grappling (4.95 takedowns/15 min, 2 UFC heel hooks) exploits Nzechukwu’s weaker ground game, as seen in his control by Danilo Marques at light heavyweight (X post). Walker’s high fight IQ and ability to capitalize on mistakes give him multiple paths to victory via submission.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": 165
+        },
+        {
+          "name": "FanDuel",
+          "odds": 170
+        },
+        {
+          "name": "BetMGM",
+          "odds": 160
+        }
+      ]
     }
   ],
   "gameData": {
