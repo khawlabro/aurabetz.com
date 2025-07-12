@@ -3,7 +3,7 @@
     {
       "id": 1,
       "sport": "Table Tennis",
-      "event": "(Won) Milan Klement vs Frantisek Just",
+      "event": "(COMPLETED - WON) Milan Klement vs Frantisek Just",
       "time": "2025-07-10T00:00:00Z",
       "mainBet": {
         "type": "Moneyline",
@@ -34,7 +34,7 @@
     {
       "id": 2,
       "sport": "Table Tennis",
-      "event": "(Won) Bruna Takahashi vs Dina Meshref",
+      "event": "(COMPLETED - WON) Bruna Takahashi vs Dina Meshref",
       "time": "2025-07-06T22:40:00Z",
       "mainBet": {
         "type": "Moneyline",
@@ -65,7 +65,7 @@
     {
       "id": 3,
       "sport": "Table Tennis",
-      "event": "S. Lin/M. Kuai (CHN) vs J. Lim/Y. Shin (KOR)",
+      "event": "(COMPLETED - WON) S. Lin/M. Kuai (CHN) vs J. Lim/Y. Shin (KOR)",
       "time": "2025-07-11 00:0000",
       "mainBet": {
         "type": "Moneyline",
