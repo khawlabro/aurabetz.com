@@ -123,6 +123,37 @@
           "odds": 160
         }
       ]
+    },
+{
+      "id": 5,
+      "sport": "UFC",
+      "event": "Jake Matthews vs Chidi Njokuani",
+      "time": "2025-07-12T22:00:00Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Jake Matthews",
+        "odds": 100,
+        "probability": 0.6,
+        "value": 0.2,
+        "confidence": "Medium"
+      },
+      "otherBets": [],
+      "analysis": "Matthews’ well-rounded skill set (3.45 SLpM, 1.46 takedowns/15 min, 7 submissions) and strong cardio (3 straight decisions) allow him to neutralize Njokuani’s striking (4.72 SLpM, 62% accuracy) by mixing takedowns and controlling the cage",
+      "aiReasoning": "The odds (+100 vs. -120) slightly overvalue Njokuani’s striking and recent TKO, while Matthews’ +100 offers value, supported by X posts favoring his underdog status. The fight is likely to go to decision due to Matthews’ durability and Njokuani’s conservative striking approach.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": 100
+        },
+        {
+          "name": "FanDuel",
+          "odds": 105
+        },
+        {
+          "name": "BetMGM",
+          "odds": 95
+        }
+      ]
     }
   ],
   "gameData": {
