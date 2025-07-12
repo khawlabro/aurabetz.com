@@ -4,12 +4,12 @@ class BetSmartApp {
         this.bets = [];
         this.gameData = {};
         this.selectedSport = 'All Sports';
-        this.sortBy = 'value';
+        this.sortBy = 'time'; // Changed default to 'time' for chronological sorting
         this.highValueOnly = false;
         this.DATA_URL = this.resolveDataUrl();
         this.isMaintenanceMode = false;
         
-        // Initialize Firebase (using your config)
+        // Initialize Firebase
         this.firebaseConfig = {
             apiKey: "AIzaSyDalVcdFUamoA90pSvNX2hfIkyH7hMZk9I",
             authDomain: "aurabetz.firebaseapp.com",
@@ -75,8 +75,8 @@ class BetSmartApp {
     }
 
     setupAuthForms() {
-        document.getElementById('signInBtn').addEventListener('click', () => this.handleEmailSignIn());
-        document.getElementById('signUpBtn').addEventListener('click', () => this.handleEmailSignUp());
+        document.getElementById('signInBtn')?.addEventListener('click', () => this.handleEmailSignIn());
+        document.getElementById('signUpBtn')?.addEventListener('click', () => this.handleEmailSignUp());
     }
 
     handleEmailSignIn() {
@@ -379,6 +379,7 @@ class BetSmartApp {
             filteredBets = filteredBets.filter(bet => bet.mainBet.value >= 0.20);
         }
         
+        // Updated sorting logic - now defaults to newest first
         switch(this.sortBy) {
             case 'value':
                 filteredBets.sort((a, b) => (b.mainBet.value || 0) - (a.mainBet.value || 0));
@@ -394,10 +395,11 @@ class BetSmartApp {
                 );
                 break;
             case 'time':
+            default:
                 filteredBets.sort((a, b) => {
                     const dateA = a.time ? new Date(a.time) : new Date(0);
                     const dateB = b.time ? new Date(b.time) : new Date(0);
-                    return dateA - dateB;
+                    return dateB - dateA; // Changed to dateB - dateA for newest first
                 });
                 break;
         }
