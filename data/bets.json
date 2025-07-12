@@ -65,7 +65,7 @@
     {
       "id": 3,
       "sport": "Table Tennis",
-      "event": "(LIVE MATCH STARTS SOON) S. Lin/M. Kuai (CHN) vs J. Lim/Y. Shin (KOR)",
+      "event": "S. Lin/M. Kuai (CHN) vs J. Lim/Y. Shin (KOR)",
       "time": "2025-07-11 00:0000",
       "mainBet": {
         "type": "Moneyline",
