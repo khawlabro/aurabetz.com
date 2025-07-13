@@ -96,7 +96,7 @@
     {
       "id": 4,
       "sport": "UFC",
-      "event": "Kennedy Nzechukwu vs Valter Walker",
+      "event": "(COMPLETED - WON) Kennedy Nzechukwu vs Valter Walker",
       "time": "2025-07-12T22:00:00Z",
       "mainBet": {
         "type": "Moneyline",
@@ -127,7 +127,7 @@
 {
       "id": 5,
       "sport": "UFC",
-      "event": "Jake Matthews vs Chidi Njokuani",
+      "event": "(COMPLETED - WON) Jake Matthews vs Chidi Njokuani",
       "time": "2025-07-12T23:15:00Z",
       "mainBet": {
         "type": "Moneyline",
