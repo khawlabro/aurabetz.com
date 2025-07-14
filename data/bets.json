@@ -185,6 +185,37 @@
           "odds": -230
         }
       ]
+    },
+{
+      "id": 7,
+      "sport": "Table Tennis",
+      "event": "Vratislav Petracek vs Jakub Vales",
+      "time": "2025-07-14T23:00:00Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Jakub Vales",
+        "odds": -200,
+        "probability": 0.65,
+        "value": 0.25,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "Vales’ lower error rate (10-15% vs. Petracek’s ~15-20%) and ability to extend rallies should secure the win in a best-of-5 match.",
+      "aiReasoning": "Safe bet with ~65% probability, aligning with implied 67%. Moderate value due to short odds.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -200
+        },
+        {
+          "name": "FanDuel",
+          "odds": -195
+        },
+        {
+          "name": "BetMGM",
+          "odds": -205
+        }
+      ]
     }
   ],
   "gameData": {
