@@ -154,6 +154,37 @@
           "odds": 95
         }
       ]
+    },
+{
+      "id": 6,
+      "sport": "Table Tennis",
+      "event": "Miroslav Novotny vs Jaromir Cernik",
+      "time": "2025-07-14T22:00:00Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Miroslav Novotny",
+        "odds": -225,
+        "probability": 0.75,
+        "value": 0.1,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "Novotny’s favored status (-225) reflects his consistency and likely defensive style, which counters Cernik’s aggressive play. Cernik’s recent 0-3 loss to Sprynar highlights vulnerability to errors under pressure. Novotny’s ability to extend rallies and capitalize on errors gives him the edge in Liga Pro’s best-of-5 format. Cernik may win a set with aggressive smashes, but Novotny’s steadiness should secure the victory.",
+      "aiReasoning": "- Novotny’s defensive style neutralizes Cernik’s aggressive smashes.\n- Cernik’s 0-3 loss to Sprynar shows inconsistency against strong opponents.\n- Liga Pro’s fast format favors consistency over risky aggression.\n- Novotny’s favored status reflects superior recent form and mental toughness.\n- No head-to-head data, but Novotny’s odds imply better metrics.\n- Cernik’s higher error rate (20-25% per set) vs. Novotny’s (10-15%).\n- Novotny’s rally endurance frustrates aggressive players.\n- Public backing for Novotny (-225) aligns with sharp money.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -225
+        },
+        {
+          "name": "FanDuel",
+          "odds": -220
+        },
+        {
+          "name": "BetMGM",
+          "odds": -230
+        }
+      ]
     }
   ],
   "gameData": {
