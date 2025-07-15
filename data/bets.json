@@ -216,6 +216,37 @@
           "odds": -205
         }
       ]
+    },
+{
+      "id": 8,
+      "sport": "Table Tennis",
+      "event": "(FINAL BET FOR TODAY, STARTING SOON) Dariusz Wrobel vs Kacper Nagel",
+      "time": "2025-07-15T00:20:00Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Dariusz Wrobel",
+        "odds": -227,
+        "probability": 0.7,
+        "value": 0.1,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "Wrobel’s superior recent form (4-1 vs 2-3), strong wins against quality opponents (Fabis, Iwasyszyn), and defensive consistency outweigh Nagel’s aggressive forehand and tiebreak resilience. The odds (-213) align with Wrobel’s 70% win probability, offering fair value.",
+      "aiReasoning": "Recent form, opponent strength, defensive consistency, serve effectiveness, rally length preference, mental resilience, tempo control, spin-to-speed balance, betting line value.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -227
+        },
+        {
+          "name": "FanDuel",
+          "odds": -222
+        },
+        {
+          "name": "BetMGM",
+          "odds": -232
+        }
+      ]
     }
   ],
   "gameData": {
