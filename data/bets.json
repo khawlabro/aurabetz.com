@@ -248,37 +248,6 @@
         }
       ]
     },
-{
-      "id": 9,
-      "sport": "Table Tennis",
-      "event": "Grzegorz Felkel vs Bartosz Czerwinski",
-      "time": "2025-07-15T03:00:00Z",
-      "mainBet": {
-        "type": "Moneyline",
-        "pick": "Grzegorz Felkel",
-        "odds": -625,
-        "probability": 80,
-        "value": 0.05,
-        "confidence": "High"
-      },
-      "otherBets": [],
-      "analysis": "Felkel won his last 5 matches on July 13, 2025, in TT Elite Series. He beat Adamiak Grzegorz 3-2, Josef Braun 3-0, Artur Grela 3-1, Michal Malachowski 3-0, and Michal Murawski 3-2\nFelkel won the 1st game in 6 of his last 7 matches against Czerwinski. This trend suggests he has a strong edge in their matchups.",
-      "aiReasoning": "Grzegorz Felkel has won all of his last 5 matches in the TT Elite Series, showing excellent current form. In contrast, Bartosz Czerwinski has won only 1 out of his last 5 matches, indicating struggles recently.",
-      "sportsbooks": [
-        {
-          "name": "DraftKings",
-          "odds": -625
-        },
-        {
-          "name": "FanDuel",
-          "odds": -620
-        },
-        {
-          "name": "BetMGM",
-          "odds": -630
-        }
-      ]
-    }
   ],
   "gameData": {
     "currentDay": 2,
