@@ -256,7 +256,7 @@
       "mainBet": {
         "type": "Moneyline",
         "pick": "Grzegorz Felkel",
-        "odds": -625,
+        "odds": -500,
         "probability": 0.8,
         "value": 0.05,
         "confidence": "High"
