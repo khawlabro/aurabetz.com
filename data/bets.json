@@ -278,6 +278,37 @@
           "odds": -630
         }
       ]
+    },
+{
+      "id": 4,
+      "sport": "Table Tennis",
+      "event": "Bartosz Czerwinski vs Maciej Nowalinski",
+      "time": "2025-07-16T04:00:00Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Maciej Nowalinski",
+        "odds": -227,
+        "probability": 0.75,
+        "value": 8,
+        "confidence": "Medium"
+      },
+      "otherBets": [],
+      "analysis": "Maciej Nowalinski is the favorite to win against Bartosz Czerwinski. His superior head-to-head record (32-15, 68.1% win rate) and slightly better recent form (40% win rate in last 5 vs. Czerwinski’s 20%) make him the more likely winner.",
+      "aiReasoning": "Maciej Nowalinski is the clear favorite due to his dominant head-to-head record (32-15, 68.1%) and slightly better recent form (40% vs. 20% win rate). His historical success against Czerwinski indicates tactical superiority, likely through better spin control, rally endurance, and mental resilience. Czerwinski’s recent 3-0 win on July 15, 2025, suggests potential improvement, but it’s likely an outlier given Nowalinski’s long-term edge. Subtle discrepancies like consistency, first-game aggression, and opponent strength further favor Nowalinski. Without contradictory data, the evidence strongly supports his victory.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -227
+        },
+        {
+          "name": "FanDuel",
+          "odds": -222
+        },
+        {
+          "name": "BetMGM",
+          "odds": -232
+        }
+      ]
     }
   ],
   "gameData": {
