@@ -280,7 +280,7 @@
       ]
     },
 {
-      "id": 4,
+      "id": 10,
       "sport": "Table Tennis",
       "event": "Bartosz Czerwinski vs Maciej Nowalinski",
       "time": "2025-07-16T04:00:00Z",
@@ -289,7 +289,7 @@
         "pick": "Maciej Nowalinski",
         "odds": -227,
         "probability": 0.75,
-        "value": 8,
+        "value": 0,08
         "confidence": "Medium"
       },
       "otherBets": [],
