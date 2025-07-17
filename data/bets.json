@@ -309,6 +309,37 @@
           "odds": -232
         }
       ]
+    },
+{
+      "id": 4,
+      "sport": "Table Tennis",
+      "event": "Oliver Vincenec vs Adam Kasperski",
+      "time": "2025-07-17T02:20:26Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Adam Kasperski",
+        "odds": -400,
+        "probability": 0.75,
+        "value": 0.08,
+        "confidence": "Medium"
+      },
+      "otherBets": [],
+      "analysis": "Given Kasperski’s win in their most recent encounter and slightly better recent form, it seems likely he will win, though their tied head-to-head record introduces some uncertainty.",
+      "aiReasoning": "Based on the analysis, Adam Kasperski is the slight favorite to win against Oliver Vincenec. His victory in their most recent match (3-2 on July 16, 2025) and slightly better recent form (40% win rate in last 5 vs. Vincenec’s 20%) make him the more likely winner. While their head-to-head record is tied, Kasperski’s ability to win a close, 5-game match indicates better mental resilience and tactical adaptability.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": 1.25
+        },
+        {
+          "name": "FanDuel",
+          "odds": 6.25
+        },
+        {
+          "name": "BetMGM",
+          "odds": -3.75
+        }
+      ]
     }
   ],
   "gameData": {
