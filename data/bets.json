@@ -311,7 +311,7 @@
       ]
     },
 {
-      "id": 4,
+      "id": 11,
       "sport": "Table Tennis",
       "event": "Oliver Vincenec vs Adam Kasperski",
       "time": "2025-07-17T02:20:26Z",
@@ -320,7 +320,7 @@
         "pick": "Adam Kasperski",
         "odds": -400,
         "probability": 0.75,
-        "value": 0.08,
+        "value": 0.11,
         "confidence": "Medium"
       },
       "otherBets": [],
