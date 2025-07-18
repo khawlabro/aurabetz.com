@@ -371,6 +371,37 @@
           "odds": -362
         }
       ]
+    },
+{
+      "id": 4,
+      "sport": "Table Tennis",
+      "event": "LIVE BET Juan Pablo Ficovich vs Aleksandar Kovacevic",
+      "time": "2025-07-18T06:00:49Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Aleksandar Kovacevic",
+        "odds": -833,
+        "probability": 0.9,
+        "value": 0.05,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "Based on the analysis, Aleksandar Kovacevic is favored to win the upcoming tennis match against Juan Pablo Ficovich on July 18, 2025, in the Los Cabos Open. His higher ranking (79 vs. 162), greater experience at the ATP level, and consistent playstyle give him an estimated 60% chance of victory",
+      "aiReasoning": "Kovacevic’s higher ranking (79 vs. 162), recent form, and ability to capitalize early suggest he is likely to maintain his advantage and win the match. His consistent playstyle, and early dominance in the match give him an estimated 85% chance of victory or more.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -833
+        },
+        {
+          "name": "FanDuel",
+          "odds": -828
+        },
+        {
+          "name": "BetMGM",
+          "odds": -838
+        }
+      ]
     }
   ],
   "gameData": {
