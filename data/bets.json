@@ -391,15 +391,15 @@
       "sportsbooks": [
         {
           "name": "DraftKings",
-          "odds": -833
+          "odds": -550
         },
         {
           "name": "FanDuel",
-          "odds": -828
+          "odds": -550
         },
         {
           "name": "BetMGM",
-          "odds": -838
+          "odds": -550
         }
       ]
     }
