@@ -373,14 +373,14 @@
       ]
     },
 {
-      "id": 4,
+      "id": 13,
       "sport": "Table Tennis",
       "event": "LIVE BET Juan Pablo Ficovich vs Aleksandar Kovacevic",
       "time": "2025-07-18T06:00:49Z",
       "mainBet": {
         "type": "Moneyline",
         "pick": "Aleksandar Kovacevic",
-        "odds": -833,
+        "odds": -555,
         "probability": 0.9,
         "value": 0.05,
         "confidence": "High"
