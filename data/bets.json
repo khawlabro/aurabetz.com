@@ -402,6 +402,37 @@
           "odds": -550
         }
       ]
+    },
+{
+      "id": 4,
+      "sport": "UFC",
+      "event": "Ryan Spann vs Lukasz Brzeski",
+      "time": "2025-07-19T22:00:00Z",
+      "mainBet": {
+        "type": "ROUND BETTING",
+        "pick": "Ryan Spann Rounds 2 - 3 or Decision",
+        "odds": 1000,
+        "probability": 0.02,
+        "value": 0.95,
+        "confidence": "Low"
+      },
+      "otherBets": [],
+      "analysis": "ODDS: Round 2 - 4.5 \nRound 3 - 10.0 \nPoints / Decision - 11.0",
+      "aiReasoning": "Bet 1 unit on each pick. As long as Lukasz Brzeski doesn't win or get finished in round 1, the bet will be profitable. \n\nPredicted Winner: Ryan Spann, with a 70-75% probability of defeating Łukasz Brzeski.\nAI Reasoning: Spann’s grappling dominance (13 submission wins, 1.5 attempts/15 min) and physical advantages (6’5”, 79” reach) exploit Brzeski’s poor takedown defense (36%) and durability issues (three first-round KO losses in last four fights). Despite Spann’s 1-4 skid and heavyweight debut loss, his submission win over St. Preux (October 2024) and regional advantage in New Orleans bolster his chances. Brzeski’s striking (5.02 strikes/min, 50% accuracy) poses a threat if the fight stays standing, but his 1-5 UFC record and KO vulnerability make an upset unlikely. The odds (-217 Spann, +176 Brzeski) align with Spann’s win probability but undervalue his submission potential.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": 1000
+        },
+        {
+          "name": "FanDuel",
+          "odds": 1005
+        },
+        {
+          "name": "BetMGM",
+          "odds": 995
+        }
+      ]
     }
   ],
   "gameData": {
