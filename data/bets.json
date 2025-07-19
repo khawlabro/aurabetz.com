@@ -433,6 +433,37 @@
           "odds": 995
         }
       ]
+    },
+{
+      "id": 4,
+      "sport": "UFC",
+      "event": "Carli Judice vs Nicolle Caliari",
+      "time": "2025-07-24T00:00:00Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Carli Judice",
+        "odds": -400,
+        "probability": 0.7,
+        "value": 0.05,
+        "confidence": "Medium"
+      },
+      "otherBets": [],
+      "analysis": "Judice’s high striking volume (11.18 vs. 3.85 strikes/min), 70% takedown defense, and home advantage in New Orleans give her a clear edge in a stand-up fight. Her recent head-kick KO vs. Duben highlights her finishing power and resilience. Caliari’s grappling (1.5 submission attempts per 15 minutes, 3/8 wins by submission) and endurance make her a threat if the fight goes to the mat or later rounds, but her lower striking output and recent loss reduce her chances.",
+      "aiReasoning": "Judice’s home advantage and recent KO give her a psychological edge, but Caliari’s submission threat in scrambles could shift momentum, a factor casual bettors might ignore.\n\nOther bets: Judice by decision 1.8 odds",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -400
+        },
+        {
+          "name": "FanDuel",
+          "odds": -395
+        },
+        {
+          "name": "BetMGM",
+          "odds": -405
+        }
+      ]
     }
   ],
   "gameData": {
