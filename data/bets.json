@@ -464,37 +464,6 @@
           "odds": -405
         }
       ]
-    },
-{
-      "id": 16,
-      "sport": "UFC",
-      "event": "Kevin Holland vs Daniel Rodruiguez",
-      "time": "2025-07-19T23:03:45Z",
-      "mainBet": {
-        "type": "Moneyline",
-        "pick": "Kevin Holland",
-        "odds": -560,
-        "probability": 0.8,
-        "value": 0.12,
-        "confidence": "High"
-      },
-      "otherBets": [],
-      "analysis": "Predicted Winner: Kevin Holland, with a 70-75% probability of defeating Daniel Rodriguez.\nAI Reasoning: Holland’s 7” reach advantage, versatile striking (4.24 strikes/min, 50% accuracy), and grappling (9 submission wins, 0.6 attempts/15 min) give him multiple paths to victory against Rodriguez’s high-volume striking (7.39 strikes/min) and weak grappling (0.1 attempts/15 min)",
-      "aiReasoning": "Predicted Winner: Kevin Holland, with a 70-75% probability of defeating Daniel Rodriguez.\nAI Reasoning: Holland’s 7” reach advantage, versatile striking (4.24 strikes/min, 50% accuracy), and grappling (9 submission wins, 0.6 attempts/15 min) give him multiple paths to victory against Rodriguez’s high-volume striking (7.39 strikes/min) and weak grappling (0.1 attempts/15 min)",
-      "sportsbooks": [
-        {
-          "name": "DraftKings",
-          "odds": -560
-        },
-        {
-          "name": "FanDuel",
-          "odds": -555
-        },
-        {
-          "name": "BetMGM",
-          "odds": -565
-        }
-      ]
     }
   ],
   "gameData": {
