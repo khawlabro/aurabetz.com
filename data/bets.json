@@ -464,6 +464,37 @@
           "odds": -405
         }
       ]
+    },
+{
+      "id": 16,
+      "sport": "UFC",
+      "event": "Roman Kopylov vs Paulo Costa",
+      "time": "2025-07-20T03:33:25Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Roman Kopylov",
+        "odds": -200,
+        "probability": 0.65,
+        "value": 0.16,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "Predicted Winner: Roman Kopylov, with a 60-65% probability of defeating Paulo Costa.\nAI Reasoning: Kopylov’s technical striking (4.96 strikes/min, 50% accuracy), strong takedown defense (87%), and recent momentum (6-1, 5 KO/TKO wins) give him an edge over Costa, who is hindered by a 1-4 skid, defensive lapses (6.56 strikes absorbed/min), and a 13-month layoff.",
+      "aiReasoning": "",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -200
+        },
+        {
+          "name": "FanDuel",
+          "odds": -195
+        },
+        {
+          "name": "BetMGM",
+          "odds": -205
+        }
+      ]
     }
   ],
   "gameData": {
