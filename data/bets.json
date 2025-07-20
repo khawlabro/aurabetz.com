@@ -406,7 +406,7 @@
 {
       "id": 14,
       "sport": "UFC",
-      "event": "Ryan Spann vs Lukasz Brzeski",
+      "event": "(COMPLETED - LOSS) Ryan Spann vs Lukasz Brzeski",
       "time": "2025-07-19T22:00:00Z",
       "mainBet": {
         "type": "ROUND BETTING",
@@ -468,7 +468,7 @@
 {
       "id": 16,
       "sport": "UFC",
-      "event": "Roman Kopylov vs Paulo Costa",
+      "event": "(COMPLETED - LOSS) Roman Kopylov vs Paulo Costa",
       "time": "2025-07-20T03:33:25Z",
       "mainBet": {
         "type": "Moneyline",
