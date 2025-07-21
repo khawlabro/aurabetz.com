@@ -284,6 +284,19 @@ class BetSmartApp {
 
     render() {
         this.renderBets(this.filterAndSortBets());
+        this.renderWinLossCounter();
+    }
+
+    renderWinLossCounter() {
+        const wins = this.bets.filter(bet => bet.event.toUpperCase().includes('WON')).length;
+        const losses = this.bets.filter(bet => bet.event.toUpperCase().includes('LOSS')).length;
+
+        const counterElement = document.getElementById('winLossCounter');
+        if (counterElement) {
+            counterElement.innerHTML = `
+                <span class="win-count">${wins} W</span> / <span class="loss-count">${losses} L</span>
+            `;
+        }
     }
 
     setupEventListeners() {
