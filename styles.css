@@ -126,6 +126,25 @@ a:hover {
     color: var(--gray-300);
 }
 
+.win-loss-counter {
+    font-family: 'MedievalSharp', cursive;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-top: var(--space-lg);
+    color: var(--gray-400);
+}
+
+.win-loss-counter .win-count {
+    color: var(--secondary);
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
+}
+
+.win-loss-counter .loss-count {
+    color: var(--danger);
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
+}
+
+
 /* Utility Classes */
 .flex {
     display: flex;
