@@ -444,6 +444,12 @@ class BetSmartApp {
         const card = document.createElement('div');
         card.className = 'bet-card';
         card.setAttribute('data-bet-id', bet.id);
+
+        if (bet.event.toUpperCase().includes('WON')) {
+            card.classList.add('bet-card-won');
+        } else if (bet.event.toUpperCase().includes('LOSS')) {
+            card.classList.add('bet-card-loss');
+        }
         
         card.innerHTML = `
             <div class="bet-card-content">
