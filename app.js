@@ -445,10 +445,13 @@ class BetSmartApp {
         card.className = 'bet-card';
         card.setAttribute('data-bet-id', bet.id);
 
+        let eventTitle = bet.event;
         if (bet.event.toUpperCase().includes('WON')) {
             card.classList.add('bet-card-won');
+            eventTitle = eventTitle.replace(/\(COMPLETED - WON\)/ig, '').trim();
         } else if (bet.event.toUpperCase().includes('LOSS')) {
             card.classList.add('bet-card-loss');
+            eventTitle = eventTitle.replace(/\(COMPLETED - LOSS\)/ig, '').trim();
         }
         
         card.innerHTML = `
@@ -460,7 +463,7 @@ class BetSmartApp {
                     <span class="bet-sport">${bet.sport || 'Unknown Sport'}</span>
                     <span class="bet-time">${this.formatDate(bet.time)}</span>
                 </div>
-                <h3 class="bet-title">${bet.event}</h3>
+                <h3 class="bet-title">${eventTitle}</h3>
                 <div class="bet-main">
                     <div class="bet-type-row">
                         <span class="bet-type">${bet.mainBet.type || 'Unknown Type'}</span>
