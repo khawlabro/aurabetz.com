@@ -558,65 +558,48 @@ class BetSmartApp {
         const confidenceBadgeClass = this.getConfidenceBadgeClass(bet.mainBet.confidence || "Medium");
 
         modalContent.innerHTML = `
-            <div class="modal-section">
-                <div class="modal-header-row">
-                    <div class="bet-meta">
-                        <span class="modal-sport">${bet.sport || 'Unknown Sport'}</span>
-                        <span class="modal-time">${this.formatDate(bet.time)}</span>
+            <div class="modal-top-info">
+                <span class="modal-sport">${bet.sport || 'Unknown Sport'}</span>
+                <span class="modal-time">${this.formatDate(bet.time)}</span>
+                <span class="modal-confidence ${confidenceBadgeClass}">${bet.mainBet.confidence || 'Medium'} Confidence</span>
+            </div>
+
+            <div class="modal-main-grid">
+                <div class="modal-main-bet-col">
+                    <h3 class="modal-subtitle">Main Bet</h3>
+                    <div class="main-bet-box">
+                        <div class="main-bet-type">${bet.mainBet.type || 'Unknown Type'}</div>
+                        <div class="main-bet-pick">${bet.mainBet.pick}</div>
+                        <div class="main-bet-odds">${this.formatAmericanOdds(bet.mainBet.odds)}</div>
+                        ${bet.mainBet.probability ? `
+                        <div class="implied-prob">
+                            Implied Probability: ${(bet.mainBet.probability * 100).toFixed(0)}%
+                        </div>` : ''}
                     </div>
-                    <span class="modal-confidence ${confidenceBadgeClass}">${bet.mainBet.confidence || 'Medium'} Confidence</span>
                 </div>
-                
-                <div class="main-bet-highlight">
-                    <div class="bet-meta-row">
-                        <span class="bet-type-label">${bet.mainBet.type || 'Unknown Type'}</span>
-                        ${bet.mainBet.value ? `<span class="value-badge ${this.getValueClass(bet.mainBet.value)}">Value: ${(bet.mainBet.value * 100).toFixed(0)}%</span>` : ''}
+                <div class="modal-analysis-col">
+                    <h3 class="modal-subtitle">Analysis</h3>
+                    <div class="analysis-container">
+                        <p>${bet.analysis || 'No analysis available.'}</p>
+                        ${bet.aiReasoning ? `<p><strong>AI Reasoning:</strong> ${bet.aiReasoning}</p>` : ''}
                     </div>
-                    <div class="bet-selection-row">
-                        <div class="bet-pick">${bet.mainBet.pick}</div>
-                        ${bet.mainBet.odds ? `<div class="bet-odds ${this.getValueClass(bet.mainBet.value || 0)}">${this.formatAmericanOdds(bet.mainBet.odds)}</div>` : ''}
-                    </div>
-                    ${bet.mainBet.probability ? `
-                    <div class="implied-prob">
-                        Implied Probability: ${(bet.mainBet.probability * 100).toFixed(0)}%
-                    </div>` : ''}
                 </div>
             </div>
 
-            <div class="modal-grid">
-                <div class="modal-column">
+            <div class="modal-secondary-grid">
+                <div class="modal-secondary-col">
                     <h3 class="modal-subtitle">Other Opportunities</h3>
                     <div class="other-bets-container">
                         ${otherBetsHtml}
                     </div>
                 </div>
-                
-                <div class="modal-column">
+                <div class="modal-secondary-col">
                     <h3 class="modal-subtitle">Odds Comparison</h3>
                     <div class="odds-comparison-container">
                         ${sportsBookComparison}
                     </div>
                 </div>
             </div>
-            
-            ${bet.analysis ? `
-            <div class="modal-section">
-                <h3 class="modal-subtitle">Summary</h3>
-                <div class="analysis-container">
-                    <p>${bet.analysis}</p>
-                </div>
-            </div>` : ''}
-            
-            ${bet.aiReasoning ? `
-            <div class="modal-section">
-                <h3 class="modal-subtitle ai-title">
-                    <i class="fas fa-brain text-primary"></i>
-                    AI Analysis
-                </h3>
-                <div class="ai-analysis-container">
-                    <p>${bet.aiReasoning}</p>
-                </div>
-            </div>` : ''}
         `;
         
         document.getElementById('detailModal')?.classList.add('active');
