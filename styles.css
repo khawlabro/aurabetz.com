@@ -635,6 +635,89 @@ input[type="checkbox"] {
     padding: var(--space-lg);
 }
 
+.modal-top-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.dark .modal-top-info {
+    border-bottom-color: var(--gray-700);
+}
+
+.modal-main-grid, .modal-secondary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-xl);
+    margin-bottom: var(--space-lg);
+}
+
+.modal-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: var(--space-md);
+}
+
+.main-bet-box {
+    background-color: var(--gray-100);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    text-align: center;
+}
+
+.dark .main-bet-box {
+    background-color: var(--gray-700);
+}
+
+.main-bet-type {
+    font-size: 1rem;
+    color: var(--gray-600);
+    margin-bottom: var(--space-sm);
+}
+
+.dark .main-bet-type {
+    color: var(--gray-400);
+}
+
+.main-bet-pick {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: var(--space-sm);
+}
+
+.dark .main-bet-pick {
+    color: var(--white);
+}
+
+.main-bet-odds {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: var(--space-md);
+}
+
+.implied-prob {
+    font-size: 0.9rem;
+    color: var(--gray-500);
+}
+
+.dark .implied-prob {
+    color: var(--gray-400);
+}
+
+.analysis-container, .other-bets-container, .odds-comparison-container {
+    background-color: var(--gray-100);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+}
+
+.dark .analysis-container, .dark .other-bets-container, .dark .odds-comparison-container {
+    background-color: var(--gray-700);
+}
+
 /* Game Modal Specific Styles */
 .grid {
     display: grid;
