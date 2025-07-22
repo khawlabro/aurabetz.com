@@ -557,6 +557,37 @@
           "odds": -405
         }
       ]
+    },
+{
+      "id": 19,
+      "sport": "Table Tennis",
+      "event": "Miroslav Sklensky vs Michal Malachowski",
+      "time": "2025-07-22T03:30:46.000Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Miroslav Sklensky",
+        "odds": -333,
+        "probability": 0.75,
+        "value": 0.15,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "Sklensky’s 7-2 head-to-head record, including a 3-0 win on May 26, 2025, and technical style (~60% set-win rate) dominate Malachowski’s aggressive but inconsistent play (40% win rate).",
+      "aiReasoning": "Sklensky’s 60% win rate and ~60% set-win rate outpace Malachowski’s 40% win rate and ~50% set-win rate, but Malachowski’s recent 3-2 win over Czerwinski suggests momentum, often missed by bettors",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -333
+        },
+        {
+          "name": "FanDuel",
+          "odds": -328
+        },
+        {
+          "name": "BetMGM",
+          "odds": -338
+        }
+      ]
     }
   ],
   "gameData": {
