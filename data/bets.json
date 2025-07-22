@@ -588,6 +588,37 @@
           "odds": -338
         }
       ]
+    },
+{
+      "id": 20,
+      "sport": "Table Tennis",
+      "event": "Adrian Spychala vs Frantisek Krcil",
+      "time": "2025-07-22T16:20:54.000Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Adrian Spychala",
+        "odds": -200,
+        "probability": 0.65,
+        "value": 0.19,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "Spychala’s 35-24 head-to-head record, including a 3-1 win on April 1, 2025, and aggressive style (~55% set-win rate) dominate Krcil’s defensive but inconsistent play (40% win rate).",
+      "aiReasoning": "Intuitively, Spychala’s aggressive, high-energy style aligns with his H2H dominance and recent form, giving him a psychological edge. Krcil’s defensive, steady energy could prolong rallies and push sets to deuce, supporting his +AV as an underdog",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -200
+        },
+        {
+          "name": "FanDuel",
+          "odds": -195
+        },
+        {
+          "name": "BetMGM",
+          "odds": -205
+        }
+      ]
     }
   ],
   "gameData": {
