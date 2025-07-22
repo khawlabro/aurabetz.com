@@ -526,6 +526,37 @@
           "odds": -338
         }
       ]
+    },
+{
+      "id": 4,
+      "sport": "Table Tennis",
+      "event": "Jan Pleskot vs Vaclav Hruska",
+      "time": "2025-07-22T01:30:27.000Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Jan Pleskot",
+        "odds": -400,
+        "probability": 0.8,
+        "value": 0.18,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "Predicted Winner: Jan Pleskot, with a 75-80% probability of defeating Vaclav Hruska.\nAI Reasoning: Pleskot’s 39-12 head-to-head record, 80% recent win rate, and aggressive style (~65% set-win rate) dominate Hruska’s defensive approach and 40% win rate.",
+      "aiReasoning": ".",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -400
+        },
+        {
+          "name": "FanDuel",
+          "odds": -395
+        },
+        {
+          "name": "BetMGM",
+          "odds": -405
+        }
+      ]
     }
   ],
   "gameData": {
