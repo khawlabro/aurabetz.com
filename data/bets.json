@@ -619,6 +619,37 @@
           "odds": -205
         }
       ]
+    },
+{
+      "id": 4,
+      "sport": "Table Tennis",
+      "event": "S.F. Goh / N. Izzuddin vs M. H. Kang / D. J. Ki",
+      "time": "2025-07-23T01:16:00.100Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "S.F. Goh / N. Izzuddin",
+        "odds": -400,
+        "probability": 0.6,
+        "value": 0.12,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "S.F. Goh / N. Izzuddin have a slight edge due to their No. 2 world ranking, recent 2025 India Open title, and a head-to-head win over Kang / Ki. Their experience and consistency, particularly Izzuddin’s defensive play and Goh’s attacking prowess, are likely to prevail against the rising but less seasoned Kang / Ki duo. While Kang / Ki’s power and speed pose a threat, their relative inexperience at this level suggests they may struggle to match the Malaysians’ tactical depth in a best-of-three match.",
+      "aiReasoning": ".",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -400
+        },
+        {
+          "name": "FanDuel",
+          "odds": -395
+        },
+        {
+          "name": "BetMGM",
+          "odds": -405
+        }
+      ]
     }
   ],
   "gameData": {
