@@ -619,6 +619,37 @@
           "odds": -205
         }
       ]
+    },
+{
+      "id": 4,
+      "sport": "Table Tennis",
+      "event": "LIVE BET Luis Guto Miguel vs Enzo Kohlmann de Freitas",
+      "time": "2025-07-23T02:24:00.000Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Luis Guto Miguel",
+        "odds": -333,
+        "probability": 0.75,
+        "value": 0.15,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "Miguel’s Grand Slam experience and home advantage (São Paulo) make him a threat, especially if Freitas underperforms.",
+      "aiReasoning": "",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -333
+        },
+        {
+          "name": "FanDuel",
+          "odds": -328
+        },
+        {
+          "name": "BetMGM",
+          "odds": -338
+        }
+      ]
     }
   ],
   "gameData": {
