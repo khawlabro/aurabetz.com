@@ -650,6 +650,37 @@
           "odds": -338
         }
       ]
+    },
+{
+      "id": 22,
+      "sport": "UFC",
+      "event": "Petr Yan vs Marcus McGhee",
+      "time": "2025-07-26T20:19:21.272Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Petr Yan",
+        "odds": -370,
+        "probability": 0.76,
+        "value": 0.14,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": ".",
+      "aiReasoning": "Ranked highest due to Yan’s higher Total Discrepancy Score (15.4 vs. 12.6), reflecting advantages in previous opponent strength (+16%), cardio endurance (+10%), recent win streak momentum (+10%), defensive resilience (+8%), post-loss adaptation (+8%), and fight-specific stylistic matchup (+8%). His elite experience against top-5 fighters (Figueiredo, Yadong) and takedown proficiency (1.61/15 min) give him multiple paths to victory, likely via decision, as predicted by Covers.com and HeraldNews.com. Despite McGhee’s early aggression, Yan’s fight IQ and ability to adapt mid-fight (noted in MMAmania.com) make him the safer bet, even at -350 odds.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -370
+        },
+        {
+          "name": "FanDuel",
+          "odds": -365
+        },
+        {
+          "name": "BetMGM",
+          "odds": -375
+        }
+      ]
     }
   ],
   "gameData": {
