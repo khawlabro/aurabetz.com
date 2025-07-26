@@ -650,37 +650,6 @@
           "odds": -338
         }
       ]
-    },
-{
-      "id": 22,
-      "sport": "UFC",
-      "event": "Asu Almabayev vs Jose Ochoa",
-      "time": "2025-07-26T19:26:59.742Z",
-      "mainBet": {
-        "type": "Moneyline",
-        "pick": "Jose Ochoa",
-        "odds": -111,
-        "probability": 0.48,
-        "value": 0.15,
-        "confidence": "High"
-      },
-      "otherBets": [],
-      "analysis": "Ranked highest due to Ochoa’s higher Total Discrepancy Score (11.8 vs. 10.2), reflecting advantages in finish rate momentum (+8%), southpaw stance (+6%), striking speed and volume (+5%), underdog mentality (+5%), and ground-and-pound potential. His recent KO over Cody Durden and Chute Boxe training enhance his finishing threat. Despite Almabayev’s wrestling edge, Ochoa’s anti-wrestling tools (noted in X posts) and early aggression make him a strong value bet at near-even odds (-103).",
-      "aiReasoning": ".",
-      "sportsbooks": [
-        {
-          "name": "DraftKings",
-          "odds": -111
-        },
-        {
-          "name": "FanDuel",
-          "odds": -106
-        },
-        {
-          "name": "BetMGM",
-          "odds": -116
-        }
-      ]
     }
   ],
   "gameData": {
