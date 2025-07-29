@@ -681,6 +681,37 @@
           "odds": -375
         }
       ]
+    },
+{
+      "id": 23,
+      "sport": "Table Tennis",
+      "event": "Adrian Spychala vs Jakub Kwapis",
+      "time": "2025-07-29T04:23:16.999Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Jakub Kwapis",
+        "odds": -154,
+        "probability": 0.61,
+        "value": 0.25,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": ".",
+      "aiReasoning": "Jakub Kwapis to win (AURAVALUE 1.0533). Offers the best value due to higher probability (61.41%) and strong discrepancy scores.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -154
+        },
+        {
+          "name": "FanDuel",
+          "odds": -149
+        },
+        {
+          "name": "BetMGM",
+          "odds": -159
+        }
+      ]
     }
   ],
   "gameData": {
