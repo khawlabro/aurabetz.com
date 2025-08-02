@@ -712,6 +712,37 @@
           "odds": -159
         }
       ]
+    },
+{
+      "id": 24,
+      "sport": "Table Tennis",
+      "event": "Dariusz Wrobel vs Jacek Przewloski",
+      "time": "2025-08-02T06:22:00.738Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Dariusz Wrobel",
+        "odds": -278,
+        "probability": 0.77,
+        "value": 0.16,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "Dariusz Wrobel to win (AURAVALUE 1.1926). Offers the best value due to high probability, strong form, and superior discrepancy scores in key areas like Serve Effectiveness and Tactical Combinations.",
+      "aiReasoning": "Dariusz Wrobel to win (AURAVALUE 1.1926). High probability (77.03%), recent form (web:8,16), and strong discrepancy scores make this the safest bet. However, monitor for signs of fatigue or tactical weaknesses, as David’s loss showed favorites can falter.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -278
+        },
+        {
+          "name": "FanDuel",
+          "odds": -273
+        },
+        {
+          "name": "BetMGM",
+          "odds": -283
+        }
+      ]
     }
   ],
   "gameData": {
@@ -751,3 +782,4 @@
     "version": "2.0"
   }
 }
+
