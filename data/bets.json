@@ -743,6 +743,37 @@
           "odds": -283
         }
       ]
+    },
+{
+      "id": 25,
+      "sport": "UFC",
+      "event": "Iasmin Lucindo vs Angela Hill",
+      "time": "2025-08-09T23:36:00.061Z",
+      "mainBet": {
+        "type": "Moneyline",
+        "pick": "Iasmin Lucindo",
+        "odds": -163,
+        "probability": 0.7,
+        "value": 20,
+        "confidence": "High"
+      },
+      "otherBets": [],
+      "analysis": "Lucindo’s youth and grappling give her the edge. She’s likely to pursue takedowns early, control Hill on the ground, and either secure a submission or dominate with ground-and-pound for a decision. Hill’s striking could win her rounds if she keeps the fight standing, but Lucindo’s momentum and ranking (#9 vs. Hill’s #13) suggest she’s the favorite for a reason.",
+      "aiReasoning": "Iasmin Lucindo via unanimous decision (60% probability). There’s a 25% chance of a submission win for Lucindo and a 15% chance Hill pulls off an upset via decision with her striking.",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": -163
+        },
+        {
+          "name": "FanDuel",
+          "odds": -158
+        },
+        {
+          "name": "BetMGM",
+          "odds": -168
+        }
+      ]
     }
   ],
   "gameData": {
@@ -782,5 +813,6 @@
     "version": "2.0"
   }
 }
+
 
 
