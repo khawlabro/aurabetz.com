@@ -747,7 +747,7 @@
 {
       "id": 25,
       "sport": "UFC",
-      "event": "Iasmin Lucindo vs Angela Hill",
+      "event": "(COMPLETED - WON) Iasmin Lucindo vs Angela Hill",
       "time": "2025-08-09T23:36:00.061Z",
       "mainBet": {
         "type": "Moneyline",
@@ -813,6 +813,7 @@
     "version": "2.0"
   }
 }
+
 
 
 
