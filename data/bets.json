@@ -774,6 +774,37 @@
           "odds": -168
         }
       ]
+    },
+{
+      "id": 26,
+      "sport": "UFC",
+      "event": "UFC 319",
+      "time": "2025-08-16T11:47:39.587Z",
+      "mainBet": {
+        "type": "PARLAY 1 & 2",
+        "pick": "3 favorites 1 underdog",
+        "odds": 356,
+        "probability": 0.1,
+        "value": 0.25,
+        "confidence": "Low"
+      },
+      "otherBets": [],
+      "analysis": "Main Parlay - K. Asakura | A. Idris | C. Hooper | J. Andrade = +356 Odds \n\nOPTIONAL:\nUP FOR CHANGE: J. Andrade to L. Godinez \nUP FOR CHANGE: K. Asakura to T. Elliott",
+      "aiReasoning": ".",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": 356
+        },
+        {
+          "name": "FanDuel",
+          "odds": 361
+        },
+        {
+          "name": "BetMGM",
+          "odds": 351
+        }
+      ]
     }
   ],
   "gameData": {
@@ -813,6 +844,7 @@
     "version": "2.0"
   }
 }
+
 
 
 
