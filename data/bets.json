@@ -836,6 +836,37 @@
           "odds": 192
         }
       ]
+    },
+{
+      "id": 28,
+      "sport": "UFC",
+      "event": "UFC 319 HIGHROLLER",
+      "time": "2025-08-16T11:47:39.587Z",
+      "mainBet": {
+        "type": "BIG PARLAY 9-10x",
+        "pick": "DRICUS DU PLESSIS",
+        "odds": 2400,
+        "probability": 0.02,
+        "value": 10,
+        "confidence": "Low"
+      },
+      "otherBets": [],
+      "analysis": "Main Parlay - D. Klose | C. Hooper | M. Olekseijczuk | C. Prates | M. Page | D. Du Plessis",
+      "aiReasoning": "Up For Change or Removal: M. Page | M. Olekseijczuk",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": 2400
+        },
+        {
+          "name": "FanDuel",
+          "odds": 2405
+        },
+        {
+          "name": "BetMGM",
+          "odds": 2395
+        }
+      ]
     }
   ],
   "gameData": {
@@ -875,6 +906,7 @@
     "version": "2.0"
   }
 }
+
 
 
 
