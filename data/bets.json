@@ -784,7 +784,7 @@
         "type": "PARLAY 1 & 2",
         "pick": "3 favorites 1 underdog",
         "odds": 356,
-        "probability": 0.1,
+        "probability": 0.05,
         "value": 0.25,
         "confidence": "Low"
       },
@@ -844,6 +844,7 @@
     "version": "2.0"
   }
 }
+
 
 
 
