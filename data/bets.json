@@ -781,7 +781,7 @@
       "event": "UFC 319",
       "time": "2025-08-16T11:47:39.587Z",
       "mainBet": {
-        "type": "PARLAY 1 & 2",
+        "type": "PARLAY 1",
         "pick": "3 favorites 1 underdog",
         "odds": 356,
         "probability": 0.05,
@@ -803,6 +803,37 @@
         {
           "name": "BetMGM",
           "odds": 351
+        }
+      ]
+    },
+{
+      "id": 27,
+      "sport": "UFC",
+      "event": "UFC 319",
+      "time": "2025-08-16T11:47:39.587Z",
+      "mainBet": {
+        "type": "PARLAY 2 & 3",
+        "pick": "1 favorite 1 underdog",
+        "odds": 197,
+        "probability": 0.07,
+        "value": 0.12,
+        "confidence": "Low"
+      },
+      "otherBets": [],
+      "analysis": "Main Parlay - Jared Cannonier | Baysangur Susurkaev \n\n\nSecondary Parlay - Geoff Neal | Baysangur Susurkaev",
+      "aiReasoning": ".",
+      "sportsbooks": [
+        {
+          "name": "DraftKings",
+          "odds": 197
+        },
+        {
+          "name": "FanDuel",
+          "odds": 202
+        },
+        {
+          "name": "BetMGM",
+          "odds": 192
         }
       ]
     }
@@ -844,6 +875,7 @@
     "version": "2.0"
   }
 }
+
 
 
 
