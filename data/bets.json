@@ -778,7 +778,7 @@
 {
       "id": 26,
       "sport": "UFC",
-      "event": "(LOSS Not Counted Due To Parlay) UFC 319",
+      "event": "(Not Counted Due To Parlay) UFC 319",
       "time": "2025-08-16T11:47:39.587Z",
       "mainBet": {
         "type": "PARLAY 1",
@@ -809,7 +809,7 @@
 {
       "id": 27,
       "sport": "UFC",
-      "event": "(LOSS Not Counted Due To Parlay) UFC 319",
+      "event": "(Not Counted Due To Parlay) UFC 319",
       "time": "2025-08-16T11:47:39.587Z",
       "mainBet": {
         "type": "PARLAY 2 & 3",
@@ -840,7 +840,7 @@
 {
       "id": 28,
       "sport": "UFC",
-      "event": "(LOSS Not Counted Due To Parlay) UFC 319 HIGHROLLER",
+      "event": "(Not Counted Due To Parlay) UFC 319 HIGHROLLER",
       "time": "2025-08-16T11:47:39.587Z",
       "mainBet": {
         "type": "BIG PARLAY 9-10x",
@@ -906,6 +906,7 @@
     "version": "2.0"
   }
 }
+
 
 
 
