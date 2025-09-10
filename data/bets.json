@@ -774,38 +774,7 @@
           "odds": -168
         }
       ]
-    },
-{
-      "id": 26,
-      "sport": "unknown",
-      "event": "coming soon",
-      "time": "",
-      "mainBet": {
-        "type": "",
-        "pick": "",
-        "odds": ,
-        "probability": ,
-        "value": ,
-        "confidence": ""
-      },
-      "otherBets": [],
-      "analysis": "": ".",
-      "sportsbooks": [
-        {
-          "name": "DraftKings",
-          "odds": 
-        },
-        {
-          "name": "FanDuel",
-          "odds": 
-        },
-        {
-          "name": "BetMGM",
-          "odds": 
-        }
-      ]
-    },
-
+    }
   ],
   "gameData": {
     "currentDay": 2,
@@ -844,6 +813,7 @@
     "version": "2.0"
   }
 }
+
 
 
 
