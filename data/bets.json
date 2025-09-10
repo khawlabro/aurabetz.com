@@ -777,97 +777,35 @@
     },
 {
       "id": 26,
-      "sport": "UFC",
-      "event": "(Not Counted Due To Parlay) UFC 319",
-      "time": "2025-08-16T11:47:39.587Z",
+      "sport": "unknown",
+      "event": "coming soon",
+      "time": "",
       "mainBet": {
-        "type": "PARLAY 1",
-        "pick": "3 favorites 1 underdog",
-        "odds": 356,
-        "probability": 0.05,
-        "value": 0.25,
-        "confidence": "Low"
+        "type": "",
+        "pick": "",
+        "odds": ,
+        "probability": ,
+        "value": ,
+        "confidence": ""
       },
       "otherBets": [],
-      "analysis": "Main Parlay - K. Asakura | A. Idris | C. Hooper | J. Andrade = +356 Odds \n\nOPTIONAL:\nUP FOR CHANGE: J. Andrade to L. Godinez \nUP FOR CHANGE: K. Asakura to T. Elliott",
-      "aiReasoning": ".",
+      "analysis": "": ".",
       "sportsbooks": [
         {
           "name": "DraftKings",
-          "odds": 356
+          "odds": 
         },
         {
           "name": "FanDuel",
-          "odds": 361
+          "odds": 
         },
         {
           "name": "BetMGM",
-          "odds": 351
+          "odds": 
         }
       ]
     },
-{
-      "id": 27,
-      "sport": "UFC",
-      "event": "(Not Counted Due To Parlay) UFC 319",
-      "time": "2025-08-16T11:47:39.587Z",
-      "mainBet": {
-        "type": "PARLAY 2 & 3",
-        "pick": "1 favorite 1 underdog",
-        "odds": 197,
-        "probability": 0.07,
-        "value": 0.12,
-        "confidence": "Low"
-      },
-      "otherBets": [],
-      "analysis": "Main Parlay - Jared Cannonier | Baysangur Susurkaev \n\n\nSecondary Parlay - Geoff Neal | Baysangur Susurkaev",
-      "aiReasoning": ".",
-      "sportsbooks": [
-        {
-          "name": "DraftKings",
-          "odds": 197
-        },
-        {
-          "name": "FanDuel",
-          "odds": 202
-        },
-        {
-          "name": "BetMGM",
-          "odds": 192
-        }
-      ]
-    },
-{
-      "id": 28,
-      "sport": "UFC",
-      "event": "(Not Counted Due To Parlay) UFC 319 HIGHROLLER",
-      "time": "2025-08-16T11:47:39.587Z",
-      "mainBet": {
-        "type": "BIG PARLAY 9-10x",
-        "pick": "DRICUS DU PLESSIS",
-        "odds": 2400,
-        "probability": 0.02,
-        "value": 10,
-        "confidence": "Low"
-      },
-      "otherBets": [],
-      "analysis": "Main Parlay - D. Klose | C. Hooper | M. Olekseijczuk | C. Prates | M. Page | D. Du Plessis",
-      "aiReasoning": "Up For Change or Removal: M. Page | M. Olekseijczuk",
-      "sportsbooks": [
-        {
-          "name": "DraftKings",
-          "odds": 2400
-        },
-        {
-          "name": "FanDuel",
-          "odds": 2405
-        },
-        {
-          "name": "BetMGM",
-          "odds": 2395
-        }
-      ]
-    }
+
   ],
   "gameData": {
     "currentDay": 2,
@@ -906,6 +844,7 @@
     "version": "2.0"
   }
 }
+
 
 
 
